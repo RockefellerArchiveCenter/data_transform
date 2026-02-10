@@ -14,8 +14,8 @@ jobs:
 
     env:
       LAMBDA_NAME: deployment_updates
-      LAMBDA_HANDLER_CODE: src/data_transform.py
-      BASENAME: data_transform.py
+      LAMBDA_HANDLER_CODE: src/transformers.py
+      BASENAME: transformers.py
 
     steps:
       - name: Checkout code
