@@ -32,11 +32,10 @@ def env_list(name):
 AUDIO_REFS = env_list("AUDIO_REFS")
 MOVING_IMAGE_REFS = env_list("MOVING_IMAGE_REFS")
 PHOTOGRAPH_REFS = env_list("PHOTOGRAPH_REFS")
-# Lambda environment variable.
 ASSET_BASEURL = os.environ.get("ASSET_BASEURL", "").rstrip("/")
 
 def identifier_from_uri(uri):
-    """Extract the terminal identifier from a URI."""
+    """Extract the identifier from a URI."""
     if not uri:
         return ""
     try:
@@ -50,7 +49,7 @@ def identifier_from_uri(uri):
 
 
 def generate_manifest_identifier(source, digital_object):
-    """Generate a stable manifest identifier derived from a digital object (preferred) or source URI."""
+    """Generate a manifest identifier derived from a digital object or source URI."""
     uri = None
     if isinstance(digital_object, dict):
         uri = digital_object.get("uri") or digital_object.get("ref")
@@ -61,7 +60,7 @@ def generate_manifest_identifier(source, digital_object):
 
 
 def generate_download_identifier(source, digital_object):
-    """Generate a stable download identifier derived from a digital object (preferred) or source URI."""
+    """Generate a download identifier derived from a digital object or source URI."""
     uri = None
     if isinstance(digital_object, dict):
         uri = digital_object.get("uri") or digital_object.get("ref")
@@ -87,12 +86,14 @@ def convert_dates(value):
 
 
 def has_online_asset(identifier):
+    """Checks if there is already an online PDF."""
     if not ASSET_BASEURL:
         return False
     req = requests.head("{}/pdfs/{}".format(ASSET_BASEURL.rstrip("/"), identifier))
     return True if req.status_code == 200 else False
 
 def has_online_instance(instances, uri):
+    """Checks to see if there are digital objects."""
     try:
         digital_instances = [v for v in instances if v.instance_type == "digital_object"]
     except AttributeError:
@@ -115,6 +116,7 @@ def strip_tags(user_string):
 
 
 def transform_language(value, lang_materials):
+    """Checks for language info and transforms to to structured types."""
     langz = []
     if value:
         lang_data = languages.get(part2b=value)
@@ -126,6 +128,7 @@ def transform_language(value, lang_materials):
 
 
 def transform_formats(instances, subjects, ancestors):
+    """Transforms the format info from subject data."""
     ancestor_subjects = []
     for a in ancestors:
         if a.subjects:
@@ -142,6 +145,7 @@ def transform_formats(instances, subjects, ancestors):
 
 
 def transform_group(value, prefix):
+    """Makes a source group from the identifier URI."""
     group = SourceGroupToGroup.apply(value)
     group.identifier = "/{}/{}".format(prefix, identifier_from_uri(value.identifier))
     return group

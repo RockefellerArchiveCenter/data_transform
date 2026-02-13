@@ -27,17 +27,15 @@ from .resources.source import (
 )
 
 
-# Environment variables
+# Environment variables. This is a work in progress. I'm guessing these should be SSM params.
 SUCCESS_TOPIC_ARN = os.environ.get("SUCCESS_TOPIC_ARN", "")
 FAILURE_TOPIC_ARN = os.environ.get("FAILURE_TOPIC_ARN", "")
-
 SCHEMAS_BASE_DIR = os.environ.get("SCHEMAS_BASE_DIR", "").rstrip("/")
 SCHEMA_AGENT = os.environ.get("SCHEMA_AGENT", "")
 SCHEMA_COLLECTION = os.environ.get("SCHEMA_COLLECTION", "")
 SCHEMA_OBJECT = os.environ.get("SCHEMA_OBJECT", "")
 SCHEMA_TERM = os.environ.get("SCHEMA_TERM", "")
 SCHEMA_BASE = os.environ.get("SCHEMA_BASE")  # optional
-
 SSM_PREFIX = os.environ.get("SSM_PREFIX", "").rstrip("/")
 
 sns = boto3.client("sns")
@@ -52,7 +50,7 @@ class TransformError(Exception):
 def require_env():
     """Validate required environment variables."""
     missing = []
-    for k, v in [
+    for item, variables in [
         ("SUCCESS_TOPIC_ARN", SUCCESS_TOPIC_ARN),
         ("FAILURE_TOPIC_ARN", FAILURE_TOPIC_ARN),
         ("SCHEMAS_BASE_DIR", SCHEMAS_BASE_DIR),
@@ -61,7 +59,7 @@ def require_env():
         ("SCHEMA_OBJECT", SCHEMA_OBJECT),
         ("SCHEMA_TERM", SCHEMA_TERM),
     ]:
-        if not v:
+        if not variable:
             missing.append(k)
     if missing:
         raise ValueError("Missing required environment variables: " + ", ".join(missing))
@@ -78,8 +76,6 @@ def publish(topic_arn, payload, subject=None):
 def ssm_get(name, decrypt=True):
     """
     Fetch a value from SSM Parameter Store under SSM_PREFIX.
-
-    This is present for future use. Delete if you won't use secrets.
     """
     if not SSM_PREFIX:
         raise ValueError("SSM_PREFIX is not set but ssm_get() was called")
@@ -90,14 +86,10 @@ def ssm_get(name, decrypt=True):
 
 class Transformer:
     """
-    Compute-only transformer (no Django, no DB), with an SQS-aware handler method.
-
     - Parses SQS record: JSON from body, metadata from message attributes
-    - Transforms and validates using existing transformer-folder mappings/resources
+    - Transforms and validates using mappings and resources
     - Publishes success/failure events to SNS
-    - Supports partial batch failure response for SQS event source mapping
     """
-
     def __init__(self):
         require_env()
         self.identifier = None
@@ -115,18 +107,14 @@ class Transformer:
         """
         try:
             self.identifier = data.get("uri")
-
             from_resource, mapping, schema_name = self.get_mapping_classes(object_type)
             transformed = self.get_transformed_object(data, from_resource, mapping)
-
             transformed["_online_pending"] = self.get_online_pending(
                 data.get("instances", []),
                 transformed.get("online", False),
             )
-
             self.validate_transformed(transformed, schema_name)
             return transformed
-
         except ValidationError as e:
             raise TransformError("Transformed data is invalid: {0}".format(e))
         except Exception as e:
@@ -135,7 +123,7 @@ class Transformer:
             )
 
     def get_mapping_classes(self, object_type):
-        """Return (SourceResource, Mapping, schema filename) tuple for object_type."""
+        """Return tuple for object_type."""
         type_map = {
             "agent_person": (SourceAgentPerson, SourceAgentPersonToAgent, SCHEMA_AGENT),
             "agent_corporate_entity": (
@@ -173,7 +161,7 @@ class Transformer:
         return False
 
     def get_transformed_object(self, data, from_resource, mapping):
-        """Transform source dict using Odin resources/mappings, returning a plain dict."""
+        """Transform source dict, returning a plain dict."""
         from_obj = json_codec.loads(json.dumps(data), resource=from_resource)
         transformed = json.loads(json_codec.dumps(mapping.apply(from_obj)))
         return self.remove_keys_from_dict(transformed)
@@ -211,11 +199,6 @@ class Transformer:
     def process_message(self, record):
         """
         Parse and process a single SQS record, then publish success/failure to SNS.
-
-        Per your requirements:
-        - JSON data is parsed from the message body
-        - other data is parsed from message attributes
-
         Args:
             record (dict): A single SQS message record.
 
@@ -223,83 +206,59 @@ class Transformer:
             dict: success payload that was published (useful for local testing).
         """
         message_id = record.get("messageId", "unknown")
-
-        # Parse JSON from body
         try:
             body = json.loads(record.get("body") or "{}")
         except json.JSONDecodeError:
             body = record.get("body")
-
-        # Parse metadata from message attributes
         attributes = record.get("messageAttributes", {}) or {}
-
-        # Your proposed approach: attribute key objectType (camelCase)
-        # Also accept common alternates to make this resilient.
         object_type = (
             attributes.get("objectType", {}).get("stringValue")
             or attributes.get("object_type", {}).get("stringValue")
             or (body.get("objectType") if isinstance(body, dict) else None)
             or (body.get("object_type") if isinstance(body, dict) else None)
         )
-
         if not object_type:
             raise ValueError("Missing object_type (messageAttributes.objectType/object_type or body field)")
-
-        # Source payload usually lives in body['data'] or body['record']; otherwise use body itself.
         source_data = None
         if isinstance(body, dict):
             source_data = body.get("data") or body.get("record") or body
         else:
             raise ValueError("Message body must be JSON object for transformation")
-
         if not isinstance(source_data, dict):
             raise ValueError("Source data must be a JSON object (dict)")
-
         transformed = self.run(object_type, source_data)
-
         success_payload = {
             "status": "success",
             "message_id": message_id,
             "object_type": object_type,
             "identifier": source_data.get("uri"),
             "transformed": transformed,
-            # include attributes (stringValue only) for debugging / downstream routing
             "message_attributes": dict(
                 (k, (v.get("stringValue") if isinstance(v, dict) else None))
                 for k, v in attributes.items()
             ),
         }
-
         publish(
             SUCCESS_TOPIC_ARN,
             success_payload,
             subject="transform success: {0}".format(object_type),
         )
-
         return success_payload
 
-
-# Single instance reused per container
 transformer = Transformer()
-
 
 def lambda_handler(event, context):
     """
-    Lambda handler for SQS event source mappings.
-
-    Iterates batch, processes each record, and returns partial batch failures so only
-    failed messages retry.
+    Processes each record, and returns partial  failures so only failed messages retry.
     """
     records = event.get("Records") or []
     failures = []
-
     for record in records:
         message_id = record.get("messageId", "unknown")
         try:
             transformer.process_message(record)
         except Exception as exc:
             failures.append({"itemIdentifier": message_id})
-
             failure_payload = {
                 "status": "failure",
                 "message_id": message_id,
@@ -311,5 +270,4 @@ def lambda_handler(event, context):
                 failure_payload,
                 subject="transform failure",
             )
-
     return {"batchItemFailures": failures}
