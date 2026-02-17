@@ -1,0 +1,44 @@
+{
+    "create_time": "2015-06-03T18:25:30Z",
+    "created_by": "battalb",
+    "external_documents": [],
+    "external_ids": [],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/17093",
+        "title": "Governors -- Election -- New York (State) -- 1970"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "battalb",
+    "lock_version": 34,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2018-02-13T15:32:49Z",
+    "terms": [
+        {
+            "create_time": "2015-06-03T18:25:30Z",
+            "created_by": "battalb",
+            "jsonmodel_type": "term",
+            "last_modified_by": "battalb",
+            "lock_version": 0,
+            "system_mtime": "2015-06-03T18:25:30Z",
+            "term": "Governors -- Election -- New York (State) -- 1970",
+            "term_type": "topical",
+            "uri": "/terms/14652",
+            "user_mtime": "2015-06-03T18:25:30Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "Governors -- Election -- New York (State) -- 1970",
+    "uri": "/subjects/17093",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2015-06-03T18:25:30Z",
+    "vocabulary": "/vocabularies/1"
+}

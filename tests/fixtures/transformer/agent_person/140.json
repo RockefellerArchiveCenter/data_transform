@@ -1,0 +1,121 @@
+{
+    "agent_contacts": [
+        {
+            "create_time": "2014-12-06T02:41:01Z",
+            "created_by": "admin",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Weaver",
+            "system_mtime": "2014-12-06T02:41:01Z",
+            "telephones": [],
+            "user_mtime": "2014-12-06T02:41:01Z"
+        }
+    ],
+    "agent_type": "agent_person",
+    "create_time": "2014-12-06T02:41:01Z",
+    "created_by": "admin",
+    "dates_of_existence": [
+        {
+            "begin": "1894",
+            "create_time": "2014-12-06T02:41:01Z",
+            "created_by": "admin",
+            "date_type": "inclusive",
+            "end": "1978",
+            "jsonmodel_type": "date",
+            "label": "existence",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:41:01Z",
+            "user_mtime": "2014-12-06T02:41:01Z"
+        }
+    ],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:41:01Z",
+        "created_by": "admin",
+        "is_display_name": true,
+        "jsonmodel_type": "name_person",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "name_order": "inverted",
+        "primary_name": "Weaver",
+        "rest_of_name": "Warren",
+        "sort_name": "Weaver, Warren",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2017-08-22T15:44:45Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:41:01Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/people/140",
+                "role": "creator",
+                "title": "Weaver, Warren",
+                "type": "agent_person"
+            }
+        ],
+        "dates": [
+            {
+                "begin": "1894",
+                "create_time": "2014-12-06T02:41:01Z",
+                "created_by": "admin",
+                "date_type": "inclusive",
+                "end": "1978",
+                "jsonmodel_type": "date",
+                "label": "existence",
+                "last_modified_by": "admin",
+                "lock_version": 0,
+                "system_mtime": "2014-12-06T02:41:01Z",
+                "user_mtime": "2014-12-06T02:41:01Z"
+            }
+        ],
+        "identifier": "/agents/people/140",
+        "title": "Weaver, Warren"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_person",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "creator",
+        "source",
+        "subject"
+    ],
+    "lock_version": 181,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:41:01Z",
+            "created_by": "admin",
+            "is_display_name": true,
+            "jsonmodel_type": "name_person",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name_order": "inverted",
+            "primary_name": "Weaver",
+            "rest_of_name": "Warren",
+            "sort_name": "Weaver, Warren",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2017-08-22T15:44:45Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:41:01Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2017-12-15T22:30:28Z",
+    "title": "Weaver, Warren",
+    "uri": "/agents/people/140",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:41:01Z"
+}

@@ -1,0 +1,151 @@
+{
+    "agent_contacts": [
+        {
+            "create_time": "2014-12-06T02:40:59Z",
+            "created_by": "admin",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Rockefeller",
+            "system_mtime": "2014-12-06T02:40:59Z",
+            "telephones": [],
+            "user_mtime": "2014-12-06T02:40:59Z"
+        }
+    ],
+    "agent_type": "agent_person",
+    "create_time": "2014-12-06T02:40:58Z",
+    "created_by": "admin",
+    "dates_of_existence": [
+        {
+            "create_time": "2014-12-06T02:40:59Z",
+            "created_by": "admin",
+            "date_type": "single",
+            "expression": "1915-",
+            "jsonmodel_type": "date",
+            "label": "existence",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:40:59Z",
+            "user_mtime": "2014-12-06T02:40:59Z"
+        }
+    ],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:40:58Z",
+        "created_by": "admin",
+        "is_display_name": true,
+        "jsonmodel_type": "name_person",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "name_order": "inverted",
+        "primary_name": "Rockefeller",
+        "rest_of_name": "David",
+        "sort_name": "Rockefeller, David",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2017-08-22T15:44:45Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:40:58Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/people/138",
+                "role": "creator",
+                "title": "Rockefeller, David",
+                "type": "agent_person"
+            }
+        ],
+        "dates": [
+            {
+                "create_time": "2014-12-06T02:40:59Z",
+                "created_by": "admin",
+                "date_type": "single",
+                "expression": "1915-",
+                "jsonmodel_type": "date",
+                "label": "existence",
+                "last_modified_by": "admin",
+                "lock_version": 0,
+                "system_mtime": "2014-12-06T02:40:59Z",
+                "user_mtime": "2014-12-06T02:40:59Z"
+            }
+        ],
+        "identifier": "/agents/people/138",
+        "title": "Rockefeller, David"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_person",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "creator",
+        "source",
+        "subject"
+    ],
+    "lock_version": 417,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:40:58Z",
+            "created_by": "admin",
+            "is_display_name": true,
+            "jsonmodel_type": "name_person",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name_order": "inverted",
+            "primary_name": "Rockefeller",
+            "rest_of_name": "David",
+            "sort_name": "Rockefeller, David",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2017-08-22T15:44:45Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:40:58Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:40:58Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_person",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name_order": "inverted",
+            "primary_name": "D.R.",
+            "sort_name": "D.R.",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:40:58Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:40:58Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:40:58Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_person",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name_order": "inverted",
+            "primary_name": "DR",
+            "sort_name": "DR",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:40:58Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:40:58Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2019-04-15T20:49:21Z",
+    "title": "Rockefeller, David",
+    "uri": "/agents/people/138",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:40:58Z"
+}

@@ -1,0 +1,44 @@
+{
+    "create_time": "2015-04-24T20:33:39Z",
+    "created_by": "pgalligan",
+    "external_documents": [],
+    "external_ids": [],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/10537",
+        "title": "Occupational training--United States"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "pgalligan",
+    "lock_version": 13,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2017-12-15T22:26:27Z",
+    "terms": [
+        {
+            "create_time": "2015-04-24T20:33:39Z",
+            "created_by": "pgalligan",
+            "jsonmodel_type": "term",
+            "last_modified_by": "pgalligan",
+            "lock_version": 0,
+            "system_mtime": "2015-04-24T20:33:39Z",
+            "term": "Occupational training--United States",
+            "term_type": "topical",
+            "uri": "/terms/8206",
+            "user_mtime": "2015-04-24T20:33:39Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "Occupational training--United States",
+    "uri": "/subjects/10537",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2015-04-24T20:33:39Z",
+    "vocabulary": "/vocabularies/1"
+}

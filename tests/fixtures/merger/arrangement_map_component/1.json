@@ -1,0 +1,25 @@
+{
+    "ref": "/api/components/1/",
+    "title": "Jackson Davis papers",
+    "map": 1,
+    "parent": null,
+    "order": 0,
+    "level": "collection",
+    "archivesspace_uri": "/repositories/2/resources/3",
+    "publish": true,
+    "ancestors": [],
+    "children": [
+        {
+            "title": "Peter F. Geithner papers",
+            "ref": "/api/components/3/",
+            "archivesspace_uri": "/repositories/2/resources/3",
+            "level": "collection"
+        },
+        {
+            "title": "Rockefeller Foundation records, China Medical Board records, RG 4",
+            "ref": "/api/components/4/",
+            "archivesspace_uri": "/repositories/2/resources/4",
+            "level": "otherlevel"
+        }
+    ]
+}

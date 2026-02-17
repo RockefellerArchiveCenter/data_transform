@@ -1,0 +1,98 @@
+{
+    "agent_alternate_sets": [],
+    "agent_contacts": [],
+    "agent_conventions_declarations": [],
+    "agent_functions": [],
+    "agent_identifiers": [],
+    "agent_maintenance_histories": [],
+    "agent_occupations": [],
+    "agent_other_agency_codes": [],
+    "agent_places": [],
+    "agent_record_controls": [],
+    "agent_record_identifiers": [],
+    "agent_resources": [],
+    "agent_sources": [],
+    "agent_topics": [],
+    "agent_type": "agent_corporate_entity",
+    "create_time": "2015-04-24T21:54:28Z",
+    "created_by": "pgalligan",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "conference_meeting": false,
+        "create_time": "2019-12-02T20:05:40Z",
+        "created_by": "dyoung",
+        "is_display_name": true,
+        "jsonmodel_type": "name_corporate_entity",
+        "jurisdiction": false,
+        "last_modified_by": "dyoung",
+        "lock_version": 0,
+        "parallel_names": [],
+        "primary_name": "International Laboratory for Research on Animal Diseases",
+        "rules": "local",
+        "sort_name": "International Laboratory for Research on Animal Diseases",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2019-12-02T20:05:40Z",
+        "use_dates": [],
+        "user_mtime": "2019-12-02T20:05:40Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/corporate_entities/10267a",
+                "role": "creator",
+                "title": "International Laboratory for Research on Animal Diseases",
+                "type": "agent_corporate_entity"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/corporate_entities/10267a",
+        "title": "International Laboratory for Research on Animal Diseases"
+    },
+    "is_linked_to_published_record": true,
+    "is_slug_auto": false,
+    "jsonmodel_type": "agent_corporate_entity",
+    "last_modified_by": "dyoung",
+    "linked_agent_roles": [
+        "creator"
+    ],
+    "lock_version": 27,
+    "names": [
+        {
+            "authorized": true,
+            "conference_meeting": false,
+            "create_time": "2019-12-02T20:05:40Z",
+            "created_by": "dyoung",
+            "is_display_name": true,
+            "jsonmodel_type": "name_corporate_entity",
+            "jurisdiction": false,
+            "last_modified_by": "dyoung",
+            "lock_version": 0,
+            "parallel_names": [],
+            "primary_name": "International Laboratory for Research on Animal Diseases",
+            "rules": "local",
+            "sort_name": "International Laboratory for Research on Animal Diseases",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2019-12-02T20:05:40Z",
+            "use_dates": [],
+            "user_mtime": "2019-12-02T20:05:40Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2021-06-16T19:25:32Z",
+    "title": "International Laboratory for Research on Animal Diseases",
+    "uri": "/agents/corporate_entities/10267a",
+    "used_languages": [],
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2019-12-02T20:05:40Z"
+}

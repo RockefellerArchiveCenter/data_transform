@@ -1,0 +1,117 @@
+{
+    "agent_contacts": [
+        {
+            "create_time": "2014-12-06T02:42:14Z",
+            "created_by": "admin",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Cannon",
+            "system_mtime": "2014-12-06T02:42:14Z",
+            "telephones": [],
+            "user_mtime": "2014-12-06T02:42:14Z"
+        }
+    ],
+    "agent_type": "agent_person",
+    "create_time": "2014-12-06T02:42:14Z",
+    "created_by": "admin",
+    "dates_of_existence": [
+        {
+            "create_time": "2014-12-06T02:42:14Z",
+            "created_by": "admin",
+            "date_type": "single",
+            "expression": "1918-",
+            "jsonmodel_type": "date",
+            "label": "existence",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:42:14Z",
+            "user_mtime": "2014-12-06T02:42:14Z"
+        }
+    ],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:42:14Z",
+        "created_by": "admin",
+        "is_display_name": true,
+        "jsonmodel_type": "name_person",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "name_order": "inverted",
+        "primary_name": "Cannon",
+        "rest_of_name": "James M.",
+        "sort_name": "Cannon, James M.",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2017-08-22T15:44:45Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:42:14Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/people/531",
+                "role": "creator",
+                "title": "Cannon, James M.",
+                "type": "agent_person"
+            }
+        ],
+        "dates": [
+            {
+                "create_time": "2014-12-06T02:42:14Z",
+                "created_by": "admin",
+                "date_type": "single",
+                "expression": "1918-",
+                "jsonmodel_type": "date",
+                "label": "existence",
+                "last_modified_by": "admin",
+                "lock_version": 0,
+                "system_mtime": "2014-12-06T02:42:14Z",
+                "user_mtime": "2014-12-06T02:42:14Z"
+            }
+        ],
+        "identifier": "/agents/people/531",
+        "title": "Cannon, James M."
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_person",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "creator"
+    ],
+    "lock_version": 131,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:42:14Z",
+            "created_by": "admin",
+            "is_display_name": true,
+            "jsonmodel_type": "name_person",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name_order": "inverted",
+            "primary_name": "Cannon",
+            "rest_of_name": "James M.",
+            "sort_name": "Cannon, James M.",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2017-08-22T15:44:45Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:14Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2017-12-15T22:30:28Z",
+    "title": "Cannon, James M.",
+    "uri": "/agents/people/531",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:42:14Z"
+}

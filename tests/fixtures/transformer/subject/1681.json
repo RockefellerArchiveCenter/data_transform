@@ -1,0 +1,55 @@
+{
+    "create_time": "2014-12-06T02:32:16Z",
+    "created_by": "admin",
+    "external_documents": [],
+    "external_ids": [
+        {
+            "create_time": "2014-12-06T02:32:16Z",
+            "created_by": "admin",
+            "external_id": "2631",
+            "jsonmodel_type": "external_id",
+            "last_modified_by": "admin",
+            "source": "Archivists Toolkit Database::SUBJECT",
+            "system_mtime": "2014-12-06T02:32:16Z",
+            "user_mtime": "2014-12-06T02:32:16Z"
+        }
+    ],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/1681",
+        "title": "Program budgeting"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "admin",
+    "lock_version": 87,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2018-11-08T14:48:39Z",
+    "terms": [
+        {
+            "create_time": "2014-12-06T02:32:16Z",
+            "created_by": "admin",
+            "jsonmodel_type": "term",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:32:16Z",
+            "term": "Program budgeting",
+            "term_type": "topical",
+            "uri": "/terms/1652",
+            "user_mtime": "2014-12-06T02:32:16Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "Program budgeting",
+    "uri": "/subjects/1681",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:32:16Z",
+    "vocabulary": "/vocabularies/1"
+}

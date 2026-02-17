@@ -1,0 +1,44 @@
+{
+    "create_time": "2015-04-28T19:00:20Z",
+    "created_by": "pgalligan",
+    "external_documents": [],
+    "external_ids": [],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/16998",
+        "title": "Political campaigns -- United States"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "pgalligan",
+    "lock_version": 111,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2018-07-31T20:22:57Z",
+    "terms": [
+        {
+            "create_time": "2015-04-28T19:00:20Z",
+            "created_by": "pgalligan",
+            "jsonmodel_type": "term",
+            "last_modified_by": "pgalligan",
+            "lock_version": 0,
+            "system_mtime": "2015-04-28T19:00:20Z",
+            "term": "Political campaigns -- United States",
+            "term_type": "topical",
+            "uri": "/terms/14620",
+            "user_mtime": "2015-04-28T19:00:20Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "Political campaigns -- United States",
+    "uri": "/subjects/16998",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2015-04-28T19:00:20Z",
+    "vocabulary": "/vocabularies/1"
+}

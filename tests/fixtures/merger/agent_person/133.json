@@ -1,0 +1,210 @@
+{
+    "lock_version": 21,
+    "publish": true,
+    "created_by": "admin",
+    "last_modified_by": "harnold",
+    "create_time": "2014-12-06T02:40:58Z",
+    "system_mtime": "2021-12-17T19:28:57Z",
+    "user_mtime": "2021-12-17T19:28:41Z",
+    "is_slug_auto": false,
+    "jsonmodel_type": "agent_person",
+    "agent_contacts": [
+        {
+            "lock_version": 0,
+            "name": "Dodge",
+            "created_by": "harnold",
+            "last_modified_by": "harnold",
+            "create_time": "2021-12-17T19:28:50Z",
+            "system_mtime": "2021-12-17T19:28:50Z",
+            "user_mtime": "2021-12-17T19:28:50Z",
+            "jsonmodel_type": "agent_contact",
+            "telephones": [],
+            "notes": [],
+            "is_representative": false
+        }
+    ],
+    "agent_record_controls": [],
+    "agent_alternate_sets": [],
+    "agent_conventions_declarations": [],
+    "agent_other_agency_codes": [],
+    "agent_maintenance_histories": [],
+    "agent_record_identifiers": [],
+    "agent_identifiers": [],
+    "agent_sources": [],
+    "agent_places": [],
+    "agent_occupations": [],
+    "agent_functions": [],
+    "agent_topics": [],
+    "agent_resources": [],
+    "linked_agent_roles": [
+        "creator"
+    ],
+    "external_documents": [],
+    "notes": [],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "dates_of_existence": [
+        {
+            "created_by": "harnold",
+            "last_modified_by": "harnold",
+            "create_time": "2021-12-17T19:28:54Z",
+            "system_mtime": "2021-12-17T19:28:54Z",
+            "user_mtime": "2021-12-17T19:28:54Z",
+            "lock_version": 0,
+            "date_type_structured": "range",
+            "date_label": "existence",
+            "jsonmodel_type": "structured_date_label",
+            "structured_date_range": {
+                "begin_date_standardized": "1882",
+                "end_date_standardized": "1973",
+                "created_by": "harnold",
+                "last_modified_by": "harnold",
+                "create_time": "2021-12-17T19:28:54Z",
+                "system_mtime": "2021-12-17T19:28:54Z",
+                "user_mtime": "2021-12-17T19:28:54Z",
+                "lock_version": 0,
+                "begin_date_standardized_type": "standard",
+                "end_date_standardized_type": "standard",
+                "jsonmodel_type": "structured_date_range"
+            }
+        }
+    ],
+    "used_languages": [],
+    "metadata_rights_declarations": [],
+    "names": [
+        {
+            "lock_version": 1,
+            "primary_name": "Dodge",
+            "rest_of_name": "Geraldine R. (Geraldine Rockefeller)",
+            "sort_name": "Dodge, Geraldine R. (Geraldine Rockefeller) (1882-1973)",
+            "sort_name_auto_generate": true,
+            "created_by": "harnold",
+            "last_modified_by": "harnold",
+            "create_time": "2021-12-17T19:28:50Z",
+            "system_mtime": "2021-12-17T19:28:57Z",
+            "user_mtime": "2021-12-17T19:28:50Z",
+            "authorized": true,
+            "is_display_name": true,
+            "source": "naf",
+            "name_order": "inverted",
+            "jsonmodel_type": "name_person",
+            "use_dates": [],
+            "parallel_names": []
+        },
+        {
+            "lock_version": 0,
+            "primary_name": "Rockefeller",
+            "rest_of_name": "Ethel Geraldine",
+            "sort_name": "Rockefeller, Ethel Geraldine",
+            "sort_name_auto_generate": true,
+            "created_by": "harnold",
+            "last_modified_by": "harnold",
+            "create_time": "2021-12-17T19:28:50Z",
+            "system_mtime": "2021-12-17T19:28:50Z",
+            "user_mtime": "2021-12-17T19:28:50Z",
+            "name_order": "inverted",
+            "jsonmodel_type": "name_person",
+            "use_dates": [
+                {
+                    "created_by": "harnold",
+                    "last_modified_by": "harnold",
+                    "create_time": "2021-12-17T19:28:50Z",
+                    "system_mtime": "2021-12-17T19:28:50Z",
+                    "user_mtime": "2021-12-17T19:28:50Z",
+                    "lock_version": 0,
+                    "date_type_structured": "range",
+                    "date_label": "usage",
+                    "jsonmodel_type": "structured_date_label",
+                    "structured_date_range": {
+                        "begin_date_standardized": "1882",
+                        "end_date_standardized": "1973",
+                        "created_by": "harnold",
+                        "last_modified_by": "harnold",
+                        "create_time": "2021-12-17T19:28:50Z",
+                        "system_mtime": "2021-12-17T19:28:50Z",
+                        "user_mtime": "2021-12-17T19:28:50Z",
+                        "lock_version": 0,
+                        "begin_date_standardized_type": "standard",
+                        "end_date_standardized_type": "standard",
+                        "jsonmodel_type": "structured_date_range"
+                    }
+                }
+            ],
+            "authorized": false,
+            "is_display_name": false,
+            "parallel_names": []
+        },
+        {
+            "lock_version": 0,
+            "primary_name": "Rockefeller",
+            "rest_of_name": "Gerrie",
+            "sort_name": "Rockefeller, Gerrie",
+            "sort_name_auto_generate": true,
+            "created_by": "harnold",
+            "last_modified_by": "harnold",
+            "create_time": "2021-12-17T19:28:50Z",
+            "system_mtime": "2021-12-17T19:28:50Z",
+            "user_mtime": "2021-12-17T19:28:50Z",
+            "name_order": "inverted",
+            "jsonmodel_type": "name_person",
+            "use_dates": [
+                {
+                    "created_by": "harnold",
+                    "last_modified_by": "harnold",
+                    "create_time": "2021-12-17T19:28:50Z",
+                    "system_mtime": "2021-12-17T19:28:50Z",
+                    "user_mtime": "2021-12-17T19:28:50Z",
+                    "lock_version": 0,
+                    "date_type_structured": "range",
+                    "date_label": "usage",
+                    "jsonmodel_type": "structured_date_label",
+                    "structured_date_range": {
+                        "begin_date_standardized": "1882",
+                        "end_date_standardized": "1973",
+                        "created_by": "harnold",
+                        "last_modified_by": "harnold",
+                        "create_time": "2021-12-17T19:28:50Z",
+                        "system_mtime": "2021-12-17T19:28:50Z",
+                        "user_mtime": "2021-12-17T19:28:50Z",
+                        "lock_version": 0,
+                        "begin_date_standardized_type": "standard",
+                        "end_date_standardized_type": "standard",
+                        "jsonmodel_type": "structured_date_range"
+                    }
+                }
+            ],
+            "authorized": false,
+            "is_display_name": false,
+            "parallel_names": []
+        }
+    ],
+    "agent_genders": [],
+    "related_agents": [],
+    "uri": "/agents/people/133",
+    "agent_type": "agent_person",
+    "is_linked_to_published_record": true,
+    "display_name": {
+        "lock_version": 1,
+        "primary_name": "Dodge",
+        "rest_of_name": "Geraldine R. (Geraldine Rockefeller)",
+        "sort_name": "Dodge, Geraldine R. (Geraldine Rockefeller) (1882-1973)",
+        "sort_name_auto_generate": true,
+        "created_by": "harnold",
+        "last_modified_by": "harnold",
+        "create_time": "2021-12-17T19:28:50Z",
+        "system_mtime": "2021-12-17T19:28:57Z",
+        "user_mtime": "2021-12-17T19:28:50Z",
+        "authorized": true,
+        "is_display_name": true,
+        "source": "naf",
+        "name_order": "inverted",
+        "jsonmodel_type": "name_person",
+        "use_dates": [],
+        "parallel_names": []
+    },
+    "title": "Dodge, Geraldine R. (Geraldine Rockefeller) (1882-1973)"
+}

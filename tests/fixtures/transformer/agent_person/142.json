@@ -1,0 +1,177 @@
+{
+    "lock_version": 479,
+    "publish": true,
+    "created_by": "admin",
+    "last_modified_by": "k.martin",
+    "create_time": "2014-12-06T02:41:02Z",
+    "system_mtime": "2022-01-26T18:20:34Z",
+    "user_mtime": "2022-01-26T18:20:24Z",
+    "is_slug_auto": false,
+    "jsonmodel_type": "agent_person",
+    "agent_contacts": [
+        {
+            "lock_version": 0,
+            "name": "Gregg",
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2022-01-26T18:20:29Z",
+            "system_mtime": "2022-01-26T18:20:29Z",
+            "user_mtime": "2022-01-26T18:20:29Z",
+            "jsonmodel_type": "agent_contact",
+            "telephones": [],
+            "notes": [],
+            "is_representative": false
+        }
+    ],
+    "agent_record_controls": [],
+    "agent_alternate_sets": [],
+    "agent_conventions_declarations": [],
+    "agent_other_agency_codes": [],
+    "agent_maintenance_histories": [],
+    "agent_record_identifiers": [
+        {
+            "primary_identifier": true,
+            "record_identifier": "Q64021188",
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2022-01-26T18:20:32Z",
+            "system_mtime": "2022-01-26T18:20:32Z",
+            "user_mtime": "2022-01-26T18:20:32Z",
+            "lock_version": 0,
+            "source": "wikidata",
+            "jsonmodel_type": "agent_record_identifier"
+        }
+    ],
+    "agent_identifiers": [],
+    "agent_sources": [],
+    "agent_places": [],
+    "agent_occupations": [],
+    "agent_functions": [],
+    "agent_topics": [],
+    "agent_resources": [],
+    "group": {
+      "creators": [
+          {
+              "ref": "/agents/people/143",
+              "role": "creator",
+              "title": "Gregg, Alan",
+              "type": "agent_person"
+          }
+      ],
+      "dates": [
+          {
+              "begin": "1903",
+              "create_time": "2014-12-06T02:41:02Z",
+              "created_by": "admin",
+              "date_type": "inclusive",
+              "end": "1980",
+              "jsonmodel_type": "date",
+              "label": "existence",
+              "last_modified_by": "admin",
+              "lock_version": 0,
+              "system_mtime": "2014-12-06T02:41:02Z",
+              "user_mtime": "2014-12-06T02:41:02Z"
+          }
+      ],
+      "identifier": "/agents/people/142",
+      "title": "Gregg, Alan"
+    },
+    "linked_agent_roles": [
+        "creator"
+    ],
+    "external_documents": [],
+    "notes": [
+        {
+            "jsonmodel_type": "note_bioghist",
+            "persistent_id": "2dee6bb4b12bd7ca738a64e3517bc6cb",
+            "subnotes": [
+                {
+                    "jsonmodel_type": "note_text",
+                    "content": "Born in 1890 in Colorado Springs, Colorado, Alan Gregg headed East to earn both an undergraduate (1911) and a medical degree (1916) from Harvard University. Following medical school, Gregg volunteered his services on the Western front in World War I, joining up with Great Britain’s Royal Army Medical Corps in 1917 and remaining until his discharge in 1919. \r\n\r\nAfter the war Gregg began his career with the RF. In 1919 Gregg joined the International Health Division (IHD) and was immediately assigned to the field staff in Brazil. Gregg remained in Brazil until 1922, when he accepted the position of Associate Director of the RF’s Division of Medical Education.  In 1929 Gregg became the Associate Director of the Medical Sciences Division and one year later was promoted to director. Gregg left this position in 1951 and assumed the office of Vice President of the RF, a title he held until his retirement in 1956.  \r\n\r\nIn his work with the Medical Sciences Division, Gregg took a special interest in helping to build the field of psychiatry. Gregg firmly believed that the teaching of psychiatry and the funding of mental health research should be on par with the attention given any other disease of the body. Gregg supported initiatives that ensured the inclusion of psychiatry in standard medical school curricula and also directed RF funding toward individual researchers in the field. \r\n\r\nIn addition to his work with the RF, Gregg served as an advisor to a number of government departments, including the Office of the Surgeon General of the War Department, the National Institute of Mental Health, and the psychiatric and neuropsychiatric sections of the Department of Veterans Affairs. Gregg also received the French National Order of the Legion of Honour and was named as an Honorary Fellow of the Royal Society of Medicine in Great Britain. In 1956, he received an award from the Lasker Foundation in 1956 that recognized his service in the fields of public health, medical education and research. \r\n\r\nAlan Gregg died in Big Sur, California in 1957.",
+                    "publish": true
+                }
+            ],
+            "publish": true
+        }
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "dates_of_existence": [
+        {
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2022-01-26T18:20:32Z",
+            "system_mtime": "2022-01-26T18:20:32Z",
+            "user_mtime": "2022-01-26T18:20:32Z",
+            "lock_version": 0,
+            "date_type_structured": "range",
+            "date_label": "existence",
+            "jsonmodel_type": "structured_date_label",
+            "structured_date_range": {
+                "begin_date_standardized": "1890",
+                "end_date_standardized": "1957",
+                "created_by": "k.martin",
+                "last_modified_by": "k.martin",
+                "create_time": "2022-01-26T18:20:32Z",
+                "system_mtime": "2022-01-26T18:20:32Z",
+                "user_mtime": "2022-01-26T18:20:32Z",
+                "lock_version": 0,
+                "begin_date_standardized_type": "standard",
+                "end_date_standardized_type": "standard",
+                "jsonmodel_type": "structured_date_range"
+            }
+        }
+    ],
+    "used_languages": [],
+    "metadata_rights_declarations": [],
+    "names": [
+        {
+            "lock_version": 3,
+            "primary_name": "Gregg",
+            "rest_of_name": "Alan",
+            "sort_name": "Gregg, Alan (1890-1957)",
+            "sort_name_auto_generate": true,
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2022-01-26T18:20:29Z",
+            "system_mtime": "2022-01-26T18:20:34Z",
+            "user_mtime": "2022-01-26T18:20:29Z",
+            "authorized": true,
+            "is_display_name": true,
+            "source": "naf",
+            "name_order": "inverted",
+            "jsonmodel_type": "name_person",
+            "use_dates": [],
+            "parallel_names": []
+        }
+    ],
+    "agent_genders": [],
+    "related_agents": [],
+    "uri": "/agents/people/142",
+    "agent_type": "agent_person",
+    "is_linked_to_published_record": true,
+    "display_name": {
+        "lock_version": 3,
+        "primary_name": "Gregg",
+        "rest_of_name": "Alan",
+        "sort_name": "Gregg, Alan (1890-1957)",
+        "sort_name_auto_generate": true,
+        "created_by": "k.martin",
+        "last_modified_by": "k.martin",
+        "create_time": "2022-01-26T18:20:29Z",
+        "system_mtime": "2022-01-26T18:20:34Z",
+        "user_mtime": "2022-01-26T18:20:29Z",
+        "authorized": true,
+        "is_display_name": true,
+        "source": "naf",
+        "name_order": "inverted",
+        "jsonmodel_type": "name_person",
+        "use_dates": [],
+        "parallel_names": []
+    },
+    "title": "Gregg, Alan (1890-1957)"
+}

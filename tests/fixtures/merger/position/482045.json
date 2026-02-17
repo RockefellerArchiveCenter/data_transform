@@ -1,0 +1,761 @@
+{
+    "lock_version": 4,
+    "position": 15,
+    "publish": true,
+    "ref_id": "7a5ff852833b4447981de97ca384888f",
+    "title": "University of Florida - Bananas",
+    "display_string": "University of Florida - Bananas, 1981-1987",
+    "restrictions_apply": false,
+    "created_by": "admin",
+    "last_modified_by": "k.martin",
+    "create_time": "2014-12-06T13:17:28Z",
+    "system_mtime": "2021-03-05T22:03:05Z",
+    "user_mtime": "2021-01-12T17:57:54Z",
+    "suppressed": false,
+    "is_slug_auto": false,
+    "level": "file",
+    "jsonmodel_type": "archival_object",
+    "external_ids": [
+        {
+            "external_id": "1756014",
+            "source": "Archivists Toolkit Database::RESOURCE_COMPONENT",
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2021-01-12T17:57:55Z",
+            "system_mtime": "2021-01-12T17:57:55Z",
+            "user_mtime": "2021-01-12T17:57:55Z",
+            "jsonmodel_type": "external_id"
+        }
+    ],
+    "subjects": [],
+    "linked_events": [],
+    "extents": [],
+    "lang_materials": [],
+    "dates": [
+        {
+            "lock_version": 0,
+            "expression": "1981-1987",
+            "begin": "1981",
+            "end": "1987",
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2021-01-12T17:57:54Z",
+            "system_mtime": "2021-01-12T17:57:54Z",
+            "user_mtime": "2021-01-12T17:57:54Z",
+            "date_type": "inclusive",
+            "label": "creation",
+            "jsonmodel_type": "date"
+        }
+    ],
+    "external_documents": [],
+    "rights_statements": [],
+    "linked_agents": [],
+    "ancestors": [
+        {
+            "ref": "/repositories/2/archival_objects/482029",
+            "level": "subseries",
+            "_resolved": {
+                "lock_version": 3,
+                "position": 11,
+                "publish": true,
+                "ref_id": "b41e744b718d452abb9f0049d599c123",
+                "component_id": "200D",
+                "title": "United States - Natural Sciences and Agriculture",
+                "display_string": "United States - Natural Sciences and Agriculture",
+                "restrictions_apply": false,
+                "created_by": "admin",
+                "last_modified_by": "k.martin",
+                "create_time": "2014-12-06T13:17:27Z",
+                "system_mtime": "2021-03-05T22:03:05Z",
+                "user_mtime": "2021-01-12T17:57:02Z",
+                "suppressed": false,
+                "is_slug_auto": false,
+                "level": "subseries",
+                "jsonmodel_type": "archival_object",
+                "external_ids": [
+                    {
+                        "external_id": "1756003",
+                        "source": "Archivists Toolkit Database::RESOURCE_COMPONENT",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2021-01-12T17:57:03Z",
+                        "system_mtime": "2021-01-12T17:57:03Z",
+                        "user_mtime": "2021-01-12T17:57:03Z",
+                        "jsonmodel_type": "external_id"
+                    }
+                ],
+                "subjects": [],
+                "linked_events": [],
+                "extents": [],
+                "lang_materials": [],
+                "dates": [],
+                "external_documents": [],
+                "rights_statements": [],
+                "linked_agents": [],
+                "ancestors": [
+                    {
+                        "ref": "/repositories/2/archival_objects/482001",
+                        "level": "series"
+                    },
+                    {
+                        "ref": "/repositories/2/archival_objects/482000",
+                        "level": "subgrp"
+                    },
+                    {
+                        "ref": "/repositories/2/resources/668",
+                        "level": "subgrp"
+                    }
+                ],
+                "instances": [],
+                "notes": [],
+                "uri": "/repositories/2/archival_objects/482029",
+                "repository": {
+                    "ref": "/repositories/2"
+                },
+                "resource": {
+                    "ref": "/repositories/2/resources/668"
+                },
+                "parent": {
+                    "ref": "/repositories/2/archival_objects/482001"
+                },
+                "has_unpublished_ancestor": false
+            }
+        },
+        {
+            "ref": "/repositories/2/archival_objects/482001",
+            "level": "series",
+            "_resolved": {
+                "lock_version": 3,
+                "position": 0,
+                "publish": true,
+                "ref_id": "baf0e11fe85d4247950f8514c9c4a576",
+                "component_id": "200",
+                "title": "United States",
+                "display_string": "United States",
+                "restrictions_apply": false,
+                "created_by": "admin",
+                "last_modified_by": "k.martin",
+                "create_time": "2014-12-06T13:17:25Z",
+                "system_mtime": "2021-03-05T22:03:05Z",
+                "user_mtime": "2021-01-12T17:56:18Z",
+                "suppressed": false,
+                "is_slug_auto": false,
+                "level": "series",
+                "jsonmodel_type": "archival_object",
+                "external_ids": [
+                    {
+                        "external_id": "1756048",
+                        "source": "Archivists Toolkit Database::RESOURCE_COMPONENT",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2021-01-12T17:56:18Z",
+                        "system_mtime": "2021-01-12T17:56:18Z",
+                        "user_mtime": "2021-01-12T17:56:18Z",
+                        "jsonmodel_type": "external_id"
+                    }
+                ],
+                "subjects": [],
+                "linked_events": [],
+                "extents": [],
+                "lang_materials": [],
+                "dates": [],
+                "external_documents": [],
+                "rights_statements": [],
+                "linked_agents": [],
+                "ancestors": [
+                    {
+                        "ref": "/repositories/2/archival_objects/482000",
+                        "level": "subgrp"
+                    },
+                    {
+                        "ref": "/repositories/2/resources/668",
+                        "level": "subgrp"
+                    }
+                ],
+                "instances": [],
+                "notes": [],
+                "uri": "/repositories/2/archival_objects/482001",
+                "repository": {
+                    "ref": "/repositories/2"
+                },
+                "resource": {
+                    "ref": "/repositories/2/resources/668"
+                },
+                "parent": {
+                    "ref": "/repositories/2/archival_objects/482000"
+                },
+                "has_unpublished_ancestor": false
+            }
+        },
+        {
+            "ref": "/repositories/2/archival_objects/482000",
+            "level": "subgrp",
+            "_resolved": {
+                "lock_version": 13,
+                "position": 1,
+                "publish": true,
+                "ref_id": "a8ce7135638648d0b4bdd692fcb10569",
+                "component_id": "1.17",
+                "title": "Rockefeller Foundation records, projects (A91)",
+                "display_string": "Rockefeller Foundation records, projects (A91), bulk: 1979-1989",
+                "restrictions_apply": false,
+                "created_by": "admin",
+                "last_modified_by": "k.martin",
+                "create_time": "2014-12-06T13:17:25Z",
+                "system_mtime": "2021-03-05T22:03:05Z",
+                "user_mtime": "2021-03-05T22:03:05Z",
+                "suppressed": false,
+                "is_slug_auto": false,
+                "level": "subgrp",
+                "jsonmodel_type": "archival_object",
+                "external_ids": [
+                    {
+                        "external_id": "1755299",
+                        "source": "Archivists Toolkit Database::RESOURCE_COMPONENT",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2021-03-05T22:03:05Z",
+                        "system_mtime": "2021-03-05T22:03:05Z",
+                        "user_mtime": "2021-03-05T22:03:05Z",
+                        "jsonmodel_type": "external_id"
+                    }
+                ],
+                "subjects": [],
+                "linked_events": [],
+                "extents": [
+                    {
+                        "lock_version": 0,
+                        "number": "96.19",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2021-03-05T22:03:05Z",
+                        "system_mtime": "2021-03-05T22:03:05Z",
+                        "user_mtime": "2021-03-05T22:03:05Z",
+                        "portion": "whole",
+                        "extent_type": "cubic_feet",
+                        "jsonmodel_type": "extent"
+                    }
+                ],
+                "lang_materials": [],
+                "dates": [
+                    {
+                        "lock_version": 0,
+                        "expression": "1979-1989",
+                        "begin": "1964",
+                        "end": "2004",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2021-03-05T22:03:05Z",
+                        "system_mtime": "2021-03-05T22:03:05Z",
+                        "user_mtime": "2021-03-05T22:03:05Z",
+                        "date_type": "bulk",
+                        "label": "creation",
+                        "jsonmodel_type": "date"
+                    }
+                ],
+                "external_documents": [],
+                "rights_statements": [],
+                "linked_agents": [],
+                "ancestors": [
+                    {
+                        "ref": "/repositories/2/resources/668",
+                        "level": "subgrp"
+                    }
+                ],
+                "instances": [],
+                "notes": [
+                    {
+                        "jsonmodel_type": "note_singlepart",
+                        "type": "physdesc",
+                        "content": [
+                            "217 letter size document storage boxes (Boxes 1-217) 1 half legal size document storage box (Box 7A) and 1 legal size document storage box (Box 218)"
+                        ],
+                        "persistent_id": "e3e1d3ca065e487414db95036668eb87",
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "type": "arrangement",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "publish": true,
+                                "content": "Record Group 1.17 represents the period during which the Rockefeller Foundation transitioned from its traditional series (country code) and subseries (program letter) structure to a structure arranged by program only. The arrangement of the material in RG 1.17 reflects this transition.\n\nRecords are arranged as received. Within folders, materials are primarily arranged in reverse chronological order.\n"
+                            }
+                        ],
+                        "persistent_id": "5292b998621b40c2c7c79ee8fc582d5f",
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "type": "processinfo",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "publish": false,
+                                "content": "Several accessions of this material have not been entered into ArchivesSpace and are therefore not linked to this resource record. They are 1991-089, 1991-090, 1991-093, 1991-101, 1991-104, 1991-110, 1991-117, 1991-125, 1991-133, and 1991-139, and include Boxes R2531-R2549 and Boxes R2553-R2575."
+                            }
+                        ],
+                        "persistent_id": "cadbc9b089b1a9ac7f11561e4b220672",
+                        "publish": false
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "rights_restriction": {
+                            "local_access_restriction_type": []
+                        },
+                        "persistent_id": "de841049e6202e50dadcd25c835bde81",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "publish": true,
+                                "content": "Open for research with select materials restricted as noted. Brittle or damaged items are available at the discretion of RAC. Researchers interested in accessing digital media (floppy disks, CDs, DVDs, etc.) or audiovisual material (audio cassettes, VHS, etc.) in this collection must use an access surrogate. The original items may not be accessed because of preservation concerns. To request an access surrogate be made, or if you are unsure if there is an access surrogate, please contact an archivist."
+                            }
+                        ],
+                        "type": "accessrestrict",
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "ecd283f4d4b9a84825b0e633048de274",
+                        "type": "processinfo",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Standard processing was conducted by Gail Antos, Fall/Winter 2018. All records have been placed in acid free lignin free folders and rehoused in archival document storage boxes. Original order and original folder titles have been maintained.\n\nThis guide provides file level description. Each file may represent multiple folders.",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    }
+                ],
+                "uri": "/repositories/2/archival_objects/482000",
+                "repository": {
+                    "ref": "/repositories/2"
+                },
+                "resource": {
+                    "ref": "/repositories/2/resources/668"
+                },
+                "has_unpublished_ancestor": false
+            }
+        },
+        {
+            "ref": "/repositories/2/resources/668",
+            "level": "subgrp",
+            "_resolved": {
+                "lock_version": 60,
+                "title": "Rockefeller Foundation records, projects, SG 1.16-1.19 (A90-A93)",
+                "publish": true,
+                "restrictions": true,
+                "ead_id": "FA469.xml",
+                "finding_aid_title": "A Guide to the Rockefeller foundation records, projects, SG 1.16-1.19 (A90-A93)\n",
+                "finding_aid_filing_title": "Rockefeller foundation records, projects, SG 1.16-1.19 (A90-A93)",
+                "finding_aid_language_note": "English",
+                "created_by": "admin",
+                "last_modified_by": "k.martin",
+                "create_time": "2014-12-06T13:16:59Z",
+                "system_mtime": "2021-06-08T20:12:12Z",
+                "user_mtime": "2020-12-15T21:53:40Z",
+                "suppressed": false,
+                "is_slug_auto": false,
+                "id_0": "FA469",
+                "level": "subgrp",
+                "finding_aid_description_rules": "dacs",
+                "finding_aid_language": "eng",
+                "finding_aid_script": "Latn",
+                "jsonmodel_type": "resource",
+                "external_ids": [
+                    {
+                        "external_id": "20084",
+                        "source": "Archivists Toolkit Database::RESOURCE",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T21:54:02Z",
+                        "system_mtime": "2020-12-15T21:54:02Z",
+                        "user_mtime": "2020-12-15T21:54:02Z",
+                        "jsonmodel_type": "external_id"
+                    }
+                ],
+                "subjects": [],
+                "linked_events": [],
+                "extents": [
+                    {
+                        "lock_version": 0,
+                        "number": "304.52",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T21:54:02Z",
+                        "system_mtime": "2020-12-15T21:54:02Z",
+                        "user_mtime": "2020-12-15T21:54:02Z",
+                        "portion": "whole",
+                        "extent_type": "cubic_feet",
+                        "jsonmodel_type": "extent"
+                    }
+                ],
+                "lang_materials": [
+                    {
+                        "lock_version": 0,
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T21:54:02Z",
+                        "system_mtime": "2020-12-15T21:54:02Z",
+                        "user_mtime": "2020-12-15T21:54:02Z",
+                        "jsonmodel_type": "lang_material",
+                        "notes": [],
+                        "language_and_script": {
+                            "lock_version": 0,
+                            "created_by": "k.martin",
+                            "last_modified_by": "k.martin",
+                            "create_time": "2020-12-15T21:54:02Z",
+                            "system_mtime": "2020-12-15T21:54:02Z",
+                            "user_mtime": "2020-12-15T21:54:02Z",
+                            "language": "eng",
+                            "jsonmodel_type": "language_and_script"
+                        }
+                    },
+                    {
+                        "lock_version": 0,
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T21:54:02Z",
+                        "system_mtime": "2020-12-15T21:54:02Z",
+                        "user_mtime": "2020-12-15T21:54:02Z",
+                        "jsonmodel_type": "lang_material",
+                        "notes": [
+                            {
+                                "jsonmodel_type": "note_langmaterial",
+                                "persistent_id": "e385e3cf465503f3d3c24f294d1c2432",
+                                "type": "langmaterial",
+                                "content": [
+                                    "Multiple languages contained in written material specific to country/region. Predominately written in English."
+                                ],
+                                "publish": true
+                            }
+                        ]
+                    }
+                ],
+                "dates": [
+                    {
+                        "lock_version": 0,
+                        "expression": "1978-1993",
+                        "begin": "1964",
+                        "end": "2007",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T21:54:02Z",
+                        "system_mtime": "2020-12-15T21:54:02Z",
+                        "user_mtime": "2020-12-15T21:54:02Z",
+                        "date_type": "bulk",
+                        "label": "creation",
+                        "jsonmodel_type": "date"
+                    }
+                ],
+                "external_documents": [],
+                "rights_statements": [],
+                "linked_agents": [
+                    {
+                        "role": "creator",
+                        "relator": "aut",
+                        "terms": [],
+                        "ref": "/agents/corporate_entities/4884"
+                    }
+                ],
+                "revision_statements": [],
+                "instances": [],
+                "deaccessions": [],
+                "related_accessions": [
+                    {
+                        "ref": "/repositories/2/accessions/863"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1058"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1064"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1067"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1075"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1101"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1102"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1107"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1111"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1114"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1132"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1164"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/978"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/971"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/979"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/991"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/993"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/996"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/997"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1028"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/1056"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/968"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/866"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/868"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/869"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/873"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/876"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/879"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/913"
+                    },
+                    {
+                        "ref": "/repositories/2/accessions/932"
+                    }
+                ],
+                "classifications": [],
+                "notes": [
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "032a275e8933807dd2efd1740f7c159a",
+                        "label": "Processing Information note",
+                        "type": "processinfo",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Records have received basic level 1 processing to establish initial intellectual and physical control of the holdings. Materials remain in original record cartons and folders.\n\nThis guide provides file level description. Each file may represent multiple folders.\n\n\n\n",
+                                "publish": false
+                            }
+                        ],
+                        "publish": false
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "b988573aef6c3e29e216339de7cf4770",
+                        "type": "acqinfo",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Project files transferred to the RAC by Rockefeller Foundation, 1990-1993.",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "104c22a32b3055f34990d3d0217e8516",
+                        "label": "Arrangement note",
+                        "type": "arrangement",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Records are arranged as received. Within folders, materials are primarily arranged in reverse chronological order.\n\nRG 1.16 is arranged by the Rockefeller Foundation traditional series (country code) and subseries (program letter) structure.\n\nSubsequent subgroups are arranged by program, with RG 1.17 being the most prominent transition period where some materials are arrranged by the outgoing traditional series/subseries, and others are arranged by program.\n  \n\n",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "e688708464733e0c7d46fc40170a4342",
+                        "label": "Biographical/Historical note",
+                        "type": "bioghist",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Rockefeller Foundation\n\nThe Rockefeller Foundation was established by act of the New York State Legislature approved by the Governor on May 14, 1913, \"to promote the well-being of mankind throughout the world.\" Between 1913 and 1928 the China Medical Board, the International Health Board, and the Division of Medical Education functioned as divisions of the Foundation, concentrating on the administration of programs in public health and medical education. A Division of Studies was created in 1923 to handle projects outside the medical field. These early years were experimental as the new foundation studied the methods of philanthropy and explored its relationships with other Rockefeller boards. Although the Rockefeller Foundation is the largest and best known philanthropy founded by the Rockefeller family, it was neither the first nor the last to be established. The Rockefeller Institute for Medical Research (1901), the General Education Board (1902), the Rockefeller Sanitary Commission for the Eradication of Hookworm Disease (1909), and the Bureau of Social Hygiene (1911) all existed earlier. When the Foundation was created, the Sanitary Commission was disbanded. After the establishment of the Foundation, the Laura Spelman Rockefeller Memorial (1918) and the International Education Board (1923) were created.\n\nThe Rockefeller boards and their programs were reconsidered and reorganized in 1927-1928 in order to avoid overlapping programs. The International Health Board of the Foundation was disbanded and an International Health Division was organized. The China Medical Board, Inc., was established as a separately incorporated institution, and the China Medical Board of the Foundation ceased to exist. The Division of Studies was dropped and the Division of Medical Education was phased out. The Laura Spelman Rockefeller Memorial was combined with the Foundation and the Spelman Fund of New York was chartered to continue activities of the LSRM that were not absorbed by the Foundation. The International Education Board was disbanded.\n\nAs a result of this reorganization, the Foundation adopted a program which included public health work (administered by the IHD), the advancement of knowledge in the medical and natural sciences (in part taken over from the IEB), the social sciences (formerly the field of the LSRM), and the humanities and arts (shared with the GEB). The Rockefeller Institute and the Bureau of Social Hygiene were not affected by the reorganization. The program adopted by the Foundation at this time remained basically the same for the next twenty years.\n\n\n",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "f5478d9b104ad08df1fa4494e83d6534",
+                        "label": "Conditions Governing Access note",
+                        "type": "accessrestrict",
+                        "rights_restriction": {
+                            "local_access_restriction_type": []
+                        },
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Records more than 20 years old are open for research with select materials restricted as noted. Brittle or damaged items are available at the discretion of RAC. RAC is unable to provide access to obsolete media and original digital media. In addition separated media may not yet have undergone stabilization procedures. When feasible, a digital surrogate may be created via special order. All applicable charges will apply. \n\n",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "8ebfb8e14898ee95a9f8f6d7ea730468",
+                        "type": "userestrict",
+                        "rights_restriction": {
+                            "local_access_restriction_type": []
+                        },
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Rockefeller Foundation retains title, copyright and literary and intellectual property rights to the records, in so far as it holds them.\n\nRAC has authority to grant permission to publish for scholarly purposes.\n\n ",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "ec5e4cde7e6258459fb79f58a9f423e6",
+                        "type": "scopecontent",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Types of records include: projects files and related material.",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "41517153e555e5037a87b0c5f18a1ae0",
+                        "type": "processinfo",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Select digital media was removed from RF Grants that needs to be repatriated during processing.",
+                                "publish": false
+                            }
+                        ],
+                        "publish": false
+                    }
+                ],
+                "uri": "/repositories/2/resources/668",
+                "repository": {
+                    "ref": "/repositories/2"
+                },
+                "collection_management": {
+                    "lock_version": 0,
+                    "rights_determined": false,
+                    "created_by": "k.martin",
+                    "last_modified_by": "k.martin",
+                    "create_time": "2020-12-15T21:54:02Z",
+                    "system_mtime": "2021-06-16T19:09:43Z",
+                    "user_mtime": "2020-12-15T21:54:02Z",
+                    "processing_priority": "medium",
+                    "processing_status": "Backlog",
+                    "jsonmodel_type": "collection_management",
+                    "external_ids": [],
+                    "uri": "/repositories/2/collection_management/17102",
+                    "repository": {
+                        "ref": "/repositories/2"
+                    },
+                    "parent": {
+                        "ref": "/repositories/2/resources/668"
+                    }
+                },
+                "user_defined": {
+                    "lock_version": 0,
+                    "boolean_1": false,
+                    "boolean_2": false,
+                    "boolean_3": false,
+                    "date_2": "2015-12-31",
+                    "created_by": "k.martin",
+                    "last_modified_by": "k.martin",
+                    "create_time": "2020-12-15T21:54:02Z",
+                    "system_mtime": "2020-12-15T21:54:02Z",
+                    "user_mtime": "2020-12-15T21:54:02Z",
+                    "enum_1": "1 - Basic/Preliminary",
+                    "jsonmodel_type": "user_defined",
+                    "repository": {
+                        "ref": "/repositories/2"
+                    }
+                },
+                "tree": {
+                    "ref": "/repositories/2/resources/668/tree"
+                }
+            }
+        }
+    ],
+    "instances": [
+        {
+            "lock_version": 0,
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2021-01-12T17:57:54Z",
+            "system_mtime": "2021-01-12T17:57:54Z",
+            "user_mtime": "2021-01-12T17:57:54Z",
+            "instance_type": "mixed materials",
+            "jsonmodel_type": "instance",
+            "is_representative": false,
+            "sub_container": {
+                "lock_version": 0,
+                "indicator_2": "88",
+                "created_by": "k.martin",
+                "last_modified_by": "k.martin",
+                "create_time": "2021-01-12T17:57:54Z",
+                "system_mtime": "2021-01-12T17:57:54Z",
+                "user_mtime": "2021-01-12T17:57:54Z",
+                "type_2": "folder",
+                "jsonmodel_type": "sub_container",
+                "top_container": {
+                    "ref": "/repositories/2/top_containers/179476"
+                }
+            }
+        }
+    ],
+    "notes": [],
+    "uri": "/repositories/2/archival_objects/482045",
+    "repository": {
+        "ref": "/repositories/2"
+    },
+    "resource": {
+        "ref": "/repositories/2/resources/668"
+    },
+    "parent": {
+        "ref": "/repositories/2/archival_objects/482029"
+    },
+    "has_unpublished_ancestor": false
+}

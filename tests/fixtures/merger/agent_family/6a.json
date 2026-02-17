@@ -1,0 +1,83 @@
+{
+    "lock_version": 484,
+    "publish": true,
+    "created_by": "pgalligan",
+    "last_modified_by": "harnold",
+    "create_time": "2015-04-28T19:00:16Z",
+    "system_mtime": "2021-06-16T19:25:32Z",
+    "user_mtime": "2019-04-09T19:53:47Z",
+    "is_slug_auto": false,
+    "jsonmodel_type": "agent_family",
+    "agent_contacts": [],
+    "agent_record_controls": [],
+    "agent_alternate_sets": [],
+    "agent_conventions_declarations": [],
+    "agent_other_agency_codes": [],
+    "agent_maintenance_histories": [],
+    "agent_record_identifiers": [],
+    "agent_identifiers": [],
+    "agent_sources": [],
+    "agent_places": [],
+    "agent_occupations": [],
+    "agent_functions": [],
+    "agent_topics": [],
+    "agent_resources": [],
+    "linked_agent_roles": [
+        "creator",
+        "source",
+        "subject"
+    ],
+    "external_documents": [],
+    "notes": [],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "dates_of_existence": [],
+    "used_languages": [],
+    "names": [
+        {
+            "lock_version": 0,
+            "family_name": "Rockefeller family",
+            "sort_name": "Rockefeller family",
+            "sort_name_auto_generate": true,
+            "created_by": "harnold",
+            "last_modified_by": "harnold",
+            "create_time": "2019-04-09T19:53:47Z",
+            "system_mtime": "2019-04-09T19:53:47Z",
+            "user_mtime": "2019-04-09T19:53:47Z",
+            "authorized": true,
+            "is_display_name": true,
+            "source": "local",
+            "rules": "dacs",
+            "jsonmodel_type": "name_family",
+            "use_dates": [],
+            "parallel_names": []
+        }
+    ],
+    "related_agents": [],
+    "uri": "/agents/families/6a",
+    "agent_type": "agent_family",
+    "is_linked_to_published_record": true,
+    "display_name": {
+        "lock_version": 0,
+        "family_name": "Rockefeller family",
+        "sort_name": "Rockefeller family",
+        "sort_name_auto_generate": true,
+        "created_by": "harnold",
+        "last_modified_by": "harnold",
+        "create_time": "2019-04-09T19:53:47Z",
+        "system_mtime": "2019-04-09T19:53:47Z",
+        "user_mtime": "2019-04-09T19:53:47Z",
+        "authorized": true,
+        "is_display_name": true,
+        "source": "local",
+        "rules": "dacs",
+        "jsonmodel_type": "name_family",
+        "use_dates": [],
+        "parallel_names": []
+    },
+    "title": "Rockefeller family"
+}

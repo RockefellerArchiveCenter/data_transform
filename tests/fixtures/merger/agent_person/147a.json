@@ -1,0 +1,121 @@
+{
+    "lock_version": 2071,
+    "publish": true,
+    "created_by": "admin",
+    "last_modified_by": "aberish",
+    "create_time": "2014-12-06T02:41:04Z",
+    "system_mtime": "2021-06-16T19:25:32Z",
+    "user_mtime": "2019-10-15T16:01:18Z",
+    "is_slug_auto": false,
+    "jsonmodel_type": "agent_person",
+    "agent_contacts": [
+        {
+            "lock_version": 0,
+            "name": "Rockefeller",
+            "created_by": "aberish",
+            "last_modified_by": "aberish",
+            "create_time": "2019-10-15T16:01:19Z",
+            "system_mtime": "2019-10-15T16:01:19Z",
+            "user_mtime": "2019-10-15T16:01:19Z",
+            "jsonmodel_type": "agent_contact",
+            "telephones": [],
+            "notes": []
+        }
+    ],
+    "agent_record_controls": [],
+    "agent_alternate_sets": [],
+    "agent_conventions_declarations": [],
+    "agent_other_agency_codes": [],
+    "agent_maintenance_histories": [],
+    "agent_record_identifiers": [],
+    "agent_identifiers": [],
+    "agent_sources": [],
+    "agent_places": [],
+    "agent_occupations": [],
+    "agent_functions": [],
+    "agent_topics": [],
+    "agent_resources": [],
+    "linked_agent_roles": [
+        "creator",
+        "source",
+        "subject"
+    ],
+    "external_documents": [],
+    "notes": [],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "dates_of_existence": [
+        {
+            "create_time": "2021-06-16T19:12:12Z",
+            "system_mtime": "2021-06-16T19:12:12Z",
+            "user_mtime": "2021-06-16T19:12:12Z",
+            "lock_version": 0,
+            "date_label": "existence",
+            "date_type_structured": "range",
+            "date_calendar": "gregorian",
+            "jsonmodel_type": "structured_date_label",
+            "structured_date_range": {
+                "begin_date_standardized": "1908",
+                "end_date_standardized": "1979",
+                "create_time": "2021-06-16T19:12:12Z",
+                "system_mtime": "2021-06-16T19:12:12Z",
+                "user_mtime": "2021-06-16T19:12:12Z",
+                "lock_version": 0,
+                "begin_date_standardized_type": "standard",
+                "end_date_standardized_type": "standard",
+                "jsonmodel_type": "structured_date_range"
+            }
+        }
+    ],
+    "used_languages": [],
+    "names": [
+        {
+            "lock_version": 0,
+            "primary_name": "Rockefeller",
+            "rest_of_name": "Nelson A. (Nelson Aldrich)",
+            "sort_name": "Rockefeller, Nelson A. (Nelson Aldrich)",
+            "sort_name_auto_generate": true,
+            "created_by": "aberish",
+            "last_modified_by": "aberish",
+            "create_time": "2019-10-15T16:01:19Z",
+            "system_mtime": "2019-10-15T16:01:19Z",
+            "user_mtime": "2019-10-15T16:01:19Z",
+            "authorized": true,
+            "is_display_name": true,
+            "source": "naf",
+            "name_order": "inverted",
+            "jsonmodel_type": "name_person",
+            "use_dates": [],
+            "parallel_names": []
+        }
+    ],
+    "agent_genders": [],
+    "related_agents": [],
+    "uri": "/agents/people/147a",
+    "agent_type": "agent_person",
+    "is_linked_to_published_record": true,
+    "display_name": {
+        "lock_version": 0,
+        "primary_name": "Rockefeller",
+        "rest_of_name": "Nelson A. (Nelson Aldrich)",
+        "sort_name": "Rockefeller, Nelson A. (Nelson Aldrich)",
+        "sort_name_auto_generate": true,
+        "created_by": "aberish",
+        "last_modified_by": "aberish",
+        "create_time": "2019-10-15T16:01:19Z",
+        "system_mtime": "2019-10-15T16:01:19Z",
+        "user_mtime": "2019-10-15T16:01:19Z",
+        "authorized": true,
+        "is_display_name": true,
+        "source": "naf",
+        "name_order": "inverted",
+        "jsonmodel_type": "name_person",
+        "use_dates": [],
+        "parallel_names": []
+    },
+    "title": "Rockefeller, Nelson A. (Nelson Aldrich)"
+}

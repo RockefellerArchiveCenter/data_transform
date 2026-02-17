@@ -1,0 +1,77 @@
+{
+    "agent_contacts": [],
+    "agent_type": "agent_corporate_entity",
+    "create_time": "2015-06-03T18:25:28Z",
+    "created_by": "battalb",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2015-06-03T18:25:28Z",
+        "created_by": "battalb",
+        "is_display_name": true,
+        "jsonmodel_type": "name_corporate_entity",
+        "last_modified_by": "battalb",
+        "lock_version": 0,
+        "primary_name": "United States. President's Advisory Committee on Government Organization",
+        "rules": "dacs",
+        "sort_name": "United States. President's Advisory Committee on Government Organization",
+        "sort_name_auto_generate": true,
+        "source": "ingest",
+        "system_mtime": "2015-06-03T18:25:28Z",
+        "use_dates": [],
+        "user_mtime": "2015-06-03T18:25:28Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/corporate_entities/20023",
+                "role": "creator",
+                "title": "United States. President's Advisory Committee on Government Organization",
+                "type": "agent_corporate_entity"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/corporate_entities/20023",
+        "title": "United States. President's Advisory Committee on Government Organization"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_corporate_entity",
+    "last_modified_by": "battalb",
+    "linked_agent_roles": [
+        "subject"
+    ],
+    "lock_version": 53,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2015-06-03T18:25:28Z",
+            "created_by": "battalb",
+            "is_display_name": true,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "battalb",
+            "lock_version": 0,
+            "primary_name": "United States. President's Advisory Committee on Government Organization",
+            "rules": "dacs",
+            "sort_name": "United States. President's Advisory Committee on Government Organization",
+            "sort_name_auto_generate": true,
+            "source": "ingest",
+            "system_mtime": "2015-06-03T18:25:28Z",
+            "use_dates": [],
+            "user_mtime": "2015-06-03T18:25:28Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2017-12-15T22:26:27Z",
+    "title": "United States. President's Advisory Committee on Government Organization",
+    "uri": "/agents/corporate_entities/20023",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2015-06-03T18:25:28Z"
+}

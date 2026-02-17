@@ -1,0 +1,354 @@
+{
+    "lock_version": 6,
+    "position": 3,
+    "publish": true,
+    "ref_id": "5c6a1f945a39459e98ae9035d5865534",
+    "title": "Ferrell, J. A. - Journal Covering Central American Journey, November - December",
+    "display_string": "Ferrell, J. A. - Journal Covering Central American Journey, November - December",
+    "restrictions_apply": false,
+    "created_by": "admin",
+    "last_modified_by": "k.martin",
+    "create_time": "2014-12-06T03:45:35Z",
+    "system_mtime": "2021-01-04T17:28:01Z",
+    "user_mtime": "2021-01-04T17:28:01Z",
+    "suppressed": false,
+    "is_slug_auto": false,
+    "level": "file",
+    "jsonmodel_type": "archival_object",
+    "external_ids": [
+        {
+            "external_id": "727303",
+            "source": "Archivists Toolkit Database::RESOURCE_COMPONENT",
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2021-01-04T17:28:01Z",
+            "system_mtime": "2021-01-04T17:28:01Z",
+            "user_mtime": "2021-01-04T17:28:01Z",
+            "jsonmodel_type": "external_id"
+        }
+    ],
+    "subjects": [],
+    "linked_events": [],
+    "extents": [],
+    "lang_materials": [],
+    "dates": [],
+    "external_documents": [],
+    "rights_statements": [],
+    "linked_agents": [],
+    "ancestors": [
+        {
+            "ref": "/repositories/2/archival_objects/13828",
+            "level": "series",
+            "_resolved": {
+                "lock_version": 5,
+                "position": 70,
+                "publish": true,
+                "ref_id": "df2d6a9f32b14f709b514633db98b410",
+                "component_id": "333",
+                "title": "El Salvador",
+                "display_string": "El Salvador",
+                "restrictions_apply": false,
+                "created_by": "admin",
+                "last_modified_by": "k.martin",
+                "create_time": "2014-12-06T03:45:35Z",
+                "system_mtime": "2021-01-04T17:27:53Z",
+                "user_mtime": "2021-01-04T17:27:53Z",
+                "suppressed": false,
+                "is_slug_auto": false,
+                "level": "series",
+                "jsonmodel_type": "archival_object",
+                "external_ids": [
+                    {
+                        "external_id": "727296",
+                        "source": "Archivists Toolkit Database::RESOURCE_COMPONENT",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2021-01-04T17:27:53Z",
+                        "system_mtime": "2021-01-04T17:27:53Z",
+                        "user_mtime": "2021-01-04T17:27:53Z",
+                        "jsonmodel_type": "external_id"
+                    }
+                ],
+                "subjects": [],
+                "linked_events": [],
+                "extents": [],
+                "lang_materials": [],
+                "dates": [],
+                "external_documents": [],
+                "rights_statements": [],
+                "linked_agents": [],
+                "ancestors": [
+                    {
+                        "ref": "/repositories/2/resources/93",
+                        "level": "collection"
+                    }
+                ],
+                "instances": [],
+                "notes": [],
+                "uri": "/repositories/2/archival_objects/13828",
+                "repository": {
+                    "ref": "/repositories/2"
+                },
+                "resource": {
+                    "ref": "/repositories/2/resources/93"
+                },
+                "has_unpublished_ancestor": false
+            }
+        },
+        {
+            "ref": "/repositories/2/resources/93",
+            "level": "collection",
+            "_resolved": {
+                "lock_version": 20,
+                "title": "Rockefeller Foundation records, Photographs, Series 100-1000",
+                "publish": true,
+                "restrictions": true,
+                "ead_id": "FA003.xml",
+                "finding_aid_title": "A Guide to the Rockefeller Foundation records, Photographs, Series 100-1000\n",
+                "finding_aid_filing_title": "Rockefeller Foundation records, Photographs, Series 100-1000",
+                "finding_aid_date": "2009",
+                "finding_aid_author": "Bethany Francis",
+                "created_by": "admin",
+                "last_modified_by": "k.martin",
+                "create_time": "2014-12-06T03:43:19Z",
+                "system_mtime": "2021-08-25T17:23:28Z",
+                "user_mtime": "2020-12-15T19:44:35Z",
+                "suppressed": false,
+                "is_slug_auto": false,
+                "id_0": "FA003",
+                "level": "collection",
+                "finding_aid_language": "eng",
+                "finding_aid_script": "Latn",
+                "finding_aid_status": "in_progress",
+                "jsonmodel_type": "resource",
+                "external_ids": [
+                    {
+                        "external_id": "614",
+                        "source": "Archivists Toolkit Database::RESOURCE",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T19:44:50Z",
+                        "system_mtime": "2020-12-15T19:44:50Z",
+                        "user_mtime": "2020-12-15T19:44:50Z",
+                        "jsonmodel_type": "external_id"
+                    }
+                ],
+                "subjects": [
+                    {
+                        "ref": "/subjects/962"
+                    }
+                ],
+                "linked_events": [],
+                "extents": [
+                    {
+                        "lock_version": 0,
+                        "number": "88.25",
+                        "container_summary": "177 document boxes.",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T19:44:50Z",
+                        "system_mtime": "2020-12-15T19:44:50Z",
+                        "user_mtime": "2020-12-15T19:44:50Z",
+                        "portion": "whole",
+                        "extent_type": "cubic_feet",
+                        "jsonmodel_type": "extent"
+                    }
+                ],
+                "lang_materials": [
+                    {
+                        "lock_version": 0,
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T19:44:50Z",
+                        "system_mtime": "2020-12-15T19:44:50Z",
+                        "user_mtime": "2020-12-15T19:44:50Z",
+                        "jsonmodel_type": "lang_material",
+                        "notes": [],
+                        "language_and_script": {
+                            "lock_version": 0,
+                            "created_by": "k.martin",
+                            "last_modified_by": "k.martin",
+                            "create_time": "2020-12-15T19:44:50Z",
+                            "system_mtime": "2020-12-15T19:44:50Z",
+                            "user_mtime": "2020-12-15T19:44:50Z",
+                            "language": "eng",
+                            "jsonmodel_type": "language_and_script"
+                        }
+                    }
+                ],
+                "dates": [
+                    {
+                        "lock_version": 0,
+                        "expression": "circa 1905-1980",
+                        "begin": "1905",
+                        "end": "1980",
+                        "created_by": "k.martin",
+                        "last_modified_by": "k.martin",
+                        "create_time": "2020-12-15T19:44:50Z",
+                        "system_mtime": "2020-12-15T19:44:50Z",
+                        "user_mtime": "2020-12-15T19:44:50Z",
+                        "date_type": "inclusive",
+                        "label": "creation",
+                        "jsonmodel_type": "date"
+                    }
+                ],
+                "external_documents": [],
+                "rights_statements": [],
+                "linked_agents": [
+                    {
+                        "role": "creator",
+                        "relator": "aut",
+                        "terms": [],
+                        "ref": "/agents/corporate_entities/4884"
+                    }
+                ],
+                "revision_statements": [],
+                "instances": [],
+                "deaccessions": [],
+                "related_accessions": [],
+                "classifications": [],
+                "notes": [
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "e86ff28d752f8cc68935de79d57816cb",
+                        "type": "accessrestrict",
+                        "rights_restriction": {
+                            "local_access_restriction_type": []
+                        },
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "Open for research with select materials restricted as noted. Brittle or damaged items are available at the discretion of RAC.",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "0e2c38cc8acc938a13a2a75355ad1fc1",
+                        "type": "scopecontent",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "This collection is entirely made up photographs which document the activities of the Rockefeller Foundation during the years 1905-1980.",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    },
+                    {
+                        "jsonmodel_type": "note_multipart",
+                        "persistent_id": "e1c24dcbe5277a0014062410ce9ac729",
+                        "type": "arrangement",
+                        "subnotes": [
+                            {
+                                "jsonmodel_type": "note_text",
+                                "content": "The Rockefeller Foundation photographs are arranged in series primarily by country or state and then further arranged by subject/topic.",
+                                "publish": true
+                            }
+                        ],
+                        "publish": true
+                    }
+                ],
+                "uri": "/repositories/2/resources/93",
+                "repository": {
+                    "ref": "/repositories/2"
+                },
+                "collection_management": {
+                    "lock_version": 0,
+                    "rights_determined": false,
+                    "created_by": "k.martin",
+                    "last_modified_by": "k.martin",
+                    "create_time": "2020-12-15T19:44:50Z",
+                    "system_mtime": "2021-06-16T19:09:43Z",
+                    "user_mtime": "2020-12-15T19:44:50Z",
+                    "processing_status": "completed",
+                    "jsonmodel_type": "collection_management",
+                    "external_ids": [],
+                    "uri": "/repositories/2/collection_management/16595",
+                    "repository": {
+                        "ref": "/repositories/2"
+                    },
+                    "parent": {
+                        "ref": "/repositories/2/resources/93"
+                    }
+                },
+                "user_defined": {
+                    "lock_version": 0,
+                    "boolean_1": false,
+                    "boolean_2": false,
+                    "boolean_3": false,
+                    "date_2": "2016-12-14",
+                    "created_by": "k.martin",
+                    "last_modified_by": "k.martin",
+                    "create_time": "2020-12-15T19:44:50Z",
+                    "system_mtime": "2020-12-15T19:44:50Z",
+                    "user_mtime": "2020-12-15T19:44:50Z",
+                    "enum_1": "3 - Standard",
+                    "jsonmodel_type": "user_defined",
+                    "repository": {
+                        "ref": "/repositories/2"
+                    }
+                },
+                "tree": {
+                    "ref": "/repositories/2/resources/93/tree"
+                }
+            }
+        }
+    ],
+    "instances": [
+        {
+            "lock_version": 0,
+            "created_by": "k.martin",
+            "last_modified_by": "k.martin",
+            "create_time": "2021-01-04T17:28:01Z",
+            "system_mtime": "2021-01-04T17:28:01Z",
+            "user_mtime": "2021-01-04T17:28:01Z",
+            "instance_type": "still image",
+            "jsonmodel_type": "instance",
+            "is_representative": false,
+            "sub_container": {
+                "lock_version": 0,
+                "indicator_2": "2028",
+                "created_by": "k.martin",
+                "last_modified_by": "k.martin",
+                "create_time": "2021-01-04T17:28:01Z",
+                "system_mtime": "2021-01-04T17:28:01Z",
+                "user_mtime": "2021-01-04T17:28:01Z",
+                "type_2": "folder",
+                "jsonmodel_type": "sub_container",
+                "top_container": {
+                    "ref": "/repositories/2/top_containers/11547"
+                }
+            }
+        }
+    ],
+    "notes": [
+        {
+            "jsonmodel_type": "note_multipart",
+            "subnotes": [
+                {
+                    "jsonmodel_type": "note_text",
+                    "publish": true,
+                    "content": "Buildings, Hospitals, Houses, Streetscenes, Markets, Farming, Bananas, Temples, Monuments, Dispensaries,\n\n"
+                }
+            ],
+            "label": "Scope and Contents note",
+            "persistent_id": "dd1688d8fafe9d2a659cce050d915361",
+            "type": "scopecontent",
+            "publish": true
+        }
+    ],
+    "uri": "/repositories/2/archival_objects/13832",
+    "repository": {
+        "ref": "/repositories/2"
+    },
+    "resource": {
+        "ref": "/repositories/2/resources/93"
+    },
+    "parent": {
+        "ref": "/repositories/2/archival_objects/13828"
+    },
+    "has_unpublished_ancestor": false
+}

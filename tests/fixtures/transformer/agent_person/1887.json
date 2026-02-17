@@ -1,0 +1,93 @@
+{
+    "agent_contacts": [
+        {
+            "create_time": "2014-12-06T02:46:05Z",
+            "created_by": "admin",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Van Wie",
+            "system_mtime": "2014-12-06T02:46:05Z",
+            "telephones": [],
+            "user_mtime": "2014-12-06T02:46:05Z"
+        }
+    ],
+    "agent_type": "agent_person",
+    "create_time": "2014-12-06T02:46:05Z",
+    "created_by": "admin",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:46:05Z",
+        "created_by": "admin",
+        "is_display_name": true,
+        "jsonmodel_type": "name_person",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "name_order": "inverted",
+        "primary_name": "Van Wie",
+        "rest_of_name": "Diane",
+        "rules": "dacs",
+        "sort_name": "Van Wie, Diane",
+        "sort_name_auto_generate": true,
+        "source": "local",
+        "system_mtime": "2014-12-06T02:46:05Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:46:05Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/people/1887",
+                "role": "creator",
+                "title": "Van Wie, Diane",
+                "type": "agent_person"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/people/1887",
+        "title": "Van Wie, Diane"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_person",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "creator"
+    ],
+    "lock_version": 17,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:46:05Z",
+            "created_by": "admin",
+            "is_display_name": true,
+            "jsonmodel_type": "name_person",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name_order": "inverted",
+            "primary_name": "Van Wie",
+            "rest_of_name": "Diane",
+            "rules": "dacs",
+            "sort_name": "Van Wie, Diane",
+            "sort_name_auto_generate": true,
+            "source": "local",
+            "system_mtime": "2014-12-06T02:46:05Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:46:05Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2017-12-15T22:30:28Z",
+    "title": "Van Wie, Diane",
+    "uri": "/agents/people/1887",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:46:05Z"
+}

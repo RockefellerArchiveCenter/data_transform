@@ -1,0 +1,78 @@
+{
+    "agent_contacts": [],
+    "agent_type": "agent_family",
+    "create_time": "2018-06-22T21:14:27Z",
+    "created_by": "sgandhi",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2018-06-22T21:14:27Z",
+        "created_by": "sgandhi",
+        "family_name": "Rockefeller Foundation",
+        "is_display_name": true,
+        "jsonmodel_type": "name_family",
+        "last_modified_by": "sgandhi",
+        "lock_version": 0,
+        "rules": "dacs",
+        "sort_name": "Rockefeller Foundation",
+        "sort_name_auto_generate": true,
+        "source": "local",
+        "system_mtime": "2018-06-22T21:14:27Z",
+        "use_dates": [],
+        "user_mtime": "2018-06-22T21:14:27Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/families/11",
+                "role": "creator",
+                "title": "Rockefeller Foundation",
+                "type": "agent_family"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/families/11",
+        "title": "Rockefeller Foundation"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_family",
+    "last_modified_by": "sgandhi",
+    "linked_agent_roles": [
+        "creator",
+        "source"
+    ],
+    "lock_version": 36,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2018-06-22T21:14:27Z",
+            "created_by": "sgandhi",
+            "family_name": "Rockefeller Foundation",
+            "is_display_name": true,
+            "jsonmodel_type": "name_family",
+            "last_modified_by": "sgandhi",
+            "lock_version": 0,
+            "rules": "dacs",
+            "sort_name": "Rockefeller Foundation",
+            "sort_name_auto_generate": true,
+            "source": "local",
+            "system_mtime": "2018-06-22T21:14:27Z",
+            "use_dates": [],
+            "user_mtime": "2018-06-22T21:14:27Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2019-04-01T18:50:29Z",
+    "title": "Rockefeller Foundation",
+    "uri": "/agents/families/11",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2018-06-22T21:14:27Z"
+}

@@ -1,0 +1,44 @@
+{
+    "create_time": "2015-06-03T18:25:29Z",
+    "created_by": "battalb",
+    "external_documents": [],
+    "external_ids": [],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/17090",
+        "title": "Governors -- Election -- New York (State) -- 1962"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "battalb",
+    "lock_version": 34,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2018-02-13T15:32:49Z",
+    "terms": [
+        {
+            "create_time": "2015-06-03T18:25:29Z",
+            "created_by": "battalb",
+            "jsonmodel_type": "term",
+            "last_modified_by": "battalb",
+            "lock_version": 0,
+            "system_mtime": "2015-06-03T18:25:29Z",
+            "term": "Governors -- Election -- New York (State) -- 1962",
+            "term_type": "topical",
+            "uri": "/terms/14649",
+            "user_mtime": "2015-06-03T18:25:29Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "Governors -- Election -- New York (State) -- 1962",
+    "uri": "/subjects/17090",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2015-06-03T18:25:29Z",
+    "vocabulary": "/vocabularies/1"
+}

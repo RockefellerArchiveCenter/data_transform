@@ -1,0 +1,55 @@
+{
+    "create_time": "2014-12-06T02:29:55Z",
+    "created_by": "admin",
+    "external_documents": [],
+    "external_ids": [
+        {
+            "create_time": "2014-12-06T02:29:55Z",
+            "created_by": "admin",
+            "external_id": "143",
+            "jsonmodel_type": "external_id",
+            "last_modified_by": "admin",
+            "source": "Archivists Toolkit Database::SUBJECT",
+            "system_mtime": "2014-12-06T02:29:55Z",
+            "user_mtime": "2014-12-06T02:29:55Z"
+        }
+    ],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/123",
+        "title": "Prevention and health"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "admin",
+    "lock_version": 300,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2019-03-04T22:29:22Z",
+    "terms": [
+        {
+            "create_time": "2014-12-06T02:29:55Z",
+            "created_by": "admin",
+            "jsonmodel_type": "term",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:29:55Z",
+            "term": "Prevention and health",
+            "term_type": "topical",
+            "uri": "/terms/127",
+            "user_mtime": "2014-12-06T02:29:55Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "Prevention and health",
+    "uri": "/subjects/123",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:29:55Z",
+    "vocabulary": "/vocabularies/1"
+}

@@ -1,0 +1,76 @@
+{
+    "agent_contacts": [],
+    "agent_type": "agent_corporate_entity",
+    "create_time": "2015-05-02T06:17:52Z",
+    "created_by": "pgalligan",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2015-05-02T06:17:52Z",
+        "created_by": "pgalligan",
+        "is_display_name": true,
+        "jsonmodel_type": "name_corporate_entity",
+        "last_modified_by": "pgalligan",
+        "lock_version": 0,
+        "primary_name": "Rockefeller Foundation. International Health Board",
+        "sort_name": "Rockefeller Foundation. International Health Board",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2017-08-22T15:44:40Z",
+        "use_dates": [],
+        "user_mtime": "2015-05-02T06:17:52Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/corporate_entities/20012",
+                "role": "creator",
+                "title": "Rockefeller Foundation. International Health Board",
+                "type": "agent_corporate_entity"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/corporate_entities/20012",
+        "title": "Rockefeller Foundation. International Health Board"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_corporate_entity",
+    "last_modified_by": "pgalligan",
+    "linked_agent_roles": [
+        "creator",
+        "subject"
+    ],
+    "lock_version": 28,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2015-05-02T06:17:52Z",
+            "created_by": "pgalligan",
+            "is_display_name": true,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "pgalligan",
+            "lock_version": 0,
+            "primary_name": "Rockefeller Foundation. International Health Board",
+            "sort_name": "Rockefeller Foundation. International Health Board",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2017-08-22T15:44:40Z",
+            "use_dates": [],
+            "user_mtime": "2015-05-02T06:17:52Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2017-12-15T22:26:27Z",
+    "title": "Rockefeller Foundation. International Health Board",
+    "uri": "/agents/corporate_entities/20012",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2015-05-02T06:17:52Z"
+}

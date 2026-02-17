@@ -1,0 +1,76 @@
+{
+    "agent_contacts": [],
+    "agent_type": "agent_corporate_entity",
+    "create_time": "2015-04-28T19:00:19Z",
+    "created_by": "pgalligan",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2015-04-28T19:00:19Z",
+        "created_by": "pgalligan",
+        "is_display_name": true,
+        "jsonmodel_type": "name_corporate_entity",
+        "last_modified_by": "pgalligan",
+        "lock_version": 0,
+        "primary_name": "Rockefeller Institute for Medical Research",
+        "sort_name": "Rockefeller Institute for Medical Research",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2017-08-22T15:44:40Z",
+        "use_dates": [],
+        "user_mtime": "2015-04-28T19:00:19Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/corporate_entities/20001",
+                "role": "creator",
+                "title": "Rockefeller Institute for Medical Research",
+                "type": "agent_corporate_entity"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/corporate_entities/20001",
+        "title": "Rockefeller Institute for Medical Research"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_corporate_entity",
+    "last_modified_by": "pgalligan",
+    "linked_agent_roles": [
+        "creator",
+        "subject"
+    ],
+    "lock_version": 129,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2015-04-28T19:00:19Z",
+            "created_by": "pgalligan",
+            "is_display_name": true,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "pgalligan",
+            "lock_version": 0,
+            "primary_name": "Rockefeller Institute for Medical Research",
+            "sort_name": "Rockefeller Institute for Medical Research",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2017-08-22T15:44:40Z",
+            "use_dates": [],
+            "user_mtime": "2015-04-28T19:00:19Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2018-11-01T18:25:16Z",
+    "title": "Rockefeller Institute for Medical Research",
+    "uri": "/agents/corporate_entities/20001",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2015-04-28T19:00:19Z"
+}

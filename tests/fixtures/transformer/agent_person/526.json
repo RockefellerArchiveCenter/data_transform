@@ -1,0 +1,93 @@
+{
+    "agent_contacts": [
+        {
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Morrow",
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "telephones": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        }
+    ],
+    "agent_type": "agent_person",
+    "create_time": "2014-12-06T02:42:12Z",
+    "created_by": "admin",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:42:12Z",
+        "created_by": "admin",
+        "is_display_name": true,
+        "jsonmodel_type": "name_person",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "name_order": "inverted",
+        "primary_name": "Morrow",
+        "rest_of_name": "Hugh",
+        "sort_name": "Morrow, Hugh",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2017-08-22T15:44:45Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:42:12Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/people/526",
+                "role": "creator",
+                "title": "Morrow, Hugh",
+                "type": "agent_person"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/people/526",
+        "title": "Morrow, Hugh"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_person",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "creator",
+        "source",
+        "subject"
+    ],
+    "lock_version": 250,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": true,
+            "jsonmodel_type": "name_person",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name_order": "inverted",
+            "primary_name": "Morrow",
+            "rest_of_name": "Hugh",
+            "sort_name": "Morrow, Hugh",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2017-08-22T15:44:45Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2018-11-09T20:29:35Z",
+    "title": "Morrow, Hugh",
+    "uri": "/agents/people/526",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:42:12Z"
+}

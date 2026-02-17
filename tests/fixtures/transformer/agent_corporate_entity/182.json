@@ -1,0 +1,207 @@
+{
+    "agent_contacts": [
+        {
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Republican Party (U.S. : 1854- )",
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "telephones": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        }
+    ],
+    "agent_type": "agent_corporate_entity",
+    "create_time": "2014-12-06T02:42:12Z",
+    "created_by": "admin",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:42:12Z",
+        "created_by": "admin",
+        "is_display_name": true,
+        "jsonmodel_type": "name_corporate_entity",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "primary_name": "Republican Party (U.S. : 1854- )",
+        "sort_name": "Republican Party (U.S. : 1854- )",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "system_mtime": "2017-08-22T15:44:40Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:42:12Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/corporate_entities/182",
+                "role": "creator",
+                "title": "Republican Party (U.S. : 1854- )",
+                "type": "agent_corporate_entity"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/corporate_entities/182",
+        "title": "Republican Party (U.S. : 1854- )"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_corporate_entity",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "subject"
+    ],
+    "lock_version": 442,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": true,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "Republican Party (U.S. : 1854- )",
+            "sort_name": "Republican Party (U.S. : 1854- )",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "system_mtime": "2017-08-22T15:44:40Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "GOP.",
+            "sort_name": "GOP.",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "Grand Old Party.",
+            "sort_name": "Grand Old Party.",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "National Union Party (U.S. : 1854- ).",
+            "sort_name": "National Union Party (U.S. : 1854- ).",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "National Union Republican Party (U.S. : 1854- ).",
+            "sort_name": "National Union Republican Party (U.S. : 1854- ).",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "Republican Party.",
+            "sort_name": "Republican Party.",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "Republicans (Political party : U.S. : 1854- ).",
+            "sort_name": "Republicans (Political party : U.S. : 1854- ).",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "Union Party (U.S. : 1854- ).",
+            "sort_name": "Union Party (U.S. : 1854- ).",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:42:12Z",
+            "created_by": "admin",
+            "is_display_name": false,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "Union Republican Party (U.S. : 1854- ).",
+            "sort_name": "Union Republican Party (U.S. : 1854- ).",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:42:12Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:42:12Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2018-12-11T20:41:03Z",
+    "title": "Republican Party (U.S. : 1854- )",
+    "uri": "/agents/corporate_entities/182",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:42:12Z"
+}

@@ -28,6 +28,13 @@ SCHEMA_OBJECT = os.environ.get("SCHEMA_OBJECT", "")
 SCHEMA_TERM = os.environ.get("SCHEMA_TERM", "")
 SCHEMA_BASE = os.environ.get("SCHEMA_BASE")  # optional
 SSM_PREFIX = os.environ.get("SSM_PREFIX", "").rstrip("/")
+SCHEMAS = {
+    "base": SCHEMA_BASE,
+    "agent": SCHEMA_AGENT,
+    "collection": SCHEMA_COLLECTION,
+    "object": SCHEMA_OBJECT,
+    "term": SCHEMA_TERM,
+}
 
 sns = boto3.client("sns")
 ssm = boto3.client("ssm")
@@ -88,8 +95,8 @@ class Transformer:
     """
 
     def __init__(self):
-        require_env()
         self.identifier = None
+        self.online_pending = False
 
     def run(self, object_type, data):
         """
@@ -100,7 +107,7 @@ class Transformer:
             data (dict): source record dict
 
         Returns:
-            dict: transformed object (validated). Adds `_online_pending` boolean.
+            dict: transformed object (validated). Adds `online_pending` boolean.
         """
         try:
             self.identifier = data.get("uri")
@@ -108,10 +115,11 @@ class Transformer:
                 object_type)
             transformed = self.get_transformed_object(
                 data, from_resource, mapping)
-            transformed["_online_pending"] = self.get_online_pending(
+            transformed["online_pending"] = self.get_online_pending(
                 data.get("instances", []),
                 transformed.get("online", False),
             )
+            self.online_pending = transformed["online_pending"]
             self.validate_transformed(transformed, schema_name)
             return transformed
         except ValidationError as e:
@@ -245,21 +253,44 @@ class Transformer:
                 for k, v in attributes.items()
             ),
         }
-        publish(
-            SUCCESS_TOPIC_ARN,
+        self.publish_result(
+            "success",
             success_payload,
             subject="transform success: {0}".format(object_type),
         )
         return success_payload
 
+    def publish_result(self, status, payload, subject=None):
+        """Publish a result payload to SNS.
 
-transformer = Transformer()
+        This method exists primarily so tests can patch it and avoid real SNS calls.
+        """
+        if status == "success":
+            topic_arn = SUCCESS_TOPIC_ARN
+        elif status == "failure":
+            topic_arn = FAILURE_TOPIC_ARN
+        else:
+            raise ValueError(f"Unknown status: {status}")
+        publish(topic_arn, payload, subject=subject)
+
+
+# Hacky method because I'm running into env issues.
+transformer = None
+
+
+def get_transformer():
+    global transformer
+    if transformer is None:
+        transformer = Transformer()
+    return transformer
 
 
 def lambda_handler(event, context):
     """
-    Processes each record, and returns partial  failures so only failed messages retry.
+    Processes each record, and returns partial failures so only failed messages retry.
     """
+    transformer = get_transformer()
+
     records = event.get("Records") or []
     failures = []
     for record in records:
@@ -274,8 +305,8 @@ def lambda_handler(event, context):
                 "error": str(exc),
                 "traceback": traceback.format_exc(limit=20),
             }
-            publish(
-                FAILURE_TOPIC_ARN,
+            transformer.publish_result(
+                "failure",
                 failure_payload,
                 subject="transform failure",
             )

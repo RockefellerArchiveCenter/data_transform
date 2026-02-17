@@ -1,0 +1,55 @@
+{
+    "create_time": "2014-12-06T02:30:05Z",
+    "created_by": "admin",
+    "external_documents": [],
+    "external_ids": [
+        {
+            "create_time": "2014-12-06T02:30:05Z",
+            "created_by": "admin",
+            "external_id": "283",
+            "jsonmodel_type": "external_id",
+            "last_modified_by": "admin",
+            "source": "Archivists Toolkit Database::SUBJECT",
+            "system_mtime": "2014-12-06T02:30:05Z",
+            "user_mtime": "2014-12-06T02:30:05Z"
+        }
+    ],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/231",
+        "title": "Social problems"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "admin",
+    "lock_version": 153,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2019-03-08T17:57:17Z",
+    "terms": [
+        {
+            "create_time": "2014-12-06T02:30:05Z",
+            "created_by": "admin",
+            "jsonmodel_type": "term",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:30:05Z",
+            "term": "Social problems",
+            "term_type": "topical",
+            "uri": "/terms/237",
+            "user_mtime": "2014-12-06T02:30:05Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "Social problems",
+    "uri": "/subjects/231",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:30:05Z",
+    "vocabulary": "/vocabularies/1"
+}

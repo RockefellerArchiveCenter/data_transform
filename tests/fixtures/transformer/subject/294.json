@@ -1,0 +1,68 @@
+{
+    "create_time": "2014-12-06T02:30:11Z",
+    "created_by": "admin",
+    "external_documents": [],
+    "external_ids": [
+        {
+            "create_time": "2014-12-06T02:30:11Z",
+            "created_by": "admin",
+            "external_id": "352",
+            "jsonmodel_type": "external_id",
+            "last_modified_by": "admin",
+            "source": "Archivists Toolkit Database::SUBJECT",
+            "system_mtime": "2014-12-06T02:30:11Z",
+            "user_mtime": "2014-12-06T02:30:11Z"
+        }
+    ],
+    "group": {
+        "creators": [],
+        "dates": [],
+        "identifier": "/subjects/294",
+        "title": "International relations -- United States"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "subject",
+    "last_modified_by": "admin",
+    "lock_version": 666,
+    "publish": true,
+    "source": "lcsh",
+    "system_mtime": "2019-03-08T17:57:17Z",
+    "terms": [
+        {
+            "create_time": "2014-12-06T02:29:57Z",
+            "created_by": "admin",
+            "jsonmodel_type": "term",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:29:57Z",
+            "term": "International relations",
+            "term_type": "topical",
+            "uri": "/terms/143",
+            "user_mtime": "2014-12-06T02:29:57Z",
+            "vocabulary": "/vocabularies/1"
+        },
+        {
+            "create_time": "2014-12-06T02:29:45Z",
+            "created_by": "admin",
+            "jsonmodel_type": "term",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2014-12-06T02:29:45Z",
+            "term": "United States",
+            "term_type": "topical",
+            "uri": "/terms/22",
+            "user_mtime": "2014-12-06T02:29:45Z",
+            "vocabulary": "/vocabularies/1"
+        }
+    ],
+    "title": "International relations -- United States",
+    "uri": "/subjects/294",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:30:11Z",
+    "vocabulary": "/vocabularies/1"
+}

@@ -1,0 +1,89 @@
+{
+    "agent_contacts": [
+        {
+            "create_time": "2014-12-06T02:41:01Z",
+            "created_by": "admin",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Rockefeller Foundation",
+            "system_mtime": "2014-12-06T02:41:01Z",
+            "telephones": [],
+            "user_mtime": "2014-12-06T02:41:01Z"
+        }
+    ],
+    "agent_type": "agent_corporate_entity",
+    "create_time": "2014-12-06T02:41:01Z",
+    "created_by": "admin",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:41:01Z",
+        "created_by": "admin",
+        "is_display_name": true,
+        "jsonmodel_type": "name_corporate_entity",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "primary_name": "Rockefeller Foundation",
+        "sort_name": "Rockefeller Foundation. Natural and Environmental Sciences Division",
+        "sort_name_auto_generate": true,
+        "source": "naf",
+        "subordinate_name_1": "Natural and Environmental Sciences Division",
+        "system_mtime": "2017-08-22T15:44:40Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:41:01Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/corporate_entities/55",
+                "role": "creator",
+                "title": "Rockefeller Foundation. Natural and Environmental Sciences Division",
+                "type": "agent_corporate_entity"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/corporate_entities/55",
+        "title": "Rockefeller Foundation. Natural and Environmental Sciences Division"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_corporate_entity",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "subject"
+    ],
+    "lock_version": 13,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:41:01Z",
+            "created_by": "admin",
+            "is_display_name": true,
+            "jsonmodel_type": "name_corporate_entity",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "primary_name": "Rockefeller Foundation",
+            "sort_name": "Rockefeller Foundation. Natural and Environmental Sciences Division",
+            "sort_name_auto_generate": true,
+            "source": "naf",
+            "subordinate_name_1": "Natural and Environmental Sciences Division",
+            "system_mtime": "2017-08-22T15:44:40Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:41:01Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2017-12-15T22:26:27Z",
+    "title": "Rockefeller Foundation. Natural and Environmental Sciences Division",
+    "uri": "/agents/corporate_entities/55",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:41:01Z"
+}
