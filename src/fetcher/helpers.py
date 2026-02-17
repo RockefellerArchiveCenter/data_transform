@@ -101,11 +101,15 @@ async def handle_deleted_uris(uri_list, source, object_type, current_run):
     es_ids = [identifier_from_uri(uri) for uri in list(set(uri_list))]
     if es_ids:
         try:
-            resp = requests.post(settings.INDEX_DELETE_URL, json={"identifiers": es_ids})
+            resp = requests.post(
+                settings.INDEX_DELETE_URL, json={
+                    "identifiers": es_ids})
             resp.raise_for_status()
             updated = es_ids
         except requests.exceptions.HTTPError:
-            raise Exception("Error sending delete request: {}".format(resp.json()["detail"]))
+            raise Exception(
+                "Error sending delete request: {}".format(
+                    resp.json()["detail"]))
         except Exception as e:
             raise Exception("Error sending delete request: {}".format(e))
     return updated
@@ -114,7 +118,13 @@ async def handle_deleted_uris(uri_list, source, object_type, current_run):
 def send_email_message(title, body):
     """Send email with errors encountered during a fetch run."""
     try:
-        send_mail(title, body, "alerts@rockarch.org", settings.EMAIL_TO_ADDRESSES, fail_silently=False,)
+        send_mail(
+            title,
+            body,
+            "alerts@rockarch.org",
+            settings.EMAIL_TO_ADDRESSES,
+            fail_silently=False,
+        )
     except Exception as e:
         print(f"Unable to send error notification email: {e}")
 
@@ -152,7 +162,11 @@ def send_teams_message(title, body):
     }
     encoded_msg = json.dumps(message)
     try:
-        requests.post(settings.TEAMS_URL, headers={'Content-Type': 'application/json'}, data=encoded_msg)
+        requests.post(
+            settings.TEAMS_URL,
+            headers={
+                'Content-Type': 'application/json'},
+            data=encoded_msg)
     except Exception as e:
         print(f"Unable to deliver error notification to Teams Channel: {e}")
 
@@ -163,11 +177,15 @@ def send_error_notification(fetch_run):
     err_str = "errors" if fetch_run.error_count > 1 else "error"
     object_type = fetch_run.get_object_type_display()
     object_status = fetch_run.get_object_status_display()
-    source = [s[1] for s in FetchRun.SOURCE_CHOICES if s[0] == int(fetch_run.source)][0]
+    source = [
+        s[1] for s in FetchRun.SOURCE_CHOICES if s[0] == int(
+            fetch_run.source)][0]
     for err in fetch_run.errors:
         errors += "{}\n".format(err.message)
-    title = f"{fetch_run.error_count} {err_str} processing {object_status} {object_type} objects from {source}"
-    body = f"The following errors were encountered while processing {object_status} {object_type} objects from {source}:\n\n{errors}"
+    title = f"{fetch_run.error_count} {err_str} processing {
+        object_status} {object_type} objects from {source}"
+    body = f"The following errors were encountered while processing {
+        object_status} {object_type} objects from {source}:\n\n{errors}"
     if settings.NOTIFY_EMAIL:
         send_email_message(title, body)
     if settings.NOTIFY_TEAMS:
@@ -198,7 +216,8 @@ def valid_finding_aid_status(obj):
     Returns a boolean indicating whether the finding aid status for the object's
     resource is not in a list of configured restricted statuses.
     """
-    if len(settings.ARCHIVESSPACE.get("finding_aid_status_restrict", [])) and obj.get("jsonmodel_type") in ["resource", "archival_object"]:
+    if len(settings.ARCHIVESSPACE.get("finding_aid_status_restrict", [])
+           ) and obj.get("jsonmodel_type") in ["resource", "archival_object"]:
         resource = obj["ancestors"][-1]["_resolved"] if obj["jsonmodel_type"] == "archival_object" else obj
         if not resource.get("finding_aid_status") or any(
                 [resource.get("finding_aid_status") == value for value in settings.ARCHIVESSPACE["finding_aid_status_restrict"]]):
@@ -208,9 +227,11 @@ def valid_finding_aid_status(obj):
 
 def generate_download_identifier(source_object, digital_object):
     """Generates a URI for a downloadable object."""
-    return f'{settings.DOWNLOAD_BASEURL}/{identifier_from_uri(source_object["uri"])}'
+    return f'{
+        settings.DOWNLOAD_BASEURL}/{identifier_from_uri(source_object["uri"])}'
 
 
 def generate_manifest_identifier(source_object, digital_object):
     """Generates a URI for a IIIF Presentation manifest."""
-    return f'{settings.MANIFEST_BASEURL}/{identifier_from_uri(source_object["uri"])}'
+    return f'{
+        settings.MANIFEST_BASEURL}/{identifier_from_uri(source_object["uri"])}'

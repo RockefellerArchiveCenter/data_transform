@@ -8,26 +8,17 @@ from jsonschema.exceptions import ValidationError
 from odin.codecs import json_codec
 from rac_schema_validator import is_valid
 
-from .mappings import (
-    SourceAgentCorporateEntityToAgent,
-    SourceAgentFamilyToAgent,
-    SourceAgentPersonToAgent,
-    SourceArchivalObjectToCollection,
-    SourceArchivalObjectToObject,
-    SourceResourceToCollection,
-    SourceSubjectToTerm,
-)
-from .resources.source import (
-    SourceAgentCorporateEntity,
-    SourceAgentFamily,
-    SourceAgentPerson,
-    SourceArchivalObject,
-    SourceResource,
-    SourceSubject,
-)
+from .mappings import (SourceAgentCorporateEntityToAgent,
+                       SourceAgentFamilyToAgent, SourceAgentPersonToAgent,
+                       SourceArchivalObjectToCollection,
+                       SourceArchivalObjectToObject,
+                       SourceResourceToCollection, SourceSubjectToTerm)
+from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
+                               SourceAgentPerson, SourceArchivalObject,
+                               SourceResource, SourceSubject)
 
-
-# Environment variables. This is a work in progress. I'm guessing these should be SSM params.
+# Environment variables. This is a work in progress. I'm guessing these
+# should be SSM params.
 SUCCESS_TOPIC_ARN = os.environ.get("SUCCESS_TOPIC_ARN", "")
 FAILURE_TOPIC_ARN = os.environ.get("FAILURE_TOPIC_ARN", "")
 SCHEMAS_BASE_DIR = os.environ.get("SCHEMAS_BASE_DIR", "").rstrip("/")
@@ -62,12 +53,18 @@ def require_env():
         if not variable:
             missing.append(k)
     if missing:
-        raise ValueError("Missing required environment variables: " + ", ".join(missing))
+        raise ValueError(
+            "Missing required environment variables: " +
+            ", ".join(missing))
 
 
 def publish(topic_arn, payload, subject=None):
     """Publish a JSON payload to SNS."""
-    params = {"TopicArn": topic_arn, "Message": json.dumps(payload, default=str)}
+    params = {
+        "TopicArn": topic_arn,
+        "Message": json.dumps(
+            payload,
+            default=str)}
     if subject:
         params["Subject"] = subject[:100]
     sns.publish(**params)
@@ -90,6 +87,7 @@ class Transformer:
     - Transforms and validates using mappings and resources
     - Publishes success/failure events to SNS
     """
+
     def __init__(self):
         require_env()
         self.identifier = None
@@ -107,8 +105,10 @@ class Transformer:
         """
         try:
             self.identifier = data.get("uri")
-            from_resource, mapping, schema_name = self.get_mapping_classes(object_type)
-            transformed = self.get_transformed_object(data, from_resource, mapping)
+            from_resource, mapping, schema_name = self.get_mapping_classes(
+                object_type)
+            transformed = self.get_transformed_object(
+                data, from_resource, mapping)
             transformed["_online_pending"] = self.get_online_pending(
                 data.get("instances", []),
                 transformed.get("online", False),
@@ -119,7 +119,8 @@ class Transformer:
             raise TransformError("Transformed data is invalid: {0}".format(e))
         except Exception as e:
             raise TransformError(
-                "Error transforming {0} {1}: {2}".format(object_type, self.identifier, str(e))
+                "Error transforming {0} {1}: {2}".format(
+                    object_type, self.identifier, str(e))
             )
 
     def get_mapping_classes(self, object_type):
@@ -153,8 +154,8 @@ class Transformer:
         published_digital_instances = [
             v
             for v in instances
-            if v.get("instance_type") == "digital_object"
-            and v.get("digital_object", {}).get("_resolved", {}).get("publish")
+            if v.get("instance_type") == "digital_object" and
+            v.get("digital_object", {}).get("_resolved", {}).get("publish")
         ]
         if len(published_digital_instances) and not online:
             return True
@@ -173,7 +174,8 @@ class Transformer:
             for key, value in data.items():
                 if key != target_key:
                     if isinstance(value, dict):
-                        modified_dict[key] = self.remove_keys_from_dict(data[key], target_key=target_key)
+                        modified_dict[key] = self.remove_keys_from_dict(
+                            data[key], target_key=target_key)
                     elif isinstance(value, list):
                         modified_dict[key] = [
                             self.remove_keys_from_dict(i, target_key=target_key) for i in data[key]
@@ -212,18 +214,20 @@ class Transformer:
             body = record.get("body")
         attributes = record.get("messageAttributes", {}) or {}
         object_type = (
-            attributes.get("objectType", {}).get("stringValue")
-            or attributes.get("object_type", {}).get("stringValue")
-            or (body.get("objectType") if isinstance(body, dict) else None)
-            or (body.get("object_type") if isinstance(body, dict) else None)
+            attributes.get("objectType", {}).get("stringValue") or
+            attributes.get("object_type", {}).get("stringValue") or
+            (body.get("objectType") if isinstance(body, dict) else None) or
+            (body.get("object_type") if isinstance(body, dict) else None)
         )
         if not object_type:
-            raise ValueError("Missing object_type (messageAttributes.objectType/object_type or body field)")
+            raise ValueError(
+                "Missing object_type (messageAttributes.objectType/object_type or body field)")
         source_data = None
         if isinstance(body, dict):
             source_data = body.get("data") or body.get("record") or body
         else:
-            raise ValueError("Message body must be JSON object for transformation")
+            raise ValueError(
+                "Message body must be JSON object for transformation")
         if not isinstance(source_data, dict):
             raise ValueError("Source data must be a JSON object (dict)")
         transformed = self.run(object_type, source_data)
@@ -245,7 +249,9 @@ class Transformer:
         )
         return success_payload
 
+
 transformer = Transformer()
+
 
 def lambda_handler(event, context):
     """

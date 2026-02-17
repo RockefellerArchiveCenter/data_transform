@@ -13,13 +13,37 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='fetchrun',
             name='object_status',
-            field=models.CharField(choices=[('updated', 'Updated'), ('deleted', 'Deleted')], default='updated', max_length=100),
+            field=models.CharField(
+                choices=[
+                    ('updated',
+                     'Updated'),
+                    ('deleted',
+                     'Deleted')],
+                default='updated',
+                max_length=100),
             preserve_default=False,
         ),
         migrations.AlterField(
             model_name='fetchrun',
             name='object_type',
-            field=models.CharField(choices=[('resource', 'Resource'), ('archival_object', 'Archival Object'), ('subject', 'Subject'), ('person', 'Person'), ('organization', 'Organization'), ('family', 'Family'), ('arrangement_map', 'Arrangement Map')], default='resource', max_length=100),
+            field=models.CharField(
+                choices=[
+                    ('resource',
+                     'Resource'),
+                    ('archival_object',
+                     'Archival Object'),
+                    ('subject',
+                     'Subject'),
+                    ('person',
+                     'Person'),
+                    ('organization',
+                     'Organization'),
+                    ('family',
+                     'Family'),
+                    ('arrangement_map',
+                     'Arrangement Map')],
+                default='resource',
+                max_length=100),
             preserve_default=False,
         ),
     ]

@@ -19,14 +19,19 @@ class Note(odin.Resource):
     """
     type = odin.StringField(choices=configs.NOTE_TYPE_CHOICES)
     title = odin.StringField(null=True)
-    source = odin.StringField(null=True, default='archivesspace', choices=configs.SOURCE_CHOICES)
+    source = odin.StringField(
+        null=True,
+        default='archivesspace',
+        choices=configs.SOURCE_CHOICES)
     subnotes = odin.ArrayOf(Subnote)
 
 
 class ExternalIdentifier(odin.Resource):
     """Uniquely identifies a first-class entity."""
     identifier = odin.StringField()
-    source = odin.StringField(default='archivesspace', choices=configs.SOURCE_CHOICES)
+    source = odin.StringField(
+        default='archivesspace',
+        choices=configs.SOURCE_CHOICES)
 
 
 class Reference(odin.Resource):
@@ -62,7 +67,10 @@ class Date(odin.Resource):
     expression = odin.StringField()
     type = odin.StringField(choices=configs.DATE_TYPE_CHOICES)
     label = odin.StringField(choices=configs.DATE_LABEL_CHOICES)
-    source = odin.StringField(null=True, default='archivesspace', choices=configs.SOURCE_CHOICES)
+    source = odin.StringField(
+        null=True,
+        default='archivesspace',
+        choices=configs.SOURCE_CHOICES)
 
 
 class Extent(odin.Resource):

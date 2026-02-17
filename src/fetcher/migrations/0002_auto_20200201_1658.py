@@ -13,6 +13,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='fetchrun',
             name='source',
-            field=models.CharField(choices=[(0, 'ArchivesSpace'), (1, 'Cartographer')], max_length=100),
+            field=models.CharField(
+                choices=[
+                    (0, 'ArchivesSpace'), (1, 'Cartographer')], max_length=100),
         ),
     ]

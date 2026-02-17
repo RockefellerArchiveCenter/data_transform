@@ -13,6 +13,22 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='fetchrun',
             name='object_type',
-            field=models.CharField(choices=[('resource', 'Resource'), ('archival_object', 'Archival Object'), ('subject', 'Subject'), ('agent_person', 'Person'), ('agent_corporate_entity', 'Organization'), ('agent_family', 'Family'), ('arrangement_map_component', 'Arrangement Map Component')], max_length=100),
+            field=models.CharField(
+                choices=[
+                    ('resource',
+                     'Resource'),
+                    ('archival_object',
+                     'Archival Object'),
+                    ('subject',
+                     'Subject'),
+                    ('agent_person',
+                     'Person'),
+                    ('agent_corporate_entity',
+                     'Organization'),
+                    ('agent_family',
+                     'Family'),
+                    ('arrangement_map_component',
+                     'Arrangement Map Component')],
+                max_length=100),
         ),
     ]

@@ -110,7 +110,9 @@ class SourceLangMaterial(odin.Resource):
 class SourceSubcontainer(odin.Resource):
     """Provides detailed container information."""
     indicator_2 = odin.StringField(null=True)
-    type_2 = odin.StringField(choices=configs.CONTAINER_TYPE_CHOICES, null=True)
+    type_2 = odin.StringField(
+        choices=configs.CONTAINER_TYPE_CHOICES,
+        null=True)
     top_container = odin.DictAs(SourceRef)
 
 
@@ -125,7 +127,8 @@ class SourceInstance(odin.Resource):
 class SourceLinkedAgent(odin.Resource):
     """A reference to a SourceAgentFamily, SourceAgentPerson or SourceAgentCorporateEntity."""
     role = odin.StringField(choices=configs.AGENT_ROLE_CHOICES)
-    relator = odin.StringField(choices=configs.AGENT_RELATOR_CHOICES, null=True)
+    relator = odin.StringField(
+        choices=configs.AGENT_RELATOR_CHOICES, null=True)
     ref = odin.StringField()
     type = odin.StringField()
     title = odin.StringField()
@@ -140,7 +143,8 @@ class SourceNameBase(odin.Resource):
     sort_name = odin.StringField()
     authorized = odin.BooleanField()
     is_display_name = odin.BooleanField()
-    # use_dates = odin.ArrayOf(SourceStructuredDate) # TODO: account for structured and nonstructured dates
+    # use_dates = odin.ArrayOf(SourceStructuredDate) # TODO: account for
+    # structured and nonstructured dates
     rules = odin.StringField(choices=configs.NAME_RULES_CHOICES, null=True)
     source = odin.StringField(choices=configs.NAME_SOURCE_CHOICES, null=True)
 
@@ -159,7 +163,8 @@ class SourceNamePerson(SourceNameBase):
     """A structured representation of a SourceAgentPerson's name."""
     primary_name = odin.StringField()
     rest_of_name = odin.StringField(null=True)
-    name_order = odin.StringField(choices=(('direct', 'Direct'), ('inverted', 'Inverted')))
+    name_order = odin.StringField(
+        choices=(('direct', 'Direct'), ('inverted', 'Inverted')))
 
 
 class SourceSubnote(odin.Resource):
@@ -282,7 +287,8 @@ class SourceAgentBase(odin.Resource):
         ('agent_person', 'Person')
     )
 
-    agent_record_identifiers = odin.ArrayOf(SourceAgentRecordIdentifier, null=True)
+    agent_record_identifiers = odin.ArrayOf(
+        SourceAgentRecordIdentifier, null=True)
     dates_of_existence = odin.ArrayField(null=True)
     group = odin.DictAs(SourceGroup)
     jsonmodel_type = odin.StringField(choices=AGENT_TYPES)
