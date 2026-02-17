@@ -41,7 +41,7 @@ class TransformError(Exception):
 def require_env():
     """Validate required environment variables."""
     missing = []
-    for item, variables in [
+    for name, value in [
         ("SUCCESS_TOPIC_ARN", SUCCESS_TOPIC_ARN),
         ("FAILURE_TOPIC_ARN", FAILURE_TOPIC_ARN),
         ("SCHEMAS_BASE_DIR", SCHEMAS_BASE_DIR),
@@ -50,12 +50,11 @@ def require_env():
         ("SCHEMA_OBJECT", SCHEMA_OBJECT),
         ("SCHEMA_TERM", SCHEMA_TERM),
     ]:
-        if not variable:
-            missing.append(k)
+        if not value:
+            missing.append(name)
     if missing:
         raise ValueError(
-            "Missing required environment variables: " +
-            ", ".join(missing))
+            "Missing required environment variables: " + ", ".join(missing))
 
 
 def publish(topic_arn, payload, subject=None):
@@ -154,8 +153,7 @@ class Transformer:
         published_digital_instances = [
             v
             for v in instances
-            if v.get("instance_type") == "digital_object" and
-            v.get("digital_object", {}).get("_resolved", {}).get("publish")
+            if v.get("instance_type") == "digital_object" and v.get("digital_object", {}).get("_resolved", {}).get("publish")
         ]
         if len(published_digital_instances) and not online:
             return True
@@ -213,12 +211,17 @@ class Transformer:
         except json.JSONDecodeError:
             body = record.get("body")
         attributes = record.get("messageAttributes", {}) or {}
-        object_type = (
-            attributes.get("objectType", {}).get("stringValue") or
-            attributes.get("object_type", {}).get("stringValue") or
-            (body.get("objectType") if isinstance(body, dict) else None) or
-            (body.get("object_type") if isinstance(body, dict) else None)
-        )
+        object_type = None
+        for candidate in (
+            attributes.get("objectType", {}).get("stringValue"),
+            attributes.get("object_type", {}).get("stringValue"),
+            body.get("objectType") if isinstance(body, dict) else None,
+            body.get("object_type") if isinstance(body, dict) else None,
+        ):
+            if candidate:
+                object_type = candidate
+                break
+
         if not object_type:
             raise ValueError(
                 "Missing object_type (messageAttributes.objectType/object_type or body field)")

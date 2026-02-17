@@ -351,8 +351,8 @@ class SourceNoteToNote(odin.Mapping):
         elif value:
             title = [v[1] for v in NOTE_TYPE_CHOICES if v[0] == value][0]
         else:
-            title = [v[1] for v in NOTE_TYPE_CHOICES if v[0] ==
-                     self.source.jsonmodel_type.split("note_")[1]][0]
+            note_type = self.source.jsonmodel_type.split("note_", 1)[1]
+            title = [v[1] for v in NOTE_TYPE_CHOICES if v[0] == note_type][0]
         return title
 
     @odin.map_field(from_field="type", to_field="type")
