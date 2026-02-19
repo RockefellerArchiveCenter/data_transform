@@ -79,9 +79,13 @@ class TransformerTest(unittest.TestCase):
             self.assertEqual(source_len, transformed_len)
 
     def check_references(self, transformed):
-        """Checks that object has references and they are in correct formats."""
-        self.assertIn("references", transformed)
-        self.assertIsInstance(transformed["references"], list)
+        for key in ["people", "organizations", "families", "terms", "creators", "ancestors"]:
+            for obj in transformed.get(key, []):
+                for prop in ["identifier", "title", "type"]:
+                    self.assertIsNotNone(
+                        obj.get(prop),
+                        f"{prop} missing from {key} reference in {transformed.get('uri')}",
+                    )
 
     def check_uri(self, transformed):
         """Checks that object has uri field and it is an ArchivesSpace uri."""
@@ -89,27 +93,44 @@ class TransformerTest(unittest.TestCase):
         self.assertTrue(transformed["uri"].startswith("/"))
 
     def check_parent(self, transformed):
-        """Checks that object has parent and that it is ArchivesSpace uri."""
-        self.assertIn("parent", transformed)
-        self.assertTrue(transformed["parent"].startswith("/"))
+        if transformed.get("ancestors"):
+            self.assertEqual(transformed.get("parent"), transformed["ancestors"][0]["identifier"])
 
     def check_group(self, source, transformed):
-        """Checks that correct group is assigned based on finding aid."""
-        if source.get("finding_aid", {}).get("title"):
-            self.assertEqual(transformed.get("group"), "finding_aid")
+        group = transformed.get("group")
+        self.assertIsNotNone(group, "group missing from transformed")
+
+        # Group can be an Odin resource or a dict
+        if hasattr(group, "to_dict"):
+            group = group.to_dict()
+        self.assertIsInstance(group, dict, f"Expected group dict, got {type(group)}")
+        self.assertIn("identifier", group)
+
+        import importlib
+        mappings_mod = importlib.import_module("src.mappings")
+        identifier_from_uri = mappings_mod.identifier_from_uri
+        ancestors = source.get("ancestors", []) or []
+        if len(ancestors):
+            expected = "/collections/{}".format(
+                identifier_from_uri(ancestors[-1]["ref"])
+            )
         else:
-            self.assertEqual(transformed.get("group"), "default")
+            expected = transformed.get("uri")
+        self.assertEqual(group["identifier"], expected)
+        if transformed.get("type") == "agent":
+            self.assertEqual(group.get("title"), transformed.get("title"))
 
     def check_formats(self, transformed):
-        """Checks that object has formats list."""
-        self.assertIn("formats", transformed)
-        self.assertIsInstance(transformed["formats"], list)
+        """Cary Reich papers have `Sound recordings` as a subject term at the top
+        level, so all objects from this collection should include `audio` in the
+        formats list.
+        """
+        if transformed["group"]["identifier"] == "/collections/gfvm2HihpLwCTnKgpDtdhR":
+            self.assertIn("audio", transformed.get("formats"))
 
     def check_component_id(self, source, transformed):
-        """Checks that object has component_id if it exists on the source."""
         if source.get("component_id"):
-            self.assertIn("component_id", transformed)
-            self.assertEqual(source["component_id"], transformed["component_id"])
+            self.assertEqual(transformed["title"], "{}, {} {}".format(source["title"], source["level"].capitalize(), source["component_id"]))
 
     def check_position(self, transformed, object_type):
         """Checks that object has a position field for archival objects."""
