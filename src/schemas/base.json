@@ -1,0 +1,828 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "urn:base",
+	"type": "object",
+	"title": "RAC JSON Schema",
+	"$defs": {
+		"date": {
+			"$id": "/date",
+			"type": "object",
+			"title": "Dates",
+			"required": [
+				"begin",
+				"expression",
+				"label",
+				"type",
+				"source"
+			],
+			"properties": {
+				"begin": {
+					"$id": "/date/properties/begin",
+					"type": ["date", "null"],
+					"title": "Begin Date",
+					"description": "Begin date of the objects described",
+					"examples": [
+						"1939-06-03"
+					]
+				},
+				"end": {
+					"$id": "/date/properties/end",
+					"type": ["date", "null"],
+					"title": "End Date",
+					"description": "End date of the objects described",
+					"examples": [
+						"1991-05-23"
+					]
+				},
+				"expression": {
+					"$id": "/date/properties/expression",
+					"type": "string",
+					"title": "Date Expression",
+					"description": "Human readable date expression",
+					"minLength": 1,
+					"examples": [
+						"Jun 3rd, 1939 - May 23rd, 1991"
+					],
+					"pattern": "^(.*)$"
+				},
+				"type": {
+					"$id": "/date/properties/type",
+					"type": "string",
+					"enum": [
+						"bulk",
+						"inclusive",
+						"single",
+						"range"
+					],
+					"title": "Date Type",
+					"description": "The type of date being described",
+					"minLength": 1,
+					"examples": [
+						"single"
+					],
+					"pattern": "^(.*)$"
+				},
+				"label": {
+					"$id": "/date/properties/label",
+					"type": "string",
+					"enum": [
+						"agent_relation",
+						"broadcast",
+						"copyright",
+						"creation",
+						"deaccession",
+						"digitized",
+						"existence",
+						"event",
+						"issued",
+						"modified",
+						"other",
+						"publication",
+						"record_keeping",
+						"usage"
+					],
+					"title": "Date label",
+					"description": "Textual indication of the reason for recording the date",
+					"minLength": 1,
+					"examples": [
+						"publication"
+					]
+				},
+				"source": {
+					"type": "string",
+					"title": "Date Source",
+					"examples": [
+						"wikidata",
+						"archivesspace"
+					],
+					"pattern": "^(.*)$",
+					"allOf": [{
+						"$ref": "urn:base#/$defs/source"
+					}]
+				}
+			}
+		},
+		"files": {
+			"$id": "/files",
+			"type": "object",
+			"title": "Files",
+			"required": [
+				"title"
+			],
+			"properties": {
+				"title": {
+					"$id": "/files/properties/title",
+					"type": "string",
+					"title": "File Title",
+					"description": "Title of the file",
+					"examples": [
+						"Board Reports"
+					]
+				},
+				"manifest": {
+					"$id": "/files/properties/manifest",
+					"type": "string",
+					"format": "uri",
+					"title": "Manifest URI",
+					"description": "URI for a IIIF Manifest",
+					"examples": [
+						"https://wwww.manifest_uri.com/1234"
+					]
+				},
+				"download": {
+					"$id": "/files/properties/download",
+					"type": "string",
+					"format": "uri",
+					"title": "Download URI",
+					"description": "URI to download the file object",
+					"examples": [
+						"https://wwww.download_uri.com/1234"
+					]
+				}
+			},
+			"anyOf": [
+				{ "required": [ "manifest" ] },
+				{ "required": [ "download" ] }
+			]
+		},
+		"extent": {
+			"$id": "/extent",
+			"type": "object",
+			"title": "Extents",
+			"required": [
+				"type",
+				"value"
+			],
+			"properties": {
+				"value": {
+					"$id": "/extents/properties/value",
+					"type": "string",
+					"title": "Extent Value",
+					"description": "Floating point value of the extent",
+					"minLength": 1,
+					"examples": [
+						"3.7"
+					]
+				},
+				"type": {
+					"$id": "/extents/properties/type",
+					"type": "string",
+					"title": "Extent Type",
+					"description": "Records the type of the extent value",
+					"minLength": 1,
+					"examples": [
+						"record cartons"
+					],
+					"pattern": "^(.*)$"
+				}
+			}
+		},
+		"external_identifier": {
+			"$id": "/external_identifier",
+			"type": "object",
+			"title": "External Identifiers",
+			"required": [
+				"identifier",
+				"source"
+			],
+			"properties": {
+				"source": {
+					"type": "string",
+					"title": "External Identifier Source",
+					"examples": [
+						"wikidata",
+						"archivesspace"
+					],
+					"pattern": "^(.*)$",
+					"oneOf": [{
+						"$ref": "urn:base#/$defs/source"
+					}]
+				},
+				"identifier": {
+					"$id": "/external_identifier/properties/identifier",
+					"type": "string",
+					"minLength": 1,
+					"title": "External Identifiers ID",
+					"examples": [
+						"5d604f4ffaa7bea21d1f258d"
+					],
+					"pattern": "^(.*)$"
+				}
+			}
+		},
+		"group": {
+			"$id": "/group",
+			"type": "object",
+			"title": "Group",
+			"required": [
+				"identifier",
+				"title"
+			],
+			"properties": {
+				"category": {
+					"$id": "/group/properties/category",
+					"type": "string",
+					"title": "Group Category",
+					"enum": [
+						"collection",
+						"organization",
+						"person",
+						"subject"
+					]
+				},
+				"creators": {
+					"$id": "/group/properties/creators",
+					"type": "array",
+					"title": "Group Creators",
+					"items": {
+						"allOf": [{
+							"$ref": "urn:base#/$defs/reference"
+						}]
+					}
+				},
+				"dates": {
+					"$id": "/group/properties/dates",
+					"type": "array",
+					"title": "Group Dates",
+					"items": {
+						"allOf": [{
+							"$ref": "urn:base#/$defs/date"
+						}]
+					}
+				},
+				"identifier": {
+					"$id": "/group/properties/identifier",
+					"type": "string",
+					"title": "Group Identifier",
+					"pattern": "^(.*)$"
+				},
+				"title": {
+					"$id": "/group/properties/title",
+					"type": "string",
+					"title": "Group Title",
+					"pattern": "^(.*)$"
+				}
+			}
+		},
+		"language": {
+			"$id": "/language",
+			"type": "object",
+			"title": "Languages",
+			"required": [
+				"expression",
+				"identifier"
+			],
+			"properties": {
+				"expression": {
+					"$id": "/language/properties/expression",
+					"type": "string",
+					"title": "Language Expression",
+					"minLength": 1,
+					"description": "Human readable text representation of Language",
+					"examples": [
+						"Esperanto"
+					],
+					"pattern": "^(.*)$"
+				},
+				"identifier": {
+					"$id": "/language/properties/identifier",
+					"type": "string",
+					"title": "Language Identifier",
+					"description": "ISO language identifier",
+					"minLength": 1,
+					"maxLength": 3,
+					"examples": [
+						"epo"
+					],
+					"pattern": "^(.*)$"
+				}
+			}
+		},
+		"note": {
+			"$id": "/note",
+			"type": "object",
+			"title": "Notes",
+			"required": [
+				"source",
+				"subnotes",
+				"title",
+				"type"
+			],
+			"properties": {
+				"type": {
+					"$id": "/note/properties/type",
+					"type": "string",
+					"minLength": 1,
+					"enum": [
+						"abstract",
+						"accessrestrict",
+						"accruals",
+						"acqinfo",
+						"altformavail",
+						"appraisal",
+						"arrangement",
+						"bibliography",
+						"bioghist",
+						"custodhist",
+						"fileplan",
+						"index",
+						"odd",
+						"otherfindaid",
+						"originalsloc",
+						"phystech",
+						"prefercite",
+						"processinfo",
+						"relatedmaterial",
+						"scopecontent",
+						"separatedmaterial",
+						"userestrict",
+						"dimensions",
+						"legalstatus",
+						"summary",
+						"edition",
+						"extent",
+						"note",
+						"inscription",
+						"langmaterial",
+						"physdesc",
+						"physloc",
+						"materialspec",
+						"physfacet",
+						"rights_statement",
+						"rights_statement_act",
+						"materials",
+						"type_note",
+						"additional_information",
+						"expiration",
+						"extension",
+						"permissions",
+						"restrictions"
+					],
+					"title": "Note Types",
+					"description": "The type of note being used",
+					"examples": [
+						"materialspec"
+					],
+					"pattern": "^(.*)$"
+				},
+				"title": {
+					"$id": "/note/properties/title",
+					"type": "string",
+					"minLength": 1,
+					"title": "Note Title",
+					"description": "String title of the note",
+					"examples": [
+						"officia quis eu"
+					],
+					"pattern": "^(.*)$"
+				},
+				"source": {
+					"title": "Notes Source",
+					"type": "string",
+					"examples": [
+						"wikidata"
+					],
+					"pattern": "^(.*)$",
+					"allOf": [{
+						"$ref": "urn:base#/$defs/source"
+					}]
+				},
+				"subnotes": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"allOf": [{
+							"$ref": "/subnote"
+						}]
+					}
+				}
+			}
+		},
+		"reference": {
+			"$id": "/reference",
+			"type": "object",
+			"title": "References",
+			"required": [
+				"external_identifiers"
+			],
+			"properties": {
+				"external_identifiers": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"allOf": [{
+							"$ref": "urn:base#/$defs/external_identifier"
+						}]
+					}
+				},
+				"level": {
+					"$id": "/reference/properties/level",
+					"type": ["string", "null"],
+					"title": "Level of description",
+					"description": "Records the level of description of ancestors",
+					"examples": [
+						"series",
+						"subseries"
+					],
+					"pattern": "^(.*)$"
+				},
+				"order": {
+					"$id": "/reference/properties/order",
+					"type": ["number", "null"],
+					"title": "Order value",
+					"description": "Helps set the order of references",
+					"examples": [
+						"1",
+						"-4"
+					],
+					"pattern": "^(.*)$"
+				},
+				"relator": {
+					"$id": "/reference/properties/relator",
+					"type": ["string", "null"],
+					"title": "Agent relator",
+					"description": "Relation of linked agent",
+					"examples": [
+						"aut"
+					],
+					"pattern": "^(.*)$"
+				},
+				"role": {
+					"$id": "/reference/properties/role",
+					"type": ["string", "null"],
+					"title": "Agent relator",
+					"description": "Role of linked agent",
+					"examples": [
+						"creator",
+						"subject"
+					],
+					"pattern": "^(.*)$"
+				},
+				"title": {
+					"$id": "/reference/properties/title",
+					"type": ["string", "null"],
+					"title": "Title",
+					"description": "Reference title",
+					"examples": [
+						"Correspondence, 1925-1930"
+					],
+					"pattern": "^(.*)$"
+				},
+				"type": {
+					"$id": "/reference/properties/type",
+					"type": ["string", "null"],
+					"title": "Type",
+					"description": "Reference type",
+					"enum": [
+						"cultural_context",
+						"function",
+						"geographic",
+						"genre_form",
+						"occupation",
+						"style_period",
+						"technique",
+						"temporal",
+						"topical",
+						"person",
+						"organization",
+						"family",
+						"software",
+						"object",
+						"collection",
+						null
+					]
+				},
+				"uri": {
+					"$id": "/reference/properties/uri",
+					"type": ["string", "null"],
+					"title": "URI",
+					"description": "Relative link",
+					"examples": [
+						"collections/23rq4df3asdfaf"
+					],
+					"pattern": "^(.*)$"
+				}
+			}
+		},
+		"source": {
+			"$id": "/source",
+			"type": "string",
+			"enum": [
+				"archivesspace",
+				"cartographer",
+				"wikidata",
+				"wikipedia"
+			],
+			"title": "Sources",
+			"description": "Source of item",
+			"minLength": 1,
+			"examples": [
+				"cartographer"
+			]
+		},
+		"subnote": {
+			"$id": "/subnote",
+			"type": "object",
+			"title": "Subnotes",
+			"required": ["type"],
+			"properties": {
+				"type": {
+					"$id": "/subnote/properties/type",
+					"type": "string",
+					"enum": [
+						"definedlist",
+						"orderedlist",
+						"text"
+					],
+					"title": "Subnote Type",
+					"minLength": 1,
+					"examples": [
+						"definedlist"
+					],
+					"pattern": "^(.*)$"
+				},
+				"content": {
+					"$id": "/subnote/properties/content",
+					"type": "array",
+					"title": "Subnote Content",
+					"items": {
+						"$id": "/subnote/properties/content/items",
+						"type": ["string", "null"],
+						"title": "Content Items",
+						"examples": [
+							"cupidatat quis culpa amet labore incididunt",
+							"ullamco in Lorem ad minim labore",
+							"laborum dolore adipisicing aliquip incididunt ad",
+							"elit ipsum quis ex do dolore"
+						]
+					}
+				},
+				"items": {
+					"$id": "/subnote/properties/items",
+					"type": "array",
+					"title": "Subnote Items",
+					"items": {
+						"$id": "/subnote/properties/items/items",
+						"type": ["object", "null"],
+						"title": "Items Items",
+						"examples": [{
+							"label": "value"
+						}]
+					}
+				}
+			}
+		},
+		"rights_statement": {
+			"$id": "/rights_statement",
+			"title": "RAC PREMIS rights statement",
+			"type": "object",
+			"required": [
+				"rights_granted"
+			],
+			"properties": {
+				"rights_granted": {
+					"type": "array",
+					"items": {
+						"allOf": [{
+							"$ref": "urn:base#/$defs/rights_granted"
+						}]
+					}
+				}
+			},
+			"oneOf": [
+				{ "$ref": "urn:base#/$defs/copyright_basis" },
+				{ "$ref": "urn:base#/$defs/license_basis" },
+				{ "$ref": "urn:base#/$defs/statute_basis" },
+				{ "$ref": "urn:base#/$defs/other_basis" }
+			]
+		},
+		"rights_basis_information": {
+			"type": "object",
+			"$id": "/rights_basis_information",
+			"title": "Rights Basis Information Object",
+			"required": [
+				"rights_basis"
+			],
+			"properties": {
+				"rights_basis": {
+					"$id": "/rights_basis_information/properties/rights_basis",
+					"title": "Rights Basis Choice",
+					"type": "string"
+				},
+				"start_date": {
+					"$id": "/rights_statement/properties/start_date",
+					"title": "Rights Start Date",
+					"type": ["string", "null"],
+					"examples": [
+						"2019-08-23",
+						"open",
+						"null"
+					],
+					"minLength": 1
+				},
+				"end_date": {
+					"$id": "/rights_statement/properties/end_date",
+					"title": "Rights End Date",
+					"type": ["string", "null"],
+					"examples": [
+						"2019-08-23",
+						"open",
+						"null"
+					],
+					"minLength": 1
+				},
+				"determination_date": {
+					"$id": "/rights_basis_information/properties/determination_date",
+					"title": "Rights Basis Determination Date",
+					"type": ["string", "null"],
+					"examples": [
+						"2019-08-23",
+						"open",
+						"null"
+					],
+					"minLength": 1
+				},
+				"basis_note": {
+					"$id": "/rights_basis_information/properties/basis_note",
+					"title": "Rights Basis Note",
+					"type": "string",
+					"examples": [
+						"Ipsum Lorem",
+						"This is a rights basis note"
+						],
+					"minLength": 1
+				}
+			}
+		},
+		"other_basis": {
+			"$id": "/other_basis",
+			"title": "PREMIS Other Basis",
+			"type": "object",
+			"allOf": [
+				{ "$ref": "urn:base#/$defs/rights_basis_information" },
+				{
+					"properties": {
+						"rights_basis": { "enum": [ "other"] },
+						"other_basis": {
+							"type": "string",
+							"title": "Other Basis Designation",
+							"enum": [
+								"donor",
+								"policy"
+							]
+						}
+					},
+					"required": [ "other_basis" ]
+				}
+			]
+		},
+		"license_basis": {
+			"$id": "/license_basis",
+			"title": "PREMIS License Basis",
+			"type": "object",
+			"allOf": [
+				{ "$ref": "urn:base#/$defs/rights_basis_information" },
+				{
+					"properties": {
+						"rights_basis": { "enum": [ "license"] },
+						"terms": {
+							"type": "string",
+							"title": "Terms of License Agreement",
+							"minLength": 1
+						}
+					},
+					"required": [ "terms" ]
+				}
+			]
+		},
+		"statute_basis": {
+			"$id": "/statute_basis",
+			"title": "PREMIS Statute Basis",
+			"type": "object",
+			"allOf": [
+				{ "$ref": "urn:base#/$defs/rights_basis_information" },
+				{
+					"properties": {
+						"rights_basis": { "enum": [ "statute"] },
+						"jurisdiction": {
+							"type": "string",
+							"title": "Rights Basis Statute Jurisdiction",
+							"examples": [
+								"fr"
+							],
+							"pattern": "^[a-z]{2}$"
+						},
+						"statute_citation": {
+							"type": "string",
+							"title": "Statute Citation",
+							"minLength": 1
+						}
+					},
+					"required": [ "jurisdiction", "statute_citation" ]
+				}
+			]
+		},
+		"copyright_basis": {
+			"$id": "/copyright_basis",
+			"title": "PREMIS Copyright Basis",
+			"type": "object",
+			"allOf": [
+				{ "$ref": "urn:base#/$defs/rights_basis_information" },
+				{
+					"properties": {
+						"rights_basis": { "enum": [ "copyright"] },
+						"jurisdiction": {
+							"type": "string",
+							"title": "Rights Basis Copyright Jurisdiction",
+							"examples": [
+								"fr"
+							],
+							"pattern": "^[a-z]{2}$"
+						},
+						"copyright_status": {
+							"type": "string",
+							"title": "PREMIS Copyright Status",
+							"enum": [
+								"copyrighted",
+								"public domain",
+								"unknown"
+							]
+						}
+					},
+					"required": [ "jurisdiction", "copyright_status" ]
+				}
+			]
+		},
+		"rights_granted": {
+			"$id": "/rights_granted",
+			"title": "PREMIS rights granted",
+			"type": "object",
+			"required": [
+				"act",
+				"grant_restriction"
+			],
+			"properties": {
+				"act": {
+					"type": "string",
+					"title": "Rights Granted Act",
+					"enum": [
+						"delete",
+						"disseminate",
+						"modify",
+						"migrate",
+						"publish",
+						"replicate",
+						"use"
+					],
+					"examples": [
+						"disseminate"
+					]
+				},
+				"grant_restriction": {
+					"type": "string",
+					"title": "Rights Granted Restriction Statement",
+					"enum": [
+						"allow",
+						"conditional",
+						"disallow"
+					],
+					"examples": [
+						"allow"
+					]
+				},
+				"start_date": {
+					"title": "Rights Granted Start Date",
+					"type": ["string", "null"],
+					"examples": [
+						"2019-08-23",
+						"open",
+						"null"
+					],
+					"minLength": 1
+				},
+				"end_date": {
+					"title": "Rights Granted End Date",
+					"type": ["string", "null"],
+					"examples": [
+						"2019-08-23",
+						"open",
+						"null"
+					],
+					"minLength": 1
+				},
+				"granted_note": {
+					"$id": "/rights_granted/properties/granted_note",
+					"title": "Rights Granted Note",
+					"type": ["string", "null"]
+				}
+			},
+			"if": {
+				"properties": { "grant_restriction": { "const": "conditional" } }
+			},
+			"then": {
+				"properties": { "granted_note": {"pattern": ".*"} },
+				"required": ["granted_note"]
+			}
+		}
+	}
+}

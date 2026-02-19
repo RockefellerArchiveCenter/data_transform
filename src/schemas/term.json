@@ -1,0 +1,84 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "term.json",
+	"type": "object",
+	"title": "RAC Term Schema",
+	"allOf": [{
+		"$id": "/term",
+		"type": "object",
+		"title": "Terms",
+		"required": [
+			"category",
+			"external_identifiers",
+			"group",
+			"title",
+			"type",
+			"term_type"
+		],
+		"properties": {
+			"category": {
+				"$id": "/term/properties/category",
+				"type": "string",
+				"title": "Term Category",
+				"enum": [
+					"subject"
+				]
+			},
+			"title": {
+				"$id": "/term/properties/title",
+				"type": "string",
+				"title": "Term Title",
+				"description": "Human readable title of the term",
+				"minLength": 1,
+				"examples": [
+					"Philosophy"
+				],
+				"pattern": "^(.*)$"
+			},
+			"term_type": {
+				"$id": "/term/properties/term_type",
+				"type": "string",
+				"enum": [
+					"cultural_context",
+					"function",
+					"geographic",
+					"genre_form",
+					"occupation",
+					"style_period",
+					"technique",
+					"temporal",
+					"topical"
+				],
+				"title": "Term type",
+				"minLength": 1,
+				"examples": [
+					"temporal"
+				],
+				"pattern": "^(.*)$"
+			},
+			"type": {
+				"$id": "/term/properties/type",
+				"type": "string",
+				"minLength": 1,
+				"enum": [
+					"term"
+				]
+			},
+			"external_identifiers": {
+				"type": "array",
+				"minItems": 1,
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/external_identifier"
+					}]
+				}
+			},
+			"group": {
+				"type": "object",
+				"allOf": [{
+					"$ref": "urn:base#/$defs/group"
+				}]
+			}
+		}
+	}]
+}

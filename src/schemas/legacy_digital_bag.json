@@ -1,0 +1,33 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "legacy_digital_bag.json",
+	"type": "object",
+	"title": "Ursa Major Legacy Digital Bag Schema",
+	"allOf": [{
+		"$id": "/legacy_digital_bag",
+		"type": "object",
+		"title": "Bag",
+		"required": [
+			"identifier",
+			"origin",
+			"rights_statements"],
+		"properties": {
+			"identifier": {
+				"type": "string"
+			},
+			"origin": {
+				"type": "string",
+				"enum": ["legacy_digital"]
+			},
+			"rights_statements": {
+				"type": "array",
+				"minItems": 1,
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/rights_statement"
+					}]
+				}
+			}
+		}
+	}]
+}

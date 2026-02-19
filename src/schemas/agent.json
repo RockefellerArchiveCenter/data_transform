@@ -1,0 +1,133 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "agent.json",
+	"type": "object",
+	"title": "RAC JSON Schema",
+	"allOf": [{
+		"$id": "/agent",
+		"type": "object",
+		"title": "Agents",
+		"required": [
+			"authorized_name",
+			"category",
+			"external_identifiers",
+			"group",
+			"title",
+			"type",
+			"agent_type"
+		],
+		"properties": {
+			"agent_type": {
+				"$id": "/agent/properties/agent_type",
+				"type": "string",
+				"enum": [
+					"family",
+					"organization",
+					"person"
+				]
+			},
+			"category": {
+				"$id": "/collection/properties/category",
+				"type": "string",
+				"title": "Agent Category",
+				"enum": [
+					"person",
+					"organization"
+				]
+			},
+			"type": {
+				"$id": "/agent/properties/type",
+				"type": "string",
+				"enum": [
+					"agent"
+				]
+			},
+			"title": {
+				"$id": "/agent/properties/title",
+				"type": "string",
+				"title": "Agent Title",
+				"description": "Title for Agent",
+				"examples": [
+					"Lawson Foundation"
+				],
+				"pattern": "^(.*)$"
+			},
+			"authorized_name": {
+				"$id": "/agent/properties/authorized_name",
+				"type": "string",
+				"title": "Agent Authorized Name",
+				"description": "Authorized Name for Agent",
+				"examples": [
+					"Lawson Foundation",
+					"Rockefeller, Nelson"
+				],
+				"pattern": "^(.*)$"
+			},
+			"description": {
+				"$id": "/agent/properties/description",
+				"type": ["string", "null"],
+				"title": "Agent Description",
+				"description": "Description of the Agent",
+				"examples": [
+					"Elit irure adipisicing esse minim Lorem non deserunt ullamco. Ex eiusmod tempor ipsum nisi. Aliqua tempor cillum ea labore laboris consectetur ut incididunt esse dolor labore ullamco magna magna."
+				],
+				"pattern": "^(.*)$"
+			},
+			"dates": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/date"
+					}]
+				}
+			},
+			"notes": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/note"
+					}]
+				}
+			},
+			"people": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"organizations": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"families": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"external_identifiers": {
+				"type": "array",
+				"minItems": 1,
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/external_identifier"
+					}]
+				}
+			},
+			"group": {
+				"type": "object",
+				"allOf": [{
+					"$ref": "urn:base#/$defs/group"
+				}]
+			}
+		}
+	}]
+}

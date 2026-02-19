@@ -1,0 +1,9 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "date.json",
+	"type": "object",
+	"title": "Date schema",
+	"allOf": [{
+		"$ref": "urn:base#/$defs/date"
+	}]
+}

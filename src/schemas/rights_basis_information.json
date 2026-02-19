@@ -1,0 +1,9 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "rights_basis_information.json",
+	"type": "object",
+	"title": "Common Rights Basis Schema",
+	"allOf": [{
+		"$ref": "urn:base#/$defs/rights_basis_information"
+	}]
+}

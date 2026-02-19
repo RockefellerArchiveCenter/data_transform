@@ -1,0 +1,183 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "object.json",
+	"type": "object",
+	"title": "RAC JSON Schema",
+	"allOf": [{
+		"$id": "/object",
+		"type": "object",
+		"title": "Archival Object",
+		"required": [
+			"category",
+			"dates",
+			"extents",
+			"external_identifiers",
+			"files",
+			"formats",
+			"group",
+			"parent",
+			"position",
+			"online",
+			"title",
+			"type"
+		],
+		"properties": {
+			"category": {
+				"$id": "/object/properties/category",
+				"type": "string",
+				"title": "Object Category",
+				"enum": [
+					"collection"
+				]
+			},
+			"title": {
+				"$id": "/object/properties/title",
+				"type": "string",
+				"title": "Object Title",
+				"examples": [
+					"5d604f4ffaa7bea21d1f258d"
+				],
+				"pattern": "^(.*)$"
+			},
+			"type": {
+				"$id": "/object/properties/type",
+				"type": "string",
+				"minLength": 1,
+				"enum": [
+					"object"
+				]
+			},
+			"dates": {
+				"type": ["array"],
+				"minItems": 1,
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/date"
+					}]
+				}
+			},
+			"extents": {
+				"type": ["array"],
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/extent"
+					}]
+				}
+			},
+			"notes": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/note"
+					}]
+				}
+			},
+			"terms": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"people": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"organizations": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"families": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"languages": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/language"
+					}]
+				}
+			},
+			"rights": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/rights_statement"
+					}]
+				}
+			},
+			"ancestors": {
+				"type": "array",
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/reference"
+					}]
+				}
+			},
+			"formats": {
+				"type": "array",
+				"minItems": 1,
+				"items": {
+						"oneOf": [
+							{
+								"type": "string",
+								"enum": [
+									"documents",
+									"audio",
+									"photographs",
+									"moving image"
+								]
+							}
+						]
+					}
+			},
+			"parent": {
+				"type": ["string", "null"]
+			},
+			"position": {
+				"type": "number"
+			},
+			"online": {
+				"type": "boolean"
+			},
+			"group": {
+				"type": "object",
+				"allOf": [{
+					"$ref": "urn:base#/$defs/group"
+				}]
+			},
+			"external_identifiers": {
+				"type": "array",
+				"minItems": 1,
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/external_identifier"
+					}]
+				}
+			},
+			"files": {
+				"type": ["array"],
+				"minItems": 0,
+				"items": {
+					"allOf": [{
+						"$ref": "urn:base#/$defs/files"
+					}]
+				}
+			}
+		}
+	}]
+}

@@ -2,6 +2,7 @@ import json
 import os
 import traceback
 from os.path import join
+from pathlib import Path
 
 import boto3
 from jsonschema.exceptions import ValidationError
@@ -21,11 +22,14 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
 # should be SSM params.
 SUCCESS_TOPIC_ARN = os.environ.get("SUCCESS_TOPIC_ARN", "")
 FAILURE_TOPIC_ARN = os.environ.get("FAILURE_TOPIC_ARN", "")
-SCHEMAS_BASE_DIR = os.environ.get("SCHEMAS_BASE_DIR", "").rstrip("/")
-SCHEMA_AGENT = os.environ.get("SCHEMA_AGENT", "")
-SCHEMA_COLLECTION = os.environ.get("SCHEMA_COLLECTION", "")
-SCHEMA_OBJECT = os.environ.get("SCHEMA_OBJECT", "")
-SCHEMA_TERM = os.environ.get("SCHEMA_TERM", "")
+SCHEMAS_BASE_DIR = os.environ.get(
+    "SCHEMAS_BASE_DIR",
+    str(Path(__file__).resolve().parent / "schemas"),
+).rstrip("/")
+SCHEMA_AGENT = os.environ.get("SCHEMA_AGENT", "agent.json")
+SCHEMA_COLLECTION = os.environ.get("SCHEMA_COLLECTION", "collection.json")
+SCHEMA_OBJECT = os.environ.get("SCHEMA_OBJECT", "object.json")
+SCHEMA_TERM = os.environ.get("SCHEMA_TERM", "term.json")
 SCHEMA_BASE = os.environ.get("SCHEMA_BASE")  # optional
 SSM_PREFIX = os.environ.get("SSM_PREFIX", "").rstrip("/")
 SCHEMAS = {
@@ -170,7 +174,12 @@ class Transformer:
         """Transform source dict, returning a plain dict."""
         from_obj = json_codec.loads(json.dumps(data), resource=from_resource)
         transformed = json.loads(json_codec.dumps(mapping.apply(from_obj)))
-        return self.remove_keys_from_dict(transformed)
+        transformed = self.remove_keys_from_dict(transformed)
+        # Ensure transformed output matches RAC JSON Schema shapes.
+        # Some mappings may emit a single subnote object where the schema
+        # expects an array.
+        self.normalize_schema_shapes(transformed)
+        return transformed
 
     def remove_keys_from_dict(self, data, target_key="$"):
         """Remove all matching keys from dict."""
@@ -191,14 +200,46 @@ class Transformer:
             return data
         return modified_dict
 
+    def normalize_schema_shapes(self, data):
+        """Normalize fields to match RAC JSON Schema "shape" expectations.
+
+        Some mappings emit a scalar (e.g., string or object) where the schema
+        expects an array. Normalize those cases here so validation succeeds.
+
+        Currently normalizes:
+        - note.subnotes: dict -> [dict]
+        - formats: str -> [str]
+        """
+        if isinstance(data, dict):
+            for k, v in list(data.items()):
+                # schema: subnotes is an array of subnote objects
+                if k == "subnotes" and isinstance(v, dict):
+                    data[k] = [v]
+                    v = data[k]
+
+                # schema: formats is an array of strings
+                if k == "formats" and isinstance(v, str):
+                    data[k] = [v]
+                    v = data[k]
+
+                self.normalize_schema_shapes(v)
+        elif isinstance(data, list):
+            for item in data:
+                self.normalize_schema_shapes(item)
+
     def validate_transformed(self, data, schema_name):
         """Validate an object against the specified schema."""
+        base_dir = os.environ.get(
+            "SCHEMAS_BASE_DIR",
+            SCHEMAS_BASE_DIR).rstrip("/")
+        schema_base = os.environ.get("SCHEMA_BASE")
+
         base_schema = None
-        if SCHEMA_BASE:
-            with open(join(SCHEMAS_BASE_DIR, SCHEMA_BASE), "r", encoding="utf-8") as base_file:
+        if schema_base:
+            with open(join(base_dir, schema_base), "r", encoding="utf-8") as base_file:
                 base_schema = json.load(base_file)
 
-        with open(join(SCHEMAS_BASE_DIR, schema_name), "r", encoding="utf-8") as object_file:
+        with open(join(base_dir, schema_name), "r", encoding="utf-8") as object_file:
             object_schema = json.load(object_file)
 
         is_valid(data, object_schema, base_schema)

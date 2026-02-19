@@ -1,0 +1,142 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "accession.json",
+	"type": "object",
+	"title": "Ursa Major Accession Schema",
+	"allOf": [{
+		"$id": "/accession",
+		"type": "object",
+		"title": "Accessions",
+		"required": [
+			"title",
+			"start_date",
+			"end_date",
+			"extent_files",
+			"extent_size",
+			"description",
+			"language",
+			"access_restrictions",
+			"use_restrictions",
+			"resource",
+			"acquisition_type"
+		],
+		"properties": {
+			"url": {
+				"title": "URL",
+				"type": "string",
+				"format": "uri"
+			},
+			"creators": {
+				"type": "array"
+			},
+			"transfers": {
+				"type": "array"
+			},
+			"organization": {
+				"title": "Organization",
+				"type": "string"
+			},
+			"rights": {
+				"type": "array"
+			},
+			"language": {
+				"title": "Language",
+				"type": "string"
+			},
+			"title": {
+				"title": "Title",
+				"type": "string",
+				"maxLength": 256,
+				"minLength": 1
+			},
+			"accession_number": {
+				"title": "Accession number",
+				"type": ["string", "null"],
+				"maxLength": 10
+			},
+			"accession_date": {
+				"title": "Accession date",
+				"type": "string",
+				"format": "date-time"
+			},
+			"start_date": {
+				"title": "Start date",
+				"type": "string",
+				"format": "date-time"
+			},
+			"end_date": {
+				"title": "End date",
+				"type": "string",
+				"format": "date-time"
+			},
+			"extent_files": {
+				"title": "Extent files",
+				"type": "integer",
+				"maximum": 4294967295,
+				"minimum": 0
+			},
+			"extent_size": {
+				"title": "Extent size",
+				"type": "integer",
+				"maximum": 9223372036854776000,
+				"minimum": -9223372036854776000
+			},
+			"description": {
+				"title": "Description",
+				"type": "string",
+				"minLength": 1
+			},
+			"access_restrictions": {
+				"title": "Access restrictions",
+				"type": "string",
+				"minLength": 1
+			},
+			"use_restrictions": {
+				"title": "Use restrictions",
+				"type": "string",
+				"minLength": 1
+			},
+			"resource": {
+				"title": "Resource",
+				"type": "string",
+				"maxLength": 255,
+				"minLength": 1
+			},
+			"acquisition_type": {
+				"title": "Acquisition type",
+				"type": "string",
+				"maxLength": 200,
+				"minLength": 1
+			},
+			"appraisal_note": {
+				"title": "Appraisal note",
+				"type": ["string", "null"]
+			},
+			"created": {
+				"title": "Created",
+				"type": "string",
+				"format": "date-time"
+			},
+			"last_modified": {
+				"title": "Last modified",
+				"type": "string",
+				"format": "date-time"
+			},
+			"process_status": {
+				"title": "Process status",
+				"type": ["integer"],
+				"enum": [
+					10,
+					20,
+					30,
+					40
+				]
+			},
+			"archivesspace_identifier": {
+				"title": "Archivesspace identifier",
+				"type": ["string", "null"],
+				"maxLength": 255
+			}
+		}
+	}]
+}

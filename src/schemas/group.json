@@ -1,0 +1,9 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "group.json",
+	"type": "object",
+	"title": "Group schema",
+	"allOf": [{
+		"$ref": "urn:base#/$defs/group"
+	}]
+}

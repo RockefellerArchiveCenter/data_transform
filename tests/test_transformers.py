@@ -1,6 +1,5 @@
 import json
 import os
-import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -20,18 +19,13 @@ class TransformerTest(unittest.TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        # Create a temporary schema directory so validate_transformed can open
-        # files.
-        cls._tmpdir = tempfile.TemporaryDirectory()
-        cls.schemas_dir = Path(cls._tmpdir.name)
-        for name in [
-            "base.json",
-            "agent.json",
-            "collection.json",
-            "object.json",
-            "term.json",
-        ]:
-            (cls.schemas_dir / name).write_text("{}", encoding="utf-8")
+        # Use the real schemas bundled in the repo at src/schemas.
+        project_root = Path(__file__).resolve().parents[1]
+        cls.schemas_dir = project_root / "src" / "schemas"
+        if not cls.schemas_dir.exists():
+            raise RuntimeError(
+                f"Schemas directory not found: {
+                    cls.schemas_dir}")
 
         os.environ.setdefault("SCHEMAS_BASE_DIR", str(cls.schemas_dir))
         os.environ.setdefault("SCHEMA_BASE", "base.json")
@@ -49,10 +43,7 @@ class TransformerTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        try:
-            cls._tmpdir.cleanup()
-        finally:
-            super().tearDownClass()
+        super().tearDownClass()
 
     def check_list_counts(self, source, transformed, object_type):
         """Checks that lists of items are the same on source and data objects.
@@ -114,8 +105,7 @@ class TransformerTest(unittest.TestCase):
         if hasattr(group, "to_dict"):
             group = group.to_dict()
         self.assertIsInstance(
-            group, dict, f"Expected group dict, got {
-                type(group)}")
+            group, dict, f"Expected group dict, got {type(group)}")
         self.assertIn("identifier", group)
 
         import importlib
@@ -296,16 +286,30 @@ class TransformerTest(unittest.TestCase):
             output = transformer.get_online_pending(instances, online)
             self.assertEqual(output, expected)
 
-    def test_validate_transformed(self):
-        """Test that validate_transformed loads schemas and calls is_valid."""
+    @patch("rac_schema_validator.is_valid")
+    def test_validate_transformed(self, mock_is_valid):
+        """validate_transformed loads schemas from src/schemas and passes them to is_valid."""
         mod = self.import_transformers()
         transformer = mod.Transformer()
 
         sample = {"uri": "/repositories/2/resources/123", "type": "collection"}
 
-        with patch.object(mod, "is_valid") as mock_is_valid:
-            transformer.validate_transformed(sample, mod.SCHEMAS["collection"])
-            self.assertTrue(mock_is_valid.called)
+        # With base schema configured, base_schema is passed as a dict.
+        os.environ["SCHEMA_BASE"] = "base.json"
+        transformer.validate_transformed(sample, "object.json")
+        arg_values = mock_is_valid.call_args[0]
+        self.assertTrue(isinstance(arg_values[0], dict))
+        self.assertTrue(isinstance(arg_values[1], dict))
+        self.assertTrue(isinstance(arg_values[2], dict))
+
+        # Without base schema configured, base_schema is None.
+        mock_is_valid.reset_mock()
+        os.environ.pop("SCHEMA_BASE", None)
+        transformer.validate_transformed(sample, "object.json")
+        arg_values = mock_is_valid.call_args[0]
+        self.assertTrue(isinstance(arg_values[0], dict))
+        self.assertTrue(isinstance(arg_values[1], dict))
+        self.assertEqual(arg_values[2], None)
 
 
 if __name__ == "__main__":

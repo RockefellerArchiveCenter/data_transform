@@ -1,0 +1,9 @@
+{
+	"$schema": "https://json-schema.org/draft/2020-12/schema",
+	"$id": "rights_granted.json",
+	"type": "object",
+	"title": "Rights Granted Schema",
+	"allOf": [{
+		"$ref": "urn:base#/$defs/rights_granted"
+	}]
+}
