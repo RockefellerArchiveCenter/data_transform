@@ -175,10 +175,6 @@ class Transformer:
         from_obj = json_codec.loads(json.dumps(data), resource=from_resource)
         transformed = json.loads(json_codec.dumps(mapping.apply(from_obj)))
         transformed = self.remove_keys_from_dict(transformed)
-        # Ensure transformed output matches RAC JSON Schema shapes.
-        # Some mappings may emit a single subnote object where the schema
-        # expects an array.
-        self.normalize_schema_shapes(transformed)
         return transformed
 
     def remove_keys_from_dict(self, data, target_key="$"):
@@ -199,33 +195,6 @@ class Transformer:
         else:
             return data
         return modified_dict
-
-    def normalize_schema_shapes(self, data):
-        """Normalize fields to match RAC JSON Schema "shape" expectations.
-
-        Some mappings emit a scalar (e.g., string or object) where the schema
-        expects an array. Normalize those cases here so validation succeeds.
-
-        Currently normalizes:
-        - note.subnotes: dict -> [dict]
-        - formats: str -> [str]
-        """
-        if isinstance(data, dict):
-            for k, v in list(data.items()):
-                # schema: subnotes is an array of subnote objects
-                if k == "subnotes" and isinstance(v, dict):
-                    data[k] = [v]
-                    v = data[k]
-
-                # schema: formats is an array of strings
-                if k == "formats" and isinstance(v, str):
-                    data[k] = [v]
-                    v = data[k]
-
-                self.normalize_schema_shapes(v)
-        elif isinstance(data, list):
-            for item in data:
-                self.normalize_schema_shapes(item)
 
     def validate_transformed(self, data, schema_name):
         """Validate an object against the specified schema."""
