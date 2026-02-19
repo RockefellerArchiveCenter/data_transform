@@ -1,9 +1,9 @@
 import json
 import os
-from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch, Mock
+from pathlib import Path
+from unittest.mock import Mock, patch
 
 from src.resources.configs import NOTE_TYPE_CHOICES_TRANSFORM
 
@@ -20,7 +20,8 @@ class TransformerTest(unittest.TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        # Create a temporary schema directory so validate_transformed can open files.
+        # Create a temporary schema directory so validate_transformed can open
+        # files.
         cls._tmpdir = tempfile.TemporaryDirectory()
         cls.schemas_dir = Path(cls._tmpdir.name)
         for name in [
@@ -38,7 +39,8 @@ class TransformerTest(unittest.TestCase):
         os.environ.setdefault("SCHEMA_COLLECTION", "collection.json")
         os.environ.setdefault("SCHEMA_OBJECT", "object.json")
         os.environ.setdefault("SCHEMA_TERM", "term.json")
-        os.environ.setdefault("SNS_TOPIC_ARN", "arn:aws:sns:us-east-1:000000000000:dummy")
+        os.environ.setdefault("SNS_TOPIC_ARN",
+                              "arn:aws:sns:us-east-1:000000000000:dummy")
 
         os.environ.setdefault("ASSET_BASEURL", "https://assets.example.org")
 
@@ -59,12 +61,14 @@ class TransformerTest(unittest.TestCase):
         This includes notes in agents, which do not have a type field, so the
         jsonmodel_type field must be checked instead.
         """
-        date_source_key = "dates_of_existence" if object_type.startswith("agent_") else "dates"
+        date_source_key = "dates_of_existence" if object_type.startswith(
+            "agent_") else "dates"
         for source_key, transformed_key in [("notes", "notes"),
                                             (date_source_key, "dates"),
                                             ("extents", "extents")]:
             source_len = len(
-                [n for n in source.get(source_key, []) if (n["publish"] and n.get("type", n["jsonmodel_type"].split("_")[-1]) in NOTE_TYPE_CHOICES_TRANSFORM)]
+                [n for n in source.get(source_key, []) if (n["publish"] and n.get(
+                    "type", n["jsonmodel_type"].split("_")[-1]) in NOTE_TYPE_CHOICES_TRANSFORM)]
             ) if source_key == "notes" else len(source.get(source_key, []))
             transformed_len = len(transformed.get(transformed_key, []))
             self.assertEqual(source_len, transformed_len,
@@ -73,18 +77,22 @@ class TransformerTest(unittest.TestCase):
 
     def check_agent_counts(self, source, transformed):
         """Checks that agent names and contacts are the same on source and data objects."""
-        for source_key, transformed_key in [("agent_contacts", "contacts"), ("names", "names")]:
-            source_len = len([n for n in source.get(source_key, []) if n.get("publish") is True])
+        for source_key, transformed_key in [
+                ("agent_contacts", "contacts"), ("names", "names")]:
+            source_len = len([n for n in source.get(
+                source_key, []) if n.get("publish") is True])
             transformed_len = len(transformed.get(transformed_key, []))
             self.assertEqual(source_len, transformed_len)
 
     def check_references(self, transformed):
-        for key in ["people", "organizations", "families", "terms", "creators", "ancestors"]:
+        for key in ["people", "organizations",
+                    "families", "terms", "creators", "ancestors"]:
             for obj in transformed.get(key, []):
                 for prop in ["identifier", "title", "type"]:
                     self.assertIsNotNone(
                         obj.get(prop),
-                        f"{prop} missing from {key} reference in {transformed.get('uri')}",
+                        f"{prop} missing from {key} reference in {
+                            transformed.get('uri')}",
                     )
 
     def check_uri(self, transformed):
@@ -94,7 +102,9 @@ class TransformerTest(unittest.TestCase):
 
     def check_parent(self, transformed):
         if transformed.get("ancestors"):
-            self.assertEqual(transformed.get("parent"), transformed["ancestors"][0]["identifier"])
+            self.assertEqual(
+                transformed.get("parent"),
+                transformed["ancestors"][0]["identifier"])
 
     def check_group(self, source, transformed):
         group = transformed.get("group")
@@ -103,7 +113,9 @@ class TransformerTest(unittest.TestCase):
         # Group can be an Odin resource or a dict
         if hasattr(group, "to_dict"):
             group = group.to_dict()
-        self.assertIsInstance(group, dict, f"Expected group dict, got {type(group)}")
+        self.assertIsInstance(
+            group, dict, f"Expected group dict, got {
+                type(group)}")
         self.assertIn("identifier", group)
 
         import importlib
@@ -130,7 +142,12 @@ class TransformerTest(unittest.TestCase):
 
     def check_component_id(self, source, transformed):
         if source.get("component_id"):
-            self.assertEqual(transformed["title"], "{}, {} {}".format(source["title"], source["level"].capitalize(), source["component_id"]))
+            self.assertEqual(
+                transformed["title"],
+                "{}, {} {}".format(
+                    source["title"],
+                    source["level"].capitalize(),
+                    source["component_id"]))
 
     def check_position(self, transformed, object_type):
         """Checks that object has a position field for archival objects."""
@@ -214,8 +231,7 @@ class TransformerTest(unittest.TestCase):
 
     @patch("requests.head")
     def test_online_instance(self, mock_head):
-        mod = self.import_transformers()
-
+        self.import_transformers()
         import importlib
         mappings_mod = importlib.import_module("src.mappings")
         has_online_instance = mappings_mod.has_online_instance
@@ -239,7 +255,8 @@ class TransformerTest(unittest.TestCase):
                 self.skipTest(f"Missing fixture: {fixture_path}")
 
             instances = load_fixture(fixture_path)
-            output = has_online_instance(instances, "/repositories/2/archival_objects/4")
+            output = has_online_instance(
+                instances, "/repositories/2/archival_objects/4")
             self.assertEqual(output, expected)
 
         # 404 => always false
@@ -250,7 +267,8 @@ class TransformerTest(unittest.TestCase):
                 self.skipTest(f"Missing fixture: {fixture_path}")
 
             instances = load_fixture(fixture_path)
-            output = has_online_instance(instances, "/repositories/2/archival_objects/4")
+            output = has_online_instance(
+                instances, "/repositories/2/archival_objects/4")
             self.assertEqual(output, False)
 
     def test_online_pending(self):

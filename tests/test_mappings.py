@@ -2,8 +2,6 @@ import importlib
 import os
 from unittest.mock import patch
 
-import pytest
-
 
 def import_mappings(extra_env=None):
     env = {
@@ -31,14 +29,17 @@ def test_env_list_empty_and_split():
 def test_identifier_from_uri_handles_full_url_and_path():
     mod = import_mappings()
     assert mod.identifier_from_uri("/repositories/2/resources/123") == "123"
-    assert mod.identifier_from_uri("https://host/repositories/2/resources/999?x=1") == "999"
+    assert mod.identifier_from_uri(
+        "https://host/repositories/2/resources/999?x=1") == "999"
     assert mod.identifier_from_uri("") == ""
 
 
 def test_generate_manifest_and_download_identifiers():
     mod = import_mappings()
-    assert mod.generate_manifest_identifier({"uri": "/x/1"}, {}) == "manifest-1"
-    assert mod.generate_download_identifier({"ref": "/x/2"}, {}) == "download-2"
+    assert mod.generate_manifest_identifier(
+        {"uri": "/x/1"}, {}) == "manifest-1"
+    assert mod.generate_download_identifier(
+        {"ref": "/x/2"}, {}) == "download-2"
     assert mod.generate_manifest_identifier({}, {}) == "manifest"
 
 
@@ -67,9 +68,11 @@ def test_has_online_asset_false_when_no_baseurl():
 def test_has_online_instance_with_dict_instances_calls_has_online_asset():
     mod = import_mappings({"ASSET_BASEURL": "https://assets.example.org"})
 
-    instances = [{"instance_type": "digital_object"}, {"instance_type": "text"}]
+    instances = [{"instance_type": "digital_object"},
+                 {"instance_type": "text"}]
     with patch.object(mod, "has_online_asset", return_value=True) as hoa:
-        assert mod.has_online_instance(instances, "/repositories/2/resources/123") is True
+        assert mod.has_online_instance(
+            instances, "/repositories/2/resources/123") is True
         hoa.assert_called_once_with("123")
 
 
@@ -82,4 +85,5 @@ def test_has_online_instance_with_object_instances_calls_has_online_asset():
 
     instances = [Inst("digital_object"), Inst("text")]
     with patch.object(mod, "has_online_asset", return_value=False):
-        assert mod.has_online_instance(instances, "/repositories/2/resources/123") is False
+        assert mod.has_online_instance(
+            instances, "/repositories/2/resources/123") is False
