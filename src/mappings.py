@@ -1,12 +1,12 @@
 import json
 import os
+import pycountry
 import re
 import xml.etree.ElementTree as ET
 from urllib.parse import urlparse
 
 import odin
 import requests
-from iso639 import languages
 
 from .resources.configs import NOTE_TYPE_CHOICES, NOTE_TYPE_CHOICES_TRANSFORM
 from .resources.rac import (Agent, AgentReference, Collection, Date, Extent,
@@ -126,19 +126,29 @@ def strip_tags(user_string):
         # malformed.
         return re.sub(r"<[^>]*>", "", user_string)
 
+def language_name(code):
+    """Return a human-readable language name for a code."""
+    if not code:
+        return None
+    code = code.strip().lower()
+    lang = (
+        pycountry.languages.get(alpha_3=code)
+        or pycountry.languages.get(bibliographic=code)
+        or pycountry.languages.get(alpha_2=code)
+    )
+    return getattr(lang, "name", None) if lang else None
+
 
 def transform_language(value, lang_materials):
     """Checks for language info and transforms to to structured types."""
     langz = []
     if value:
-        lang_data = languages.get(part2b=value)
-        langz.append(Language(expression=lang_data.name, identifier=value))
+        name = language_name(value) or value
+        langz.append(Language(expression=name, identifier=value))
     elif lang_materials:
         for lang in [lng for lng in lang_materials if lng.language_and_script]:
-            langz += transform_language(
-                lang.language_and_script.language, None)
-    return langz if len(langz) else [Language(
-        expression="English", identifier="eng")]
+            langz += transform_language(lang.language_and_script.language, None)
+    return langz if len(langz) else [Language(expression="English", identifier="eng")]
 
 
 def transform_formats(instances, subjects, ancestors):
