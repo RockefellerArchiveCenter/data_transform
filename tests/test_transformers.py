@@ -194,6 +194,8 @@ class TransformerTest(unittest.TestCase):
                     source = load_fixture(source_path)
                     transformed = transformer.run(object_type, source)
 
+                    self.assertNotIn("online_pending", transformed)
+
                     self.check_list_counts(source, transformed, object_type)
 
                     if object_type.startswith("agent_"):

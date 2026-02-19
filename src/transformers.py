@@ -107,7 +107,7 @@ class Transformer:
             data (dict): source record dict
 
         Returns:
-            dict: transformed object (validated). Adds `online_pending` boolean.
+            dict: transformed object (validated).
         """
         try:
             self.identifier = data.get("uri")
@@ -115,11 +115,10 @@ class Transformer:
                 object_type)
             transformed = self.get_transformed_object(
                 data, from_resource, mapping)
-            transformed["online_pending"] = self.get_online_pending(
+            self.online_pending = self.get_online_pending(
                 data.get("instances", []),
                 transformed.get("online", False),
             )
-            self.online_pending = transformed["online_pending"]
             self.validate_transformed(transformed, schema_name)
             return transformed
         except ValidationError as e:
@@ -248,6 +247,7 @@ class Transformer:
             "object_type": object_type,
             "identifier": source_data.get("uri"),
             "transformed": transformed,
+            "online_pending": self.online_pending,
             "message_attributes": dict(
                 (k, (v.get("stringValue") if isinstance(v, dict) else None))
                 for k, v in attributes.items()
