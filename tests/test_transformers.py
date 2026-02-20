@@ -1,5 +1,6 @@
 import json
 import os
+import types
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -19,7 +20,7 @@ class TransformerTest(unittest.TestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        # Use the real schemas bundled in the repo at src/schemas.
+        # Use the schemas.
         project_root = Path(__file__).resolve().parents[1]
         cls.schemas_dir = project_root / "src" / "schemas"
         if not cls.schemas_dir.exists():
@@ -310,6 +311,119 @@ class TransformerTest(unittest.TestCase):
         self.assertTrue(isinstance(arg_values[0], dict))
         self.assertTrue(isinstance(arg_values[1], dict))
         self.assertEqual(arg_values[2], None)
+
+    def _mock_ssm_paginator(self, parameters):
+        """Helper to build a mock paginator result for get_parameters_by_path."""
+        paginator = Mock()
+        paginator.paginate.return_value = [{"Parameters": parameters}]
+        return paginator
+
+    @patch("boto3.Session")
+    def test_get_config_loads_parameters_by_path(self, mock_session):
+        os.environ["ENVIRONMENT"] = "test"
+        os.environ["AWS_REGION"] = "us-east-1"
+        os.environ["SSM_ROLE_ARN"] = "arn:aws:iam::000000000000:role/DummySsmRole"
+
+        ssm_client = Mock()
+        ssm_client.get_paginator.return_value = self._mock_ssm_paginator([
+            {"Name": "/test/data_transform/SUCCESS_TOPIC_ARN",
+             "Value": "arn:aws:sns:us-east-1:1:success"},
+            {"Name": "/test/data_transform/FAILURE_TOPIC_ARN",
+             "Value": "arn:aws:sns:us-east-1:1:failure"},
+            {"Name": "/test/data_transform/SCHEMAS_BASE_DIR",
+             "Value": "/var/task/schemas"},
+        ])
+
+        session = Mock()
+        mock_session.return_value = session
+
+        assumed_session = Mock()
+        assumed_session.client.return_value = ssm_client
+
+        fake_lib = types.SimpleNamespace()
+        fake_lib.assume_role = Mock(return_value=assumed_session)
+
+        # IMPORTANT: patch sys.modules BEFORE importing transformers/mappings
+        with patch.dict("sys.modules", {"aws_assume_role_lib": fake_lib}):
+            mod = self.import_transformers()
+
+            cfg = mod.get_config(
+                environment=os.environ["ENVIRONMENT"],
+                aws_region=os.environ["AWS_REGION"],
+                ssm_role_arn=os.environ["SSM_ROLE_ARN"],
+                service_name="data_transform",
+            )
+
+        self.assertEqual(
+            cfg["SUCCESS_TOPIC_ARN"],
+            "arn:aws:sns:us-east-1:1:success")
+        self.assertEqual(
+            cfg["FAILURE_TOPIC_ARN"],
+            "arn:aws:sns:us-east-1:1:failure")
+        self.assertEqual(cfg["SCHEMAS_BASE_DIR"], "/var/task/schemas")
+
+        paginator = ssm_client.get_paginator.return_value
+        paginator.paginate.assert_called()
+        called_kwargs = paginator.paginate.call_args.kwargs
+        self.assertEqual(called_kwargs.get("Path"), "/test/data_transform")
+
+        fake_lib.assume_role.assert_called_with(
+            session, os.environ["SSM_ROLE_ARN"])
+        self.assertGreaterEqual(fake_lib.assume_role.call_count, 1)
+
+    @patch("boto3.Session")
+    def test_cfg_env_overrides_ssm(self, mock_session):
+        os.environ["ENVIRONMENT"] = "test"
+        os.environ["AWS_REGION"] = "us-east-1"
+        os.environ["SSM_ROLE_ARN"] = "arn:aws:iam::000000000000:role/DummySsmRole"
+        os.environ["SUCCESS_TOPIC_ARN"] = "arn:aws:sns:us-east-1:999:env-success"
+
+        ssm_client = Mock()
+        ssm_client.get_paginator.return_value = self._mock_ssm_paginator([
+            {"Name": "/test/data_transform/SUCCESS_TOPIC_ARN",
+             "Value": "arn:aws:sns:us-east-1:1:ssm-success"},
+        ])
+
+        session = Mock()
+        mock_session.return_value = session
+
+        assumed_session = Mock()
+        assumed_session.client.return_value = ssm_client
+
+        fake_lib = types.SimpleNamespace()
+        fake_lib.assume_role = Mock(return_value=assumed_session)
+
+        # Patch before import so mappings’ import-time ENV load doesn’t hit STS
+        # fallback
+        with patch.dict("sys.modules", {"aws_assume_role_lib": fake_lib}):
+            mod = self.import_transformers()
+
+            # Recompute CONFIG deterministically for this test
+            mod.CONFIG = mod.get_config(
+                environment=os.environ["ENVIRONMENT"],
+                aws_region=os.environ["AWS_REGION"],
+                ssm_role_arn=os.environ["SSM_ROLE_ARN"],
+                service_name="data_transform",
+            )
+
+        value = mod.cfg("SUCCESS_TOPIC_ARN")
+        self.assertEqual(value, "arn:aws:sns:us-east-1:999:env-success")
+
+    def test_get_config_returns_empty_without_required_env(self):
+        """If required env vars are missing, get_config should return {} and not attempt AWS calls."""
+        # Clear required vars
+        os.environ.pop("ENVIRONMENT", None)
+        os.environ.pop("AWS_REGION", None)
+        os.environ.pop("AWS_DEFAULT_REGION", None)
+        os.environ.pop("SSM_ROLE_ARN", None)
+
+        mod = self.import_transformers()
+        cfg = mod.get_config(
+            environment=None,
+            aws_region=None,
+            ssm_role_arn=None,
+            service_name="data_transform")
+        self.assertEqual(cfg, {})
 
 
 if __name__ == "__main__":

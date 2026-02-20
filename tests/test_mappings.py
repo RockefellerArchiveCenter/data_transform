@@ -1,9 +1,10 @@
 import importlib
 import os
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 
 def import_mappings(extra_env=None):
+    """Import src.mappings with a default env baseline (no SSM)."""
     env = {
         "ASSET_BASEURL": "https://assets.example.org",
         "AUDIO_REFS": "",
@@ -14,6 +15,66 @@ def import_mappings(extra_env=None):
         env.update(extra_env)
 
     with patch.dict(os.environ, env, clear=False):
+        import sys
+        sys.modules.pop("src.mappings", None)
+        mod = importlib.import_module("src.mappings")
+    return mod
+
+
+def import_mappings_for_ssm(extra_env=None, ssm_params=None):
+    """Import src.mappings with ENVIRONMENT/AWS_REGION/SSM_ROLE_ARN and mocked SSM.
+
+    Mappings.load_runtime_env() merges SSM values using env.setdefault().
+    That means any key in os.environ (even if empty) will NOT be overwritten
+    by SSM. So for SSM-default tests, do not seed AUDIO_REFS/etc.
+    """
+    if ssm_params is None:
+        ssm_params = {}
+
+    env = {
+        "ASSET_BASEURL": "https://assets.example.org",
+        "ENVIRONMENT": "dev",
+        "AWS_REGION": "us-east-1",
+        "SSM_ROLE_ARN": "arn:aws:iam::000000000000:role/dummy",
+    }
+    if extra_env:
+        env.update(extra_env)
+
+    sts_client = Mock()
+    sts_client.assume_role.return_value = {
+        "Credentials": {
+            "AccessKeyId": "AKIA_TEST",
+            "SecretAccessKey": "SECRET",
+            "SessionToken": "TOKEN",
+        }
+    }
+
+    paginator = Mock()
+    paginator.paginate.return_value = [
+        {
+            "Parameters": [
+                {"Name": f"/{env['ENVIRONMENT']
+                             }/data_transform/{k}", "Value": v}
+                for k, v in ssm_params.items()
+            ]
+        }
+    ]
+
+    ssm_client = Mock()
+    ssm_client.get_paginator.return_value = paginator
+
+    base_session = Mock()
+    base_session.region_name = env["AWS_REGION"]
+    base_session.client.side_effect = lambda service: sts_client if service == "sts" else Mock()
+
+    assumed_session = Mock()
+    assumed_session.region_name = env["AWS_REGION"]
+    assumed_session.client.side_effect = lambda service: ssm_client if service == "ssm" else Mock()
+
+    with (
+        patch.dict(os.environ, env, clear=False),
+        patch("boto3.Session", side_effect=[base_session, assumed_session]),
+    ):
         import sys
         sys.modules.pop("src.mappings", None)
         mod = importlib.import_module("src.mappings")
@@ -87,3 +148,43 @@ def test_has_online_instance_with_object_instances_calls_has_online_asset():
     with patch.object(mod, "has_online_asset", return_value=False):
         assert mod.has_online_instance(
             instances, "/repositories/2/resources/123") is False
+
+
+# -----------------------------
+# New: SSM Parameter Store tests
+# -----------------------------
+
+def test_load_runtime_env_merges_ssm_defaults_when_env_missing():
+    mod = import_mappings_for_ssm(
+        extra_env={
+            # DO NOT seed AUDIO_REFS/etc here, or SSM won't fill them.
+        },
+        ssm_params={
+            "AUDIO_REFS": "a, b, c",
+            "MOVING_IMAGE_REFS": "m1,m2",
+            "PHOTOGRAPH_REFS": "p1",
+        },
+    )
+
+    assert mod.env_list("AUDIO_REFS") == ["a", "b", "c"]
+    assert mod.env_list("MOVING_IMAGE_REFS") == ["m1", "m2"]
+    assert mod.env_list("PHOTOGRAPH_REFS") == ["p1"]
+
+
+def test_load_runtime_env_env_vars_win_over_ssm():
+    mod = import_mappings_for_ssm(
+        extra_env={
+            "AUDIO_REFS": "x,y",
+        },
+        ssm_params={
+            "AUDIO_REFS": "a,b,c",
+        },
+    )
+    assert mod.env_list("AUDIO_REFS") == ["x", "y"]
+
+
+def test_get_config_returns_empty_when_missing_required_inputs():
+    mod = import_mappings()
+    assert mod.get_config("", "us-east-1", "arn:role") == {}
+    assert mod.get_config("dev", "", "arn:role") == {}
+    assert mod.get_config("dev", "us-east-1", "") == {}

@@ -1,9 +1,12 @@
 import json
+import logging
 import os
 import re
+import traceback
 import xml.etree.ElementTree as ET
 from urllib.parse import urlparse
 
+import boto3
 import odin
 import pycountry
 import requests
@@ -32,7 +35,83 @@ def map_list_field_compat(*args, **kwargs):
 odin.map_list_field = map_list_field_compat
 
 
-ENV = dict(os.environ)
+def assume_role_session(session, role_arn):
+    """Return a boto3.Session authenticated via role assumption.
+
+    Uses aws_assume_role_lib.assume_role when available; otherwise falls back to
+    STS AssumeRole directly.
+    """
+    try:
+        from aws_assume_role_lib import assume_role  # type: ignore
+        return assume_role(session, role_arn)
+    except Exception:
+        sts = session.client("sts")
+        resp = sts.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName="data_transform_ssm")
+        creds = resp["Credentials"]
+        return boto3.Session(
+            aws_access_key_id=creds["AccessKeyId"],
+            aws_secret_access_key=creds["SecretAccessKey"],
+            aws_session_token=creds["SessionToken"],
+            region_name=session.region_name,
+        )
+
+
+def get_client_with_role(resource, aws_region, role_arn):
+    """Get a boto3 client authenticated with a specific IAM role."""
+    session = boto3.Session(region_name=aws_region)
+    assumed = assume_role_session(session, role_arn) if role_arn else session
+    return assumed.client(resource)
+
+
+def get_config(environment, aws_region, ssm_role_arn,
+               service_name="data_transform"):
+    """Fetch config values from SSM Parameter Store by path.
+
+    Mirrors the Pisces/DataFetcher pattern:
+      /{environment}/{service_name}/PARAM_NAME -> {PARAM_NAME: value}
+    """
+    ssm_parameter_path = f"/{environment}/{service_name}"
+    configuration = {}
+    if not environment or not aws_region or not ssm_role_arn:
+        return configuration
+
+    ssm_client = get_client_with_role("ssm", aws_region, ssm_role_arn)
+    try:
+        paginator = ssm_client.get_paginator("get_parameters_by_path")
+        for page in paginator.paginate(
+                Path=ssm_parameter_path, Recursive=True, WithDecryption=True):
+            for entry in page.get("Parameters", []):
+                name = entry.get("Name") or ""
+                key = name.split("/")[-1] if name else None
+                if key:
+                    configuration[key] = entry.get("Value")
+    except BaseException:
+        logging.error("Encountered an error loading config from SSM.")
+        traceback.print_exc()
+    return configuration
+
+
+def load_runtime_env():
+    """Return an env dict with SSM values merged in as defaults (env vars win)."""
+    env = dict(os.environ)
+    environment = env.get("ENVIRONMENT")
+    aws_region = env.get("AWS_REGION") or env.get("AWS_DEFAULT_REGION")
+    ssm_role_arn = env.get("SSM_ROLE_ARN")
+    if environment and aws_region and ssm_role_arn:
+        cfg = get_config(
+            environment,
+            aws_region,
+            ssm_role_arn,
+            service_name="data_transform")
+        # only fill missing keys so local env/test patching still works
+        for k, v in cfg.items():
+            env.setdefault(k, v)
+    return env
+
+
+ENV = load_runtime_env()
 
 
 def env_list(name):

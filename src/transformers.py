@@ -1,6 +1,8 @@
 import json
+import logging
 import os
 import traceback
+from os import getenv
 from os.path import join
 from pathlib import Path
 
@@ -18,20 +20,99 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceAgentPerson, SourceArchivalObject,
                                SourceResource, SourceSubject)
 
-# Environment variables. This is a work in progress. I'm guessing these
-# should be SSM params.
-SUCCESS_TOPIC_ARN = os.environ.get("SUCCESS_TOPIC_ARN", "")
-FAILURE_TOPIC_ARN = os.environ.get("FAILURE_TOPIC_ARN", "")
-SCHEMAS_BASE_DIR = os.environ.get(
+
+def assume_role_session(session, role_arn):
+    """Return a boto3.Session authenticated via role assumption.
+
+    Uses aws_assume_role_lib.assume_role when available; otherwise falls back to
+    STS AssumeRole directly.
+    """
+    try:
+        from aws_assume_role_lib import assume_role
+        return assume_role(session, role_arn)
+    except Exception:
+        sts = session.client("sts")
+        resp = sts.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName="data_transform_ssm")
+        creds = resp["Credentials"]
+        return boto3.Session(
+            aws_access_key_id=creds["AccessKeyId"],
+            aws_secret_access_key=creds["SecretAccessKey"],
+            aws_session_token=creds["SessionToken"],
+            region_name=session.region_name,
+        )
+
+
+def get_client_with_role(resource, aws_region, role_arn):
+    """Get a boto3 client authenticated with a specific IAM role."""
+    session = boto3.Session(region_name=aws_region)
+    assumed = assume_role_session(session, role_arn) if role_arn else session
+    return assumed.client(resource)
+
+
+def get_config(environment, aws_region, ssm_role_arn,
+               service_name="data_transform"):
+    """Fetch config values from SSM Parameter Store by path.
+
+    Mirrors the Pisces/DataFetcher pattern:
+      /{environment}/{service_name}/PARAM_NAME -> {PARAM_NAME: value}
+    """
+    ssm_parameter_path = f"/{environment}/{service_name}"
+    configuration = {}
+    if not environment or not aws_region or not ssm_role_arn:
+        return configuration
+
+    ssm_client = get_client_with_role("ssm", aws_region, ssm_role_arn)
+    try:
+        paginator = ssm_client.get_paginator("get_parameters_by_path")
+        for page in paginator.paginate(
+                Path=ssm_parameter_path, Recursive=True, WithDecryption=True):
+            for entry in page.get("Parameters", []):
+                name = entry.get("Name") or ""
+                key = name.split("/")[-1] if name else None
+                if key:
+                    configuration[key] = entry.get("Value")
+    except BaseException:
+        logging.error("Encountered an error loading config from SSM.")
+        traceback.print_exc()
+    return configuration
+
+
+ENVIRONMENT = getenv("ENVIRONMENT", "")
+AWS_REGION = getenv("AWS_REGION") or getenv("AWS_DEFAULT_REGION") or ""
+SSM_ROLE_ARN = getenv("SSM_ROLE_ARN", "")
+
+CONFIG = get_config(
+    ENVIRONMENT,
+    AWS_REGION,
+    SSM_ROLE_ARN,
+    service_name="data_transform")
+
+
+def cfg(name, default=""):
+    """Return config value: env var wins, else SSM config, else default."""
+    value = os.environ.get(name)
+    if value is not None and str(value).strip() != "":
+        return value
+    if name in CONFIG and str(CONFIG.get(name)).strip() != "":
+        return CONFIG.get(name)
+    return default
+
+
+# Environment variables. These may be supplied as env vars or via SSM Parameter Store
+# under /{ENVIRONMENT}/data_transform/ (env vars win).
+SUCCESS_TOPIC_ARN = cfg("SUCCESS_TOPIC_ARN", "")
+FAILURE_TOPIC_ARN = cfg("FAILURE_TOPIC_ARN", "")
+SCHEMAS_BASE_DIR = cfg(
     "SCHEMAS_BASE_DIR",
     str(Path(__file__).resolve().parent / "schemas"),
 ).rstrip("/")
-SCHEMA_AGENT = os.environ.get("SCHEMA_AGENT", "agent.json")
-SCHEMA_COLLECTION = os.environ.get("SCHEMA_COLLECTION", "collection.json")
-SCHEMA_OBJECT = os.environ.get("SCHEMA_OBJECT", "object.json")
-SCHEMA_TERM = os.environ.get("SCHEMA_TERM", "term.json")
-SCHEMA_BASE = os.environ.get("SCHEMA_BASE")  # optional
-SSM_PREFIX = os.environ.get("SSM_PREFIX", "").rstrip("/")
+SCHEMA_AGENT = cfg("SCHEMA_AGENT", "agent.json")
+SCHEMA_COLLECTION = cfg("SCHEMA_COLLECTION", "collection.json")
+SCHEMA_OBJECT = cfg("SCHEMA_OBJECT", "object.json")
+SCHEMA_TERM = cfg("SCHEMA_TERM", "term.json")
+SCHEMA_BASE = cfg("SCHEMA_BASE", "") or None  # optional
 SCHEMAS = {
     "base": SCHEMA_BASE,
     "agent": SCHEMA_AGENT,
@@ -41,7 +122,6 @@ SCHEMAS = {
 }
 
 sns = boto3.client("sns")
-ssm = boto3.client("ssm")
 
 
 class TransformError(Exception):
@@ -78,17 +158,6 @@ def publish(topic_arn, payload, subject=None):
     if subject:
         params["Subject"] = subject[:100]
     sns.publish(**params)
-
-
-def ssm_get(name, decrypt=True):
-    """
-    Fetch a value from SSM Parameter Store under SSM_PREFIX.
-    """
-    if not SSM_PREFIX:
-        raise ValueError("SSM_PREFIX is not set but ssm_get() was called")
-    full_name = (SSM_PREFIX + "/" + name).replace("//", "/")
-    resp = ssm.get_parameter(Name=full_name, WithDecryption=decrypt)
-    return resp["Parameter"]["Value"]
 
 
 class Transformer:
@@ -198,10 +267,8 @@ class Transformer:
 
     def validate_transformed(self, data, schema_name):
         """Validate an object against the specified schema."""
-        base_dir = os.environ.get(
-            "SCHEMAS_BASE_DIR",
-            SCHEMAS_BASE_DIR).rstrip("/")
-        schema_base = os.environ.get("SCHEMA_BASE")
+        base_dir = cfg("SCHEMAS_BASE_DIR", SCHEMAS_BASE_DIR).rstrip("/")
+        schema_base = cfg("SCHEMA_BASE", "") or None
 
         base_schema = None
         if schema_base:
