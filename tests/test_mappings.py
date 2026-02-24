@@ -149,11 +149,6 @@ def test_has_online_instance_with_object_instances_calls_has_online_asset():
         assert mod.has_online_instance(
             instances, "/repositories/2/resources/123") is False
 
-
-# -----------------------------
-# New: SSM Parameter Store tests
-# -----------------------------
-
 def test_load_runtime_env_merges_ssm_defaults_when_env_missing():
     mod = import_mappings_for_ssm(
         extra_env={
