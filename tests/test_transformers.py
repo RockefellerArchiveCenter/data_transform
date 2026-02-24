@@ -425,6 +425,174 @@ class TransformerTest(unittest.TestCase):
             service_name="data_transform")
         self.assertEqual(cfg, {})
 
+    def test_get_mapping_classes_unsupported_type_raises(self):
+        mod = self.import_transformers()
+        transformer = mod.Transformer()
+        with self.assertRaises(KeyError):
+            transformer.get_mapping_classes("not_a_real_type")
+
+    def test_remove_keys_from_dict_removes_nested_dollar_keys(self):
+        mod = self.import_transformers()
+        transformer = mod.Transformer()
+
+        payload = {
+            "uri": "/x/1",
+            "$": {"should": "be removed"},
+            "nested": {
+                "keep": 1,
+                "$": "remove me",
+                "items": [{"a": 1, "$": 2}, {"b": 3}],
+            },
+            "lst": ["a", {"$": "x", "c": 4}],
+        }
+        cleaned = transformer.remove_keys_from_dict(payload, target_key="$")
+
+        self.assertNotIn("$", cleaned)
+        self.assertNotIn("$", cleaned["nested"])
+        self.assertEqual(cleaned["nested"]["items"][0], {"a": 1})
+        self.assertEqual(cleaned["nested"]["items"][1], {"b": 3})
+        self.assertEqual(cleaned["lst"][0], "a")
+        self.assertEqual(cleaned["lst"][1], {"c": 4})
+
+    def test_assume_role_session_falls_back_to_sts(self):
+        mod = self.import_transformers()
+
+        session = Mock()
+        session.region_name = "us-east-1"
+        sts = Mock()
+        session.client.return_value = sts
+        sts.assume_role.return_value = {
+            "Credentials": {
+                "AccessKeyId": "AKIA_TEST",
+                "SecretAccessKey": "SECRET",
+                "SessionToken": "TOKEN",
+            }
+        }
+        with patch.object(mod, "boto3") as mock_boto3:
+            mock_boto3.Session.return_value = "ASSUMED_SESSION"
+            with patch.dict("sys.modules", {"aws_assume_role_lib": None}):
+                assumed = mod.assume_role_session(
+                    session, "arn:aws:iam::1:role/Dummy")
+
+        self.assertEqual(assumed, "ASSUMED_SESSION")
+        sts.assume_role.assert_called_once()
+        mock_boto3.Session.assert_called_once()
+        kwargs = mock_boto3.Session.call_args.kwargs
+        self.assertEqual(kwargs["aws_access_key_id"], "AKIA_TEST")
+        self.assertEqual(kwargs["aws_secret_access_key"], "SECRET")
+        self.assertEqual(kwargs["aws_session_token"], "TOKEN")
+        self.assertEqual(kwargs["region_name"], "us-east-1")
+
+    def test_require_env_raises_when_missing(self):
+        mod = self.import_transformers()
+        with patch.object(mod, "SUCCESS_TOPIC_ARN", ""), patch.object(mod, "FAILURE_TOPIC_ARN", ""), patch.object(mod, "SCHEMAS_BASE_DIR", ""):
+            with self.assertRaises(ValueError) as ctx:
+                mod.require_env()
+        self.assertIn(
+            "Missing required environment variables", str(
+                ctx.exception))
+
+    def test_publish_calls_sns_and_truncates_subject(self):
+        mod = self.import_transformers()
+        long_subject = "x" * 200
+        payload = {"hello": "world"}
+
+        with patch.object(mod.sns, "publish") as mock_publish:
+            mod.publish("arn:topic", payload, subject=long_subject)
+
+        mock_publish.assert_called_once()
+        called = mock_publish.call_args.kwargs
+        self.assertEqual(called["TopicArn"], "arn:topic")
+        self.assertTrue(isinstance(called["Message"], str))
+        self.assertEqual(len(called["Subject"]), 100)
+
+    def test_publish_result_unknown_status_raises(self):
+        mod = self.import_transformers()
+        transformer = mod.Transformer()
+        with self.assertRaises(ValueError):
+            transformer.publish_result("wat", {"a": 1})
+
+    def test_process_message_parses_object_type_from_attributes_and_body(self):
+        mod = self.import_transformers()
+        transformer = mod.Transformer()
+        transformer.run = Mock(
+            return_value={
+                "uri": "/subjects/1",
+                "type": "term"})
+        transformer.online_pending = True
+        transformer.publish_result = Mock()
+        record = {
+            "messageId": "m1",
+            "body": json.dumps({"data": {"uri": "/subjects/1"}, "object_type": "subject"}),
+            "messageAttributes": {
+                "objectType": {"stringValue": "subject"},
+                "object_type": {"stringValue": "resource"},
+            },
+        }
+        out = transformer.process_message(record)
+        self.assertEqual(out["status"], "success")
+        self.assertEqual(out["message_id"], "m1")
+        self.assertEqual(out["object_type"], "subject")
+        transformer.run.assert_called_once_with(
+            "subject", {"uri": "/subjects/1"})
+        transformer.publish_result.assert_called_once()
+        self.assertIn("message_attributes", out)
+
+    def test_process_message_handles_non_json_body_missing_object_type(self):
+        mod = self.import_transformers()
+        transformer = mod.Transformer()
+        record = {
+            "messageId": "m2",
+            "body": "this is not json",
+            "messageAttributes": {}}
+        with self.assertRaises(ValueError) as ctx:
+            transformer.process_message(record)
+        self.assertIn("Missing object_type", str(ctx.exception))
+
+    def test_process_message_rejects_non_dict_source_data(self):
+        mod = self.import_transformers()
+        transformer = mod.Transformer()
+        record = {
+            "messageId": "m3",
+            "body": json.dumps({"object_type": "subject", "data": [1, 2, 3]}),
+            "messageAttributes": {},
+        }
+        with self.assertRaises(ValueError) as ctx:
+            transformer.process_message(record)
+        self.assertIn("Source data must be a JSON object", str(ctx.exception))
+
+    def test_get_transformer_is_singleton(self):
+        mod = self.import_transformers()
+        mod.transformer = None
+        t1 = mod.get_transformer()
+        t2 = mod.get_transformer()
+        self.assertIs(t1, t2)
+
+    def test_lambda_handler_returns_batch_item_failures(self):
+        mod = self.import_transformers()
+
+        fake_transformer = Mock()
+
+        def _proc(record):
+            if record.get("messageId") == "bad":
+                raise RuntimeError("boom")
+            return {"ok": True}
+
+        fake_transformer.process_message.side_effect = _proc
+        fake_transformer.publish_result = Mock()
+
+        with patch.object(mod, "get_transformer", return_value=fake_transformer):
+            event = {
+                "Records": [
+                    {"messageId": "good", "body": "{}"},
+                    {"messageId": "bad", "body": "{}"},
+                ]
+            }
+            out = mod.lambda_handler(event, context=None)
+
+        self.assertEqual(out["batchItemFailures"], [{"itemIdentifier": "bad"}])
+        fake_transformer.publish_result.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
