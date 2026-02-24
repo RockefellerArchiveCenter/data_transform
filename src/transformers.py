@@ -53,11 +53,7 @@ def get_client_with_role(resource, aws_region, role_arn):
 
 def get_config(environment, aws_region, ssm_role_arn,
                service_name="data_transform"):
-    """Fetch config values from SSM Parameter Store by path.
-
-    Mirrors the Pisces/DataFetcher pattern:
-      /{environment}/{service_name}/PARAM_NAME -> {PARAM_NAME: value}
-    """
+    """Fetch config values from SSM Parameter Store by path."""
     ssm_parameter_path = f"/{environment}/{service_name}"
     configuration = {}
     if not environment or not aws_region or not ssm_role_arn:
