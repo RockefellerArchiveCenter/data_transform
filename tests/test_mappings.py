@@ -1,35 +1,43 @@
+# tests/test_mappings.py
 import importlib
 import os
+import sys
 from unittest.mock import Mock, patch
 
+import pytest
 
-def import_mappings(extra_env=None):
-    """Import src.mappings with a default env baseline (no SSM)."""
-    env = {
-        "ASSET_BASEURL": "https://assets.example.org",
-        "AUDIO_REFS": "",
-        "MOVING_IMAGE_REFS": "",
-        "PHOTOGRAPH_REFS": "",
-    }
-    if extra_env:
-        env.update(extra_env)
+BASE_ENV = {
+    "ASSET_BASEURL": "https://assets.example.org",
+    "AUDIO_REFS": "",
+    "MOVING_IMAGE_REFS": "",
+    "PHOTOGRAPH_REFS": "",
+}
+
+
+def import_fresh(module_name: str):
+    """Import a module fresh so import-time env reads are re-evaluated."""
+    sys.modules.pop(module_name, None)
+    return importlib.import_module(module_name)
+
+
+@pytest.fixture
+def mod(request):
+    """Import src.mappings under a baseline env (no SSM)."""
+    extra_env = getattr(request, "param", None) or {}
+
+    env = dict(BASE_ENV)
+    env.update(extra_env)
 
     with patch.dict(os.environ, env, clear=False):
-        import sys
-        sys.modules.pop("src.mappings", None)
-        mod = importlib.import_module("src.mappings")
-    return mod
+        yield import_fresh("src.mappings")
 
 
-def import_mappings_for_ssm(extra_env=None, ssm_params=None):
-    """Import src.mappings with ENVIRONMENT/AWS_REGION/SSM_ROLE_ARN and mocked SSM.
-
-    Mappings.load_runtime_env() merges SSM values using env.setdefault().
-    That means any key in os.environ (even if empty) will NOT be overwritten
-    by SSM. So for SSM-default tests, do not seed AUDIO_REFS/etc.
-    """
-    if ssm_params is None:
-        ssm_params = {}
+@pytest.fixture
+def mod_ssm(request):
+    """Import src.mappings with ENVIRONMENT/AWS_REGION/SSM_ROLE_ARN and mocked SSM."""
+    params = getattr(request, "param", None) or {}
+    extra_env = params.get("extra_env") or {}
+    ssm_params = params.get("ssm_params") or {}
 
     env = {
         "ASSET_BASEURL": "https://assets.example.org",
@@ -37,9 +45,9 @@ def import_mappings_for_ssm(extra_env=None, ssm_params=None):
         "AWS_REGION": "us-east-1",
         "SSM_ROLE_ARN": "arn:aws:iam::000000000000:role/dummy",
     }
-    if extra_env:
-        env.update(extra_env)
+    env.update(extra_env)
 
+    # Mock STS assume_role
     sts_client = Mock()
     sts_client.assume_role.return_value = {
         "Credentials": {
@@ -49,6 +57,8 @@ def import_mappings_for_ssm(extra_env=None, ssm_params=None):
         }
     }
 
+    # Mock SSM paginator returning parameters under:
+    # /{ENVIRONMENT}/data_transform/{KEY}
     paginator = Mock()
     paginator.paginate.return_value = [
         {
@@ -65,38 +75,39 @@ def import_mappings_for_ssm(extra_env=None, ssm_params=None):
 
     base_session = Mock()
     base_session.region_name = env["AWS_REGION"]
-    base_session.client.side_effect = lambda service: sts_client if service == "sts" else Mock()
+    base_session.client.side_effect = (
+        lambda service: sts_client if service == "sts" else Mock()
+    )
 
     assumed_session = Mock()
     assumed_session.region_name = env["AWS_REGION"]
-    assumed_session.client.side_effect = lambda service: ssm_client if service == "ssm" else Mock()
+    assumed_session.client.side_effect = (
+        lambda service: ssm_client if service == "ssm" else Mock()
+    )
 
     with (
         patch.dict(os.environ, env, clear=False),
         patch("boto3.Session", side_effect=[base_session, assumed_session]),
     ):
-        import sys
-        sys.modules.pop("src.mappings", None)
-        mod = importlib.import_module("src.mappings")
-    return mod
+        yield import_fresh("src.mappings")
 
 
-def test_env_list_empty_and_split():
-    mod = import_mappings({"AUDIO_REFS": " a, b ,c ,, "})
+@pytest.mark.parametrize("mod",
+                         [{"AUDIO_REFS": " a, b ,c ,, "}], indirect=True)
+def test_env_list_empty_and_split(mod):
     assert mod.env_list("DOES_NOT_EXIST") == []
     assert mod.env_list("AUDIO_REFS") == ["a", "b", "c"]
 
 
-def test_identifier_from_uri_handles_full_url_and_path():
-    mod = import_mappings()
+def test_identifier_from_uri_handles_full_url_and_path(mod):
     assert mod.identifier_from_uri("/repositories/2/resources/123") == "123"
     assert mod.identifier_from_uri(
-        "https://host/repositories/2/resources/999?x=1") == "999"
+        "https://host/repositories/2/resources/999?x=1"
+    ) == "999"
     assert mod.identifier_from_uri("") == ""
 
 
-def test_generate_manifest_and_download_identifiers():
-    mod = import_mappings()
+def test_generate_manifest_and_download_identifiers(mod):
     assert mod.generate_manifest_identifier(
         {"uri": "/x/1"}, {}) == "manifest-1"
     assert mod.generate_download_identifier(
@@ -104,42 +115,38 @@ def test_generate_manifest_and_download_identifiers():
     assert mod.generate_manifest_identifier({}, {}) == "manifest"
 
 
-def test_strip_tags_xml_and_regex_fallback():
-    mod = import_mappings()
+def test_strip_tags_xml_and_regex_fallback(mod):
     assert mod.strip_tags("hi <b>there</b>") == "hi there"
     assert mod.strip_tags("a <b>broken") == "a broken"
 
 
-def test_has_online_asset_uses_requests_head_status_code():
-    mod = import_mappings({"ASSET_BASEURL": "https://assets.example.org"})
+def test_has_online_asset_uses_requests_head_status_code(mod):
     resp = type("R", (), {"status_code": 200})()
     with patch.object(mod.requests, "head", return_value=resp) as m:
         assert mod.has_online_asset("abc") is True
         m.assert_called_once()
+
     resp2 = type("R", (), {"status_code": 404})()
     with patch.object(mod.requests, "head", return_value=resp2):
         assert mod.has_online_asset("abc") is False
 
 
-def test_has_online_asset_false_when_no_baseurl():
-    mod = import_mappings({"ASSET_BASEURL": ""})
+@pytest.mark.parametrize("mod", [{"ASSET_BASEURL": ""}], indirect=True)
+def test_has_online_asset_false_when_no_baseurl(mod):
     assert mod.has_online_asset("abc") is False
 
 
-def test_has_online_instance_with_dict_instances_calls_has_online_asset():
-    mod = import_mappings({"ASSET_BASEURL": "https://assets.example.org"})
-
+def test_has_online_instance_with_dict_instances_calls_has_online_asset(mod):
     instances = [{"instance_type": "digital_object"},
                  {"instance_type": "text"}]
     with patch.object(mod, "has_online_asset", return_value=True) as hoa:
         assert mod.has_online_instance(
-            instances, "/repositories/2/resources/123") is True
+            instances, "/repositories/2/resources/123"
+        ) is True
         hoa.assert_called_once_with("123")
 
 
-def test_has_online_instance_with_object_instances_calls_has_online_asset():
-    mod = import_mappings({"ASSET_BASEURL": "https://assets.example.org"})
-
+def test_has_online_instance_with_object_instances_calls_has_online_asset(mod):
     class Inst:
         def __init__(self, t):
             self.instance_type = t
@@ -147,39 +154,47 @@ def test_has_online_instance_with_object_instances_calls_has_online_asset():
     instances = [Inst("digital_object"), Inst("text")]
     with patch.object(mod, "has_online_asset", return_value=False):
         assert mod.has_online_instance(
-            instances, "/repositories/2/resources/123") is False
-
-def test_load_runtime_env_merges_ssm_defaults_when_env_missing():
-    mod = import_mappings_for_ssm(
-        extra_env={
-            # DO NOT seed AUDIO_REFS/etc here, or SSM won't fill them.
-        },
-        ssm_params={
-            "AUDIO_REFS": "a, b, c",
-            "MOVING_IMAGE_REFS": "m1,m2",
-            "PHOTOGRAPH_REFS": "p1",
-        },
-    )
-
-    assert mod.env_list("AUDIO_REFS") == ["a", "b", "c"]
-    assert mod.env_list("MOVING_IMAGE_REFS") == ["m1", "m2"]
-    assert mod.env_list("PHOTOGRAPH_REFS") == ["p1"]
+            instances, "/repositories/2/resources/123"
+        ) is False
 
 
-def test_load_runtime_env_env_vars_win_over_ssm():
-    mod = import_mappings_for_ssm(
-        extra_env={
-            "AUDIO_REFS": "x,y",
-        },
-        ssm_params={
-            "AUDIO_REFS": "a,b,c",
-        },
-    )
-    assert mod.env_list("AUDIO_REFS") == ["x", "y"]
+@pytest.mark.parametrize(
+    "mod_ssm",
+    [
+        {
+            "extra_env": {
+                # DO NOT seed AUDIO_REFS/etc here, or SSM won't fill them.
+            },
+            "ssm_params": {
+                "AUDIO_REFS": "a, b, c",
+                "MOVING_IMAGE_REFS": "m1,m2",
+                "PHOTOGRAPH_REFS": "p1",
+            },
+        }
+    ],
+    indirect=True,
+)
+def test_load_runtime_env_merges_ssm_defaults_when_env_missing(mod_ssm):
+    assert mod_ssm.env_list("AUDIO_REFS") == ["a", "b", "c"]
+    assert mod_ssm.env_list("MOVING_IMAGE_REFS") == ["m1", "m2"]
+    assert mod_ssm.env_list("PHOTOGRAPH_REFS") == ["p1"]
 
 
-def test_get_config_returns_empty_when_missing_required_inputs():
-    mod = import_mappings()
+@pytest.mark.parametrize(
+    "mod_ssm",
+    [
+        {
+            "extra_env": {"AUDIO_REFS": "x,y"},
+            "ssm_params": {"AUDIO_REFS": "a,b,c"},
+        }
+    ],
+    indirect=True,
+)
+def test_load_runtime_env_env_vars_win_over_ssm(mod_ssm):
+    assert mod_ssm.env_list("AUDIO_REFS") == ["x", "y"]
+
+
+def test_get_config_returns_empty_when_missing_required_inputs(mod):
     assert mod.get_config("", "us-east-1", "arn:role") == {}
     assert mod.get_config("dev", "", "arn:role") == {}
     assert mod.get_config("dev", "us-east-1", "") == {}
