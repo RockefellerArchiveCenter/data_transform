@@ -13,7 +13,7 @@ jobs:
       name: ${{ github.ref_name }}
 
     env:
-      LAMBDA_NAME: deployment_updates
+      LAMBDA_NAME: data_transform
       LAMBDA_HANDLER_CODE: src/transformers.py
       BASENAME: transformers.py
 

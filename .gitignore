@@ -1,14 +1,12 @@
 *.DS_Store
 .archivessnake.yml
 *.pickle
-config.py
-source_data
 *.log
 *.pot
 *.pyc
 __pycache__/
-local_settings.py
 db.sqlite3
 media
 .pytest_cache/
 .tox/
+.coverage

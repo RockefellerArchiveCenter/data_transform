@@ -2,16 +2,16 @@ attrs==25.4.0
     # via
     #   jsonschema
     #   referencing
-boto3==1.42.52
+boto3==1.42.58
     # via
     #   -r tests/test_requirements.in
     #   moto
-botocore==1.42.52
+botocore==1.42.58
     # via
     #   boto3
     #   moto
     #   s3transfer
-certifi==2026.1.4
+certifi==2026.2.25
     # via requests
 cffi==2.0.0
     # via cryptography
@@ -55,7 +55,7 @@ pycparser==3.0
     # via cffi
 pygments==2.19.2
     # via pytest
-pytest==8.4.2
+pytest==9.0.2
     # via -r tests/test_requirements.in
 python-dateutil==2.9.0.post0
     # via
@@ -74,7 +74,7 @@ requests==2.32.5
     #   -r tests/test_requirements.in
     #   moto
     #   responses
-responses==0.25.8
+responses==0.26.0
     # via moto
 rpds-py==0.30.0
     # via
@@ -91,7 +91,7 @@ urllib3==2.6.3
     #   botocore
     #   requests
     #   responses
-werkzeug==3.1.5
+werkzeug==3.1.6
     # via moto
-xmltodict==1.0.3
+xmltodict==1.0.4
     # via moto
