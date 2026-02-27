@@ -35,7 +35,7 @@ The script is designed to consume message from an AWS Simple Queue Service (SQS)
 
 The body of the message must deserialize into one of three valid JSON shapes:
 - `object_type` is provided and `data` contains the source record
-- `object_type` is provided and `record` is contains the source record
+- `object_type` is provided and `record` contains the source record
 - `object_type` is omitted from the body but provided as an SQS message attribute.
 
 At minimum, the source record must:
