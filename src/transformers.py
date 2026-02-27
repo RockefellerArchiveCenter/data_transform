@@ -117,7 +117,21 @@ SCHEMAS = {
     "term": SCHEMA_TERM,
 }
 
-sns = boto3.client("sns")
+# Lazily created SNS client (no AWS calls at import time)
+sns_client = None
+
+
+def get_sns_client():
+    """Return a cached SNS client.
+
+    This is intentionally lazy so importing this module never requires AWS
+    configuration during CI.
+    """
+    global sns_client
+    if sns_client is None:
+        region = AWS_REGION or "us-east-1"
+        sns_client = boto3.client("sns", region_name=region)
+    return sns_client
 
 
 class TransformError(Exception):
@@ -153,7 +167,7 @@ def publish(topic_arn, payload, subject=None):
             default=str)}
     if subject:
         params["Subject"] = subject[:100]
-    sns.publish(**params)
+    get_sns_client().publish(**params)
 
 
 class Transformer:

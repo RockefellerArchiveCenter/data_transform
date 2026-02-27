@@ -497,11 +497,13 @@ class TransformerTest(unittest.TestCase):
         long_subject = "x" * 200
         payload = {"hello": "world"}
 
-        with patch.object(mod.sns, "publish") as mock_publish:
+        with patch.object(mod, "get_sns_client") as mock_get_sns:
+            mock_client = Mock()
+            mock_get_sns.return_value = mock_client
             mod.publish("arn:topic", payload, subject=long_subject)
 
-        mock_publish.assert_called_once()
-        called = mock_publish.call_args.kwargs
+        mock_client.publish.assert_called_once()
+        called = mock_client.publish.call_args.kwargs
         self.assertEqual(called["TopicArn"], "arn:topic")
         self.assertTrue(isinstance(called["Message"], str))
         self.assertEqual(len(called["Subject"]), 100)
