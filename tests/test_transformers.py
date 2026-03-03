@@ -25,8 +25,7 @@ class TransformerTest(unittest.TestCase):
         cls.schemas_dir = project_root / "src" / "schemas"
         if not cls.schemas_dir.exists():
             raise RuntimeError(
-                f"Schemas directory not found: {
-                    cls.schemas_dir}")
+                f"Schemas directory not found: {cls.schemas_dir}")
 
         os.environ.setdefault("SCHEMAS_BASE_DIR", str(cls.schemas_dir))
         os.environ.setdefault("SCHEMA_BASE", "base.json")
@@ -34,8 +33,11 @@ class TransformerTest(unittest.TestCase):
         os.environ.setdefault("SCHEMA_COLLECTION", "collection.json")
         os.environ.setdefault("SCHEMA_OBJECT", "object.json")
         os.environ.setdefault("SCHEMA_TERM", "term.json")
-        os.environ.setdefault("SNS_TOPIC_ARN",
-                              "arn:aws:sns:us-east-1:000000000000:dummy")
+        os.environ.setdefault("SUCCESS_TOPIC_ARN",
+                              "arn:aws:sns:us-east-1:000000000000:success")
+        os.environ.setdefault("FAILURE_TOPIC_ARN",
+                              "arn:aws:sns:us-east-1:000000000000:failure")
+        os.environ.setdefault("SERVICE_NAME", "data_transform")
 
         os.environ.setdefault("ASSET_BASEURL", "https://assets.example.org")
 
@@ -492,21 +494,36 @@ class TransformerTest(unittest.TestCase):
             "Missing required environment variables", str(
                 ctx.exception))
 
-    def test_publish_calls_sns_and_truncates_subject(self):
+    def test_publish_calls_sns_with_fields_and_attributes(self):
+        """publish() should pass ids + message attributes through to SNS."""
         mod = self.import_transformers()
-        long_subject = "x" * 200
         payload = {"hello": "world"}
+
+        message_attributes = {
+            "service": {"DataType": "String", "StringValue": "data_transform"},
+            "requested_action": {"DataType": "String", "StringValue": "merge"},
+        }
 
         with patch.object(mod, "get_sns_client") as mock_get_sns:
             mock_client = Mock()
             mock_get_sns.return_value = mock_client
-            mod.publish("arn:topic", payload, subject=long_subject)
+            mod.publish(
+                "arn:topic",
+                payload,
+                message_attributes=message_attributes,
+                message_group_id="data_transform-1",
+                message_deduplication_id="data_transform-1-success",
+            )
 
         mock_client.publish.assert_called_once()
         called = mock_client.publish.call_args.kwargs
         self.assertEqual(called["TopicArn"], "arn:topic")
         self.assertTrue(isinstance(called["Message"], str))
-        self.assertEqual(len(called["Subject"]), 100)
+        self.assertEqual(called["MessageGroupId"], "data_transform-1")
+        self.assertEqual(
+            called["MessageDeduplicationId"],
+            "data_transform-1-success")
+        self.assertEqual(called["MessageAttributes"], message_attributes)
 
     def test_publish_result_unknown_status_raises(self):
         mod = self.import_transformers()
@@ -517,28 +534,52 @@ class TransformerTest(unittest.TestCase):
     def test_process_message_parses_object_type_from_attributes_and_body(self):
         mod = self.import_transformers()
         transformer = mod.Transformer()
+
         transformer.run = Mock(
             return_value={
                 "uri": "/subjects/1",
                 "type": "term"})
-        transformer.online_pending = True
         transformer.publish_result = Mock()
+
         record = {
             "messageId": "m1",
             "body": json.dumps({"data": {"uri": "/subjects/1"}, "object_type": "subject"}),
             "messageAttributes": {
                 "objectType": {"stringValue": "subject"},
                 "object_type": {"stringValue": "resource"},
+                # Upstream could set this, but the transformer only emits
+                # merge.
+                "requested_action": {"stringValue": "delete"},
             },
         }
+
         out = transformer.process_message(record)
-        self.assertEqual(out["status"], "success")
-        self.assertEqual(out["message_id"], "m1")
-        self.assertEqual(out["object_type"], "subject")
+
+        self.assertIn("objects", out)
+        self.assertEqual(len(out["objects"]), 1)
+        obj = out["objects"][0]
+        self.assertEqual(obj["es_id"], "1")
+        self.assertEqual(obj["data"]["uri"], "/subjects/1")
+        self.assertEqual(obj["data"]["object_type"], "term")
+
         transformer.run.assert_called_once_with(
             "subject", {"uri": "/subjects/1"})
+
         transformer.publish_result.assert_called_once()
-        self.assertIn("message_attributes", out)
+        call = transformer.publish_result.call_args
+        self.assertEqual(call.args[0], "success")
+        self.assertEqual(call.args[1], out)
+
+        self.assertIn("message_attributes", call.kwargs)
+        self.assertEqual(
+            call.kwargs["message_attributes"]["service"]["StringValue"],
+            "data_transform")
+        self.assertEqual(
+            call.kwargs["message_attributes"]["requested_action"]["StringValue"],
+            "merge")
+
+        self.assertIn("message_group_id", call.kwargs)
+        self.assertIn("message_deduplication_id", call.kwargs)
 
     def test_process_message_handles_non_json_body_missing_object_type(self):
         mod = self.import_transformers()
@@ -584,12 +625,8 @@ class TransformerTest(unittest.TestCase):
         fake_transformer.publish_result = Mock()
 
         with patch.object(mod, "get_transformer", return_value=fake_transformer):
-            event = {
-                "Records": [
-                    {"messageId": "good", "body": "{}"},
-                    {"messageId": "bad", "body": "{}"},
-                ]
-            }
+            event = {"Records": [{"messageId": "good", "body": "{}"}, {
+                "messageId": "bad", "body": "{}"}]}
             out = mod.lambda_handler(event, context=None)
 
         self.assertEqual(out["batchItemFailures"], [{"itemIdentifier": "bad"}])

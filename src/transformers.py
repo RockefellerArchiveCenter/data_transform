@@ -100,6 +100,8 @@ def cfg(name, default=""):
 # under /{ENVIRONMENT}/data_transform/ (env vars win).
 SUCCESS_TOPIC_ARN = cfg("SUCCESS_TOPIC_ARN", "")
 FAILURE_TOPIC_ARN = cfg("FAILURE_TOPIC_ARN", "")
+SERVICE_NAME = cfg("SERVICE_NAME", "data_transform")
+SNS_ROLE_ARN = cfg("SNS_ROLE_ARN", "")
 SCHEMAS_BASE_DIR = cfg(
     "SCHEMAS_BASE_DIR",
     str(Path(__file__).resolve().parent / "schemas"),
@@ -126,11 +128,16 @@ def get_sns_client():
 
     This is intentionally lazy so importing this module never requires AWS
     configuration during CI.
+
+    If SNS_ROLE_ARN is set, publish using an assumed-role.
     """
     global sns_client
     if sns_client is None:
         region = AWS_REGION or "us-east-1"
-        sns_client = boto3.client("sns", region_name=region)
+        if SNS_ROLE_ARN:
+            sns_client = get_client_with_role("sns", region, SNS_ROLE_ARN)
+        else:
+            sns_client = boto3.client("sns", region_name=region)
     return sns_client
 
 
@@ -158,16 +165,21 @@ def require_env():
             "Missing required environment variables: " + ", ".join(missing))
 
 
-def publish(topic_arn, payload, subject=None):
+def publish(
+    topic_arn,
+    payload,
+    message_attributes,
+    message_group_id,
+    message_deduplication_id,
+):
     """Publish a JSON payload to SNS."""
-    params = {
-        "TopicArn": topic_arn,
-        "Message": json.dumps(
-            payload,
-            default=str)}
-    if subject:
-        params["Subject"] = subject[:100]
-    get_sns_client().publish(**params)
+    get_sns_client().publish(
+        TopicArn=topic_arn,
+        Message=json.dumps(payload, default=str),
+        MessageAttributes=message_attributes,
+        MessageGroupId=str(message_group_id),
+        MessageDeduplicationId=str(message_deduplication_id),
+    )
 
 
 class Transformer:
@@ -180,6 +192,39 @@ class Transformer:
     def __init__(self):
         self.identifier = None
         self.online_pending = False
+
+    def output_object_type(self, input_object_type):
+        """Map ArchivesSpace object type strings to indexer object types."""
+        if input_object_type in (
+                "agent_person", "agent_family", "agent_corporate_entity"):
+            return "agent"
+        if input_object_type in ("resource", "archival_object_collection"):
+            return "collection"
+        if input_object_type == "archival_object":
+            return "object"
+        if input_object_type == "subject":
+            return "term"
+        if input_object_type in ("agent", "collection", "object", "term"):
+            return input_object_type
+        raise KeyError(f"Unsupported object_type: {input_object_type}")
+
+    def es_id_from_uri(self, uri: str | None) -> str | None:
+        """Derive a stable Elasticsearch id from an ArchivesSpace-style uri."""
+        if not uri or not isinstance(uri, str):
+            return None
+        return uri.rstrip("/").split("/")[-1] or None
+
+    def build_indexer_payload(
+            self, input_object_type: str, source_data: dict, transformed: dict) -> dict:
+        """Build the SNS message body expected by the indexer."""
+        indexer_object_type = self.output_object_type(input_object_type)
+        data = dict(transformed)
+        data.setdefault("uri", source_data.get("uri"))
+        data["object_type"] = indexer_object_type
+        es_id = self.es_id_from_uri(data.get("uri"))
+        if not es_id:
+            raise ValueError("Cannot derive es_id from transformed uri")
+        return {"objects": [{"es_id": es_id, "data": data}]}
 
     def run(self, object_type, data):
         """
@@ -292,19 +337,20 @@ class Transformer:
 
     def process_message(self, record):
         """
-        Parse and process a single SQS record, then publish success/failure to SNS.
+        Parse and process a single SQS record, then publish to SNS for indexing.
         Args:
             record (dict): A single SQS message record.
 
         Returns:
-            dict: success payload that was published (useful for local testing).
+            dict: payload published to SNS (useful for local testing).
         """
-        message_id = record.get("messageId", "unknown")
         try:
             body = json.loads(record.get("body") or "{}")
         except json.JSONDecodeError:
             body = record.get("body")
+
         attributes = record.get("messageAttributes", {}) or {}
+
         object_type = None
         for candidate in (
             attributes.get("objectType", {}).get("stringValue"),
@@ -318,36 +364,51 @@ class Transformer:
 
         if not object_type:
             raise ValueError(
-                "Missing object_type (messageAttributes.objectType/object_type or body field)")
-        source_data = None
-        if isinstance(body, dict):
-            source_data = body.get("data") or body.get("record") or body
-        else:
+                "Missing object_type (messageAttributes.objectType/object_type or body field)"
+            )
+
+        if not isinstance(body, dict):
             raise ValueError(
                 "Message body must be JSON object for transformation")
+
+        source_data = body.get("data") or body.get("record") or body
         if not isinstance(source_data, dict):
             raise ValueError("Source data must be a JSON object (dict)")
+
         transformed = self.run(object_type, source_data)
-        success_payload = {
-            "status": "success",
-            "message_id": message_id,
-            "object_type": object_type,
-            "identifier": source_data.get("uri"),
-            "transformed": transformed,
-            "online_pending": self.online_pending,
-            "message_attributes": dict(
-                (k, (v.get("stringValue") if isinstance(v, dict) else None))
-                for k, v in attributes.items()
-            ),
-        }
+
+        payload = self.build_indexer_payload(
+            input_object_type=object_type,
+            source_data=source_data,
+            transformed=transformed,
+        )
+
+        es_id = payload["objects"][0]["es_id"]
+        msg_group = f"{SERVICE_NAME}-{es_id}"
+        msg_dedup = f"{SERVICE_NAME}-{es_id}-success"
+
         self.publish_result(
             "success",
-            success_payload,
-            subject="transform success: {0}".format(object_type),
+            payload,
+            subject=f"transform success: {object_type}",
+            message_attributes={
+                "service": {"DataType": "String", "StringValue": SERVICE_NAME},
+                "requested_action": {"DataType": "String", "StringValue": "merge"},
+            },
+            message_group_id=msg_group,
+            message_deduplication_id=msg_dedup,
         )
-        return success_payload
+        return payload
 
-    def publish_result(self, status, payload, subject=None):
+    def publish_result(
+        self,
+        status,
+        payload,
+        subject=None,
+        message_attributes=None,
+        message_group_id=None,
+        message_deduplication_id=None,
+    ):
         """Publish a result payload to SNS.
 
         This method exists primarily so tests can patch it and avoid real SNS calls.
@@ -358,7 +419,15 @@ class Transformer:
             topic_arn = FAILURE_TOPIC_ARN
         else:
             raise ValueError(f"Unknown status: {status}")
-        publish(topic_arn, payload, subject=subject)
+
+        publish(
+            topic_arn,
+            payload,
+            subject=subject,
+            message_attributes=message_attributes,
+            message_group_id=message_group_id,
+            message_deduplication_id=message_deduplication_id,
+        )
 
 
 # Hacky method because I'm running into env issues.
