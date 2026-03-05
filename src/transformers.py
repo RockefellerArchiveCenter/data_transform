@@ -6,6 +6,7 @@ from os.path import join
 from pathlib import Path
 
 import boto3
+from aws_assume_role_lib import assume_role
 from jsonschema.exceptions import ValidationError
 from odin.codecs import json_codec
 from rac_schema_validator import is_valid
@@ -20,44 +21,20 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceAgentPerson, SourceArchivalObject,
                                SourceResource, SourceSubject)
 
-
-def assume_role_session(session, role_arn):
-    """Return a boto3.Session authenticated via role assumption."""
-    try:
-        from aws_assume_role_lib import assume_role
-        return assume_role(session, role_arn)
-    except Exception:
-        sts = session.client("sts")
-        resp = sts.assume_role(
-            RoleArn=role_arn,
-            RoleSessionName="data_transform_ssm",
-        )
-        creds = resp["Credentials"]
-        return boto3.Session(
-            aws_access_key_id=creds["AccessKeyId"],
-            aws_secret_access_key=creds["SecretAccessKey"],
-            aws_session_token=creds["SessionToken"],
-            region_name=session.region_name,
-        )
+SERVICE_NAME = 'data_transform'
 
 
 def get_client_with_role(resource, aws_region, role_arn):
-    """Get a boto3 client authenticated with a specific IAM role."""
+    """Gets Boto3 client which authenticates with a specific IAM role."""
     session = boto3.Session(region_name=aws_region)
-    assumed = assume_role_session(session, role_arn) if role_arn else session
-    return assumed.client(resource)
+    assumed_role_session = assume_role(session, role_arn)
+    return assumed_role_session.client(resource)
 
 
-def get_config(environment, aws_region, ssm_role_arn,
-               service_name="data_transform"):
-    """Fetch config values from SSM Parameter Store by path.
-
-    /{environment}/{service_name}/PARAM_NAME -> {PARAM_NAME: value}
-    """
+def get_config(environment, aws_region, ssm_role_arn, service_name):
+    """Fetch config values from SSM Parameter Store by path."""
     ssm_parameter_path = f"/{environment}/{service_name}"
     configuration = {}
-    if not environment or not aws_region or not ssm_role_arn:
-        return configuration
 
     ssm_client = get_client_with_role("ssm", aws_region, ssm_role_arn)
     try:
@@ -80,55 +57,10 @@ class TransformError(Exception):
 
 
 class Transformer:
-    """Loads config from SSM in __init__.
 
-    Mappings are configured via `mappings.apply_runtime_config` so mapping
-    helpers (formats, has_online_asset, etc.) use runtime config.
-    """
-
-    def __init__(self, environment, aws_region, ssm_role_arn):
+    def __init__(self, config):
         self.service_name = "data_transform"
-        self.aws_region = aws_region
-        self.ssm_role_arn = ssm_role_arn
-        self.environment = environment
-        self.config = self.get_config(environment)
-        mappings_mod.apply_runtime_config(self.config, os.environ)
-
-        self._sns_client = None
-        self.transformer = None
-
-    def get_config(self, environment):
-        return get_config(environment, self.aws_region,
-                          self.ssm_role_arn, service_name=self.service_name)
-
-    def cfg(self, name, default=""):
-        """Env wins, then SSM config, then default."""
-        val = os.environ.get(name)
-        if val is not None and str(val).strip() != "":
-            return str(val)
-        v2 = self.config.get(name)
-        if v2 is not None and str(v2).strip() != "":
-            return str(v2)
-        return default
-
-    def require_env(self):
-        """Validate required configuration values."""
-        missing = []
-        for name in [
-            "SUCCESS_TOPIC_ARN",
-            "FAILURE_TOPIC_ARN",
-            "SCHEMAS_BASE_DIR",
-            "SCHEMA_AGENT",
-            "SCHEMA_COLLECTION",
-            "SCHEMA_OBJECT",
-            "SCHEMA_TERM",
-        ]:
-            if not self.cfg(name, ""):
-                missing.append(name)
-        if missing:
-            raise ValueError(
-                "Missing required environment variables: "
-                + ", ".join(missing))
+        self.config = config
 
     def get_sns_client(self):
         """Return SNS client."""
@@ -191,11 +123,11 @@ class Transformer:
         return {"objects": [{"es_id": es_id, "data": data}]}
 
     def get_mapping_classes(self, object_type):
-        schema_agent = self.service.cfg("SCHEMA_AGENT", "agent.json")
-        schema_collection = self.service.cfg(
+        schema_agent = self.config.get("SCHEMA_AGENT", "agent.json")
+        schema_collection = self.config.get(
             "SCHEMA_COLLECTION", "collection.json")
-        schema_object = self.service.cfg("SCHEMA_OBJECT", "object.json")
-        schema_term = self.service.cfg("SCHEMA_TERM", "term.json")
+        schema_object = self.config.get("SCHEMA_OBJECT", "object.json")
+        schema_term = self.config.get("SCHEMA_TERM", "term.json")
 
         type_map = {
             "agent_person": (SourceAgentPerson, SourceAgentPersonToAgent, schema_agent),
@@ -243,11 +175,11 @@ class Transformer:
         return modified_dict
 
     def validate_transformed(self, data, schema_name):
-        base_dir = self.service.cfg(
+        base_dir = self.config.get(
             "SCHEMAS_BASE_DIR",
             str(Path(__file__).resolve().parent / "schemas"),
         ).rstrip("/")
-        schema_base = self.service.cfg("SCHEMA_BASE", "") or None
+        schema_base = self.config.get("SCHEMA_BASE", "") or None
 
         base_schema = None
         if schema_base:
@@ -314,7 +246,7 @@ class Transformer:
         payload = self.build_indexer_payload(
             object_type, source_data, transformed)
 
-        service_name = self.service.cfg("SERVICE_NAME", "data_transform")
+        service_name = self.config.get("SERVICE_NAME", "data_transform")
         es_id = payload["objects"][0]["es_id"]
         msg_group = f"{service_name}-{es_id}"
         msg_dedup = f"{service_name}-{es_id}-success"
@@ -342,9 +274,9 @@ class Transformer:
         message_deduplication_id=None,
     ):
         if status == "success":
-            topic_arn = self.service.cfg("SUCCESS_TOPIC_ARN", "")
+            topic_arn = self.config.get("SUCCESS_TOPIC_ARN", "")
         elif status == "failure":
-            topic_arn = self.service.cfg("FAILURE_TOPIC_ARN", "")
+            topic_arn = self.config.get("FAILURE_TOPIC_ARN", "")
         else:
             raise ValueError(f"Unknown status: {status}")
 
@@ -358,26 +290,15 @@ class Transformer:
         )
 
 
-service = None
-
-
-def get_service():
-    global service
-    if service is None:
-        environment = os.getenv("ENVIRONMENT", "")
-        aws_region = os.getenv("AWS_REGION") or os.getenv(
-            "AWS_DEFAULT_REGION") or ""
-        ssm_role_arn = os.getenv("SSM_ROLE_ARN", "")
-        service = TransformerService(environment, aws_region, ssm_role_arn)
-    return service
-
-
 def lambda_handler(event, context):
     """Process SQS batch and return partial failures."""
-    transformer = Transformer(
-        os.getenv("ENVIRONMENT"),
-        os.getenv("AWS_REGION"),
-        os.getenv("AWS_SSM_ROLE_ARN"))
+    config = get_config(
+        os.getenv('ENVIRONMENT'),
+        os.getenv('AWS_REGION'),
+        os.getenv('AWS_SSM_ROLE_ARN'),
+        SERVICE_NAME)
+
+    transformer = Transformer(config)
 
     records = event.get("Records") or []
     failures = []
