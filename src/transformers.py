@@ -3,15 +3,12 @@ import logging
 import os
 import traceback
 from os.path import join
-from pathlib import Path
 
 import boto3
 from aws_assume_role_lib import assume_role
-from jsonschema.exceptions import ValidationError
 from odin.codecs import json_codec
 from rac_schema_validator import is_valid
 
-from . import mappings as mappings_mod
 from .mappings import (SourceAgentCorporateEntityToAgent,
                        SourceAgentFamilyToAgent, SourceAgentPersonToAgent,
                        SourceArchivalObjectToCollection,
@@ -52,45 +49,11 @@ def get_config(environment, aws_region, ssm_role_arn, service_name):
     return configuration
 
 
-class TransformError(Exception):
-    pass
-
-
 class Transformer:
 
     def __init__(self, config):
         self.service_name = "data_transform"
         self.config = config
-
-    def get_sns_client(self):
-        """Return SNS client."""
-        if self._sns_client is None:
-            sns_role_arn = self.cfg("SNS_ROLE_ARN", "")
-            region = self.aws_region or "us-east-1"
-            if sns_role_arn:
-                self._sns_client = get_client_with_role(
-                    "sns", region, sns_role_arn)
-            else:
-                self._sns_client = boto3.client("sns", region_name=region)
-        return self._sns_client
-
-    def publish(
-        self,
-        topic_arn,
-        payload,
-        message_attributes,
-        message_group_id,
-        message_deduplication_id,
-        subject=None,
-    ):
-        self.get_sns_client().publish(
-            TopicArn=topic_arn,
-            Message=json.dumps(payload, default=str),
-            MessageAttributes=message_attributes or {},
-            MessageGroupId=str(message_group_id),
-            MessageDeduplicationId=str(message_deduplication_id),
-            Subject=subject if subject else None,
-        )
 
     def output_object_type(self, input_object_type):
         if input_object_type in (
@@ -111,24 +74,11 @@ class Transformer:
             return None
         return uri.rstrip("/").split("/")[-1] or None
 
-    def build_indexer_payload(
-            self, input_object_type, source_data, transformed):
-        indexer_object_type = self.output_object_type(input_object_type)
-        data = dict(transformed)
-        data.setdefault("uri", source_data.get("uri"))
-        data["object_type"] = indexer_object_type
-        es_id = self.es_id_from_uri(data.get("uri"))
-        if not es_id:
-            raise ValueError("Cannot derive es_id from transformed uri")
-        return {"objects": [{"es_id": es_id, "data": data}]}
-
     def get_mapping_classes(self, object_type):
-        schema_agent = self.config.get("SCHEMA_AGENT", "agent.json")
-        schema_collection = self.config.get(
-            "SCHEMA_COLLECTION", "collection.json")
-        schema_object = self.config.get("SCHEMA_OBJECT", "object.json")
-        schema_term = self.config.get("SCHEMA_TERM", "term.json")
-
+        schema_agent = self.config["SCHEMA_AGENT"]
+        schema_collection = self.config["SCHEMA_COLLECTION"]
+        schema_object = self.config["SCHEMA_OBJECT"]
+        schema_term = self.config["SCHEMA_TERM"]
         type_map = {
             "agent_person": (SourceAgentPerson, SourceAgentPersonToAgent, schema_agent),
             "agent_corporate_entity": (SourceAgentCorporateEntity, SourceAgentCorporateEntityToAgent, schema_agent),
@@ -138,8 +88,6 @@ class Transformer:
             "archival_object_collection": (SourceArchivalObject, SourceArchivalObjectToCollection, schema_collection),
             "subject": (SourceSubject, SourceSubjectToTerm, schema_term),
         }
-        if object_type not in type_map:
-            raise KeyError(f"Unsupported object_type: {object_type}")
         return type_map[object_type]
 
     def get_online_pending(self, instances, online):
@@ -175,11 +123,8 @@ class Transformer:
         return modified_dict
 
     def validate_transformed(self, data, schema_name):
-        base_dir = self.config.get(
-            "SCHEMAS_BASE_DIR",
-            str(Path(__file__).resolve().parent / "schemas"),
-        ).rstrip("/")
-        schema_base = self.config.get("SCHEMA_BASE", "") or None
+        base_dir = self.config["SCHEMAS_BASE_DIR"].rstrip("/")
+        schema_base = self.config.get("SCHEMA_BASE", None)
 
         base_schema = None
         if schema_base:
@@ -191,6 +136,12 @@ class Transformer:
 
         is_valid(data, object_schema, base_schema)
 
+    def send_success_message(self, transformed):
+        pass
+
+    def send_error_message(self, exception):
+        pass
+
     def run(self, object_type, data):
         try:
             self.identifier = data.get("uri")
@@ -198,100 +149,19 @@ class Transformer:
                 object_type)
             transformed = self.get_transformed_object(
                 data, from_resource, mapping)
-            self.online_pending = self.get_online_pending(
+            transformed.online_pending = self.get_online_pending(
                 data.get("instances", []),
                 transformed.get("online", False),
             )
             self.validate_transformed(transformed, schema_name)
-            return transformed
-        except ValidationError as e:
-            raise TransformError(f"Transformed data is invalid: {e}")
+            self.send_success_message(transformed)
         except Exception as e:
-            raise TransformError(
-                f"Error transforming {object_type} {
-                    self.identifier}: {e}")
-
-    def process_message(self, record):
-        try:
-            body = json.loads(record.get("body") or "{}")
-        except json.JSONDecodeError:
-            body = record.get("body")
-
-        attributes = record.get("messageAttributes", {}) or {}
-
-        object_type = None
-        for candidate in (
-            attributes.get("objectType", {}).get("stringValue"),
-            attributes.get("object_type", {}).get("stringValue"),
-            body.get("objectType") if isinstance(body, dict) else None,
-            body.get("object_type") if isinstance(body, dict) else None,
-        ):
-            if candidate:
-                object_type = candidate
-                break
-        if not object_type:
-            raise ValueError(
-                "Missing object_type (object_type or body field)")
-
-        if not isinstance(body, dict):
-            raise ValueError(
-                "Message body must be JSON object")
-
-        source_data = body.get("data") or body.get("record") or body
-        if not isinstance(source_data, dict):
-            raise ValueError("Source data must be a JSON object (dict)")
-
-        transformed = self.run(object_type, source_data)
-
-        payload = self.build_indexer_payload(
-            object_type, source_data, transformed)
-
-        service_name = self.config.get("SERVICE_NAME", "data_transform")
-        es_id = payload["objects"][0]["es_id"]
-        msg_group = f"{service_name}-{es_id}"
-        msg_dedup = f"{service_name}-{es_id}-success"
-
-        self.publish_result(
-            "success",
-            payload,
-            subject=f"transform success: {object_type}",
-            message_attributes={
-                "service": {"DataType": "String", "StringValue": service_name},
-                "requested_action": {"DataType": "String", "StringValue": "index"},
-            },
-            message_group_id=msg_group,
-            message_deduplication_id=msg_dedup,
-        )
-        return payload
-
-    def publish_result(
-        self,
-        status,
-        payload,
-        subject=None,
-        message_attributes=None,
-        message_group_id=None,
-        message_deduplication_id=None,
-    ):
-        if status == "success":
-            topic_arn = self.config.get("SUCCESS_TOPIC_ARN", "")
-        elif status == "failure":
-            topic_arn = self.config.get("FAILURE_TOPIC_ARN", "")
-        else:
-            raise ValueError(f"Unknown status: {status}")
-
-        self.service.publish(
-            topic_arn,
-            payload,
-            message_attributes=message_attributes or {},
-            message_group_id=message_group_id or "data_transform",
-            message_deduplication_id=message_deduplication_id or "data_transform",
-            subject=subject,
-        )
+            self.send_error_message(e)
 
 
 def lambda_handler(event, context):
-    """Process SQS batch and return partial failures."""
+    """Process SQS batch."""
+
     config = get_config(
         os.getenv('ENVIRONMENT'),
         os.getenv('AWS_REGION'),
@@ -300,20 +170,10 @@ def lambda_handler(event, context):
 
     transformer = Transformer(config)
 
-    records = event.get("Records") or []
-    failures = []
+    records = event.get("Records", [])
+
     for record in records:
-        message_id = record.get("messageId", "unknown")
-        try:
-            transformer.process_message(record)
-        except Exception as exc:
-            failures.append({"itemIdentifier": message_id})
-            failure_payload = {
-                "status": "failure",
-                "message_id": message_id,
-                "error": str(exc),
-                "traceback": traceback.format_exc(limit=20),
-            }
-            transformer.publish_result(
-                "failure", failure_payload, subject="transform failure")
-    return {"batchItemFailures": failures}
+        object_data = json.loads(record.get("body") or "{}")
+        attributes = record.get("messageAttributes", {}) or {}
+        object_type = attributes.get("object_type", {}).get("stringValue")
+        transformer.run(object_type, object_data)
