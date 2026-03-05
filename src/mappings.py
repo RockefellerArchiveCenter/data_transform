@@ -36,13 +36,10 @@ odin.map_list_field = map_list_field_compat
 
 
 def assume_role_session(session, role_arn):
-    """Return a boto3.Session authenticated via role assumption.
-
-    Uses aws_assume_role_lib.assume_role when available; otherwise falls back to
-    STS AssumeRole directly.
+    """Assumes a boto3 role session.
     """
     try:
-        from aws_assume_role_lib import assume_role  # type: ignore
+        from aws_assume_role_lib import assume_role
         return assume_role(session, role_arn)
     except Exception:
         sts = session.client("sts")
@@ -69,8 +66,7 @@ def get_config(environment, aws_region, ssm_role_arn,
                service_name="data_transform"):
     """Fetch config values from SSM Parameter Store by path.
 
-    Mirrors the Pisces/DataFetcher pattern:
-      /{environment}/{service_name}/PARAM_NAME -> {PARAM_NAME: value}
+    /{environment}/{service_name}/PARAM_NAME -> {PARAM_NAME: value}
     """
     ssm_parameter_path = f"/{environment}/{service_name}"
     configuration = {}
@@ -93,38 +89,76 @@ def get_config(environment, aws_region, ssm_role_arn,
     return configuration
 
 
-def load_runtime_env():
-    """Return an env dict with SSM values merged in as defaults (env vars win)."""
-    env = dict(os.environ)
-    environment = env.get("ENVIRONMENT")
-    aws_region = env.get("AWS_REGION") or env.get("AWS_DEFAULT_REGION")
-    ssm_role_arn = env.get("SSM_ROLE_ARN")
-    if environment and aws_region and ssm_role_arn:
-        cfg = get_config(
-            environment,
-            aws_region,
-            ssm_role_arn,
-            service_name="data_transform")
-        # only fill missing keys so local env/test patching still works
-        for k, v in cfg.items():
-            env.setdefault(k, v)
-    return env
+def split_csv(value):
+    if not value or not str(value).strip():
+        return []
+    return [s.strip() for s in str(value).split(",") if s.strip()]
 
 
-ENV = load_runtime_env()
+# The goal is to avoid relying on lots of import-time environment variables.
+# The service loads config from SSM once, then calls `apply_runtime_config`.
+RUNTIME_CONFIG = {
+    "AUDIO_REFS": [],
+    "MOVING_IMAGE_REFS": [],
+    "PHOTOGRAPH_REFS": [],
+    "ASSET_BASEURL": "",
+}
+
+
+def apply_runtime_config(
+        config=None, env=None):
+    """Apply runtime config (SSM config + env overrides) to module globals.
+    """
+    global RUNTIME_CONFIG, AUDIO_REFS, MOVING_IMAGE_REFS, PHOTOGRAPH_REFS, ASSET_BASEURL
+
+    config = config or {}
+    env = env or os.environ
+
+    def cfg(name, default=""):
+        val = env.get(name)
+        if val is not None and str(val).strip() != "":
+            return str(val)
+        v2 = config.get(name)
+        if v2 is not None and str(v2).strip() != "":
+            return str(v2)
+        return default
+
+    AUDIO_REFS = split_csv(cfg("AUDIO_REFS", ""))
+    MOVING_IMAGE_REFS = split_csv(cfg("MOVING_IMAGE_REFS", ""))
+    PHOTOGRAPH_REFS = split_csv(cfg("PHOTOGRAPH_REFS", ""))
+
+    # ASSET_BASEURL intentionally stays as an env var in many deployments; but we
+    # still allow SSM to provide it. Env wins.
+    ASSET_BASEURL = cfg("ASSET_BASEURL", "").rstrip("/")
+
+    RUNTIME_CONFIG = {
+        "AUDIO_REFS": AUDIO_REFS,
+        "MOVING_IMAGE_REFS": MOVING_IMAGE_REFS,
+        "PHOTOGRAPH_REFS": PHOTOGRAPH_REFS,
+        "ASSET_BASEURL": ASSET_BASEURL,
+    }
+    return RUNTIME_CONFIG
+
+
+def runtime_config():
+    """Return the current runtime config for tests."""
+    return dict(RUNTIME_CONFIG)
+
+
+apply_runtime_config({}, os.environ)
 
 
 def env_list(name):
-    raw = ENV.get(name, "")
-    if not raw.strip():
-        return []
-    return [s.strip() for s in raw.split(",") if s.strip()]
+    val = RUNTIME_CONFIG.get(name, [])
+    if isinstance(val, list):
+        return list(val)
+    return split_csv(str(val))
 
 
 AUDIO_REFS = env_list("AUDIO_REFS")
 MOVING_IMAGE_REFS = env_list("MOVING_IMAGE_REFS")
 PHOTOGRAPH_REFS = env_list("PHOTOGRAPH_REFS")
-ASSET_BASEURL = os.environ.get("ASSET_BASEURL", "").rstrip("/")
+ASSET_BASEURL = str(RUNTIME_CONFIG.get("ASSET_BASEURL", "")).rstrip("/")
 
 
 def identifier_from_uri(uri):
@@ -242,8 +276,6 @@ B_TO_T = {
 
 def language_name(code):
     """Return a human-readable language name for an ISO 639 code.
-
-    Expects ISO 639-2/B (bibliographic) codes when present, matching Pisces behavior.
     """
     if not code:
         return None
@@ -509,7 +541,7 @@ class SourceNoteToNote(odin.Mapping):
         elif value.jsonmodel_type == "note_orderedlist":
             items_list = [{idx: item} for idx, item in enumerate(value.items)]
             subnote = Subnote(type="orderedlist", items=items_list)
-        elif value == "note_bibliography":
+        elif value.jsonmodel_type == "note_bibliography":
             subnote = self.bibliograpy_subnotes(value.content, value.items)
         elif value.jsonmodel_type == "note_index":
             subnote = self.index_subnotes(value.content, value.items)
