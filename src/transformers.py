@@ -79,7 +79,7 @@ class TransformError(Exception):
     pass
 
 
-class TransformerService:
+class Transformer:
     """Loads config from SSM in __init__.
 
     Mappings are configured via `mappings.apply_runtime_config` so mapping
@@ -159,20 +159,6 @@ class TransformerService:
             MessageDeduplicationId=str(message_deduplication_id),
             Subject=subject if subject else None,
         )
-
-    def get_transformer(self):
-        if self.transformer is None:
-            self.transformer = Transformer(self)
-        return self.transformer
-
-
-class Transformer:
-    """Transformation logic"""
-
-    def __init__(self, service):
-        self.service = service
-        self.identifier = None
-        self.online_pending = False
 
     def output_object_type(self, input_object_type):
         if input_object_type in (
@@ -388,8 +374,10 @@ def get_service():
 
 def lambda_handler(event, context):
     """Process SQS batch and return partial failures."""
-    service = get_service()
-    transformer = service.get_transformer()
+    transformer = Transformer(
+        os.getenv("ENVIRONMENT"),
+        os.getenv("AWS_REGION"),
+        os.getenv("AWS_SSM_ROLE_ARN"))
 
     records = event.get("Records") or []
     failures = []
