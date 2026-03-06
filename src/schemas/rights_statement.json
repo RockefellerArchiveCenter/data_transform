@@ -1,9 +1,0 @@
-{
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "rights_statement.json",
-	"type": "object",
-	"title": "PREMIS Rights Statement Schema",
-	"allOf": [{
-		"$ref": "urn:base#/$defs/rights_statement"
-	}]
-}

@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
+        with:
+          submodules: recursive
 
       - name: Export secrets to environment variables
         uses: oNaiPs/secrets-to-env-action@v1.7
@@ -28,8 +30,12 @@ jobs:
 
       - name: Make zip file
         run: |
-          cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
-          zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
+          rm -rf package
+          mkdir -p package/schemas
+          cp "${{ env.LAMBDA_HANDLER_CODE }}" "package/${{ env.BASENAME }}"
+          cp -R rac_schemas/schemas/. package/schemas/
+          cd package
+          zip -r "../${{ env.LAMBDA_NAME }}.zip" .
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5.1.1

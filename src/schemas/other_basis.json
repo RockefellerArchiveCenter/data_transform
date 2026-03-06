@@ -1,9 +1,0 @@
-{
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "other_basis.json",
-	"type": "object",
-	"title": "PREMIS Other Basis Schema",
-	"allOf": [{
-		"$ref": "urn:base#/$defs/other_basis"
-	}]
-}

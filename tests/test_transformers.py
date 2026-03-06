@@ -7,7 +7,7 @@ from src.resources.configs import NOTE_TYPE_CHOICES_TRANSFORM
 from src.transformers import Transformer
 
 DEFAULT_CONFIG = {
-    "SCHEMAS_BASE_DIR": "src/schemas",
+    "SCHEMAS_BASE_DIR": "rac_schemas/schemas",
     "SCHEMA_BASE": "base.json",
     "SCHEMA_AGENT": "agent.json",
     "SCHEMA_COLLECTION": "collection.json",

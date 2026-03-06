@@ -1,9 +1,0 @@
-{
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "external_identifier.json",
-	"type": "object",
-	"title": "External Identifier schema",
-	"allOf": [{
-		"$ref": "urn:base#/$defs/external_identifier"
-	}]
-}

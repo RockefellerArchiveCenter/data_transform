@@ -1,9 +1,0 @@
-{
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "statute_basis.json",
-	"type": "object",
-	"title": "Statute Basis Schema",
-	"allOf": [{
-		"$ref": "urn:base#/$defs/statute_basis"
-	}]
-}

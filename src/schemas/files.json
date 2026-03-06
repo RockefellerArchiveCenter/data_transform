@@ -1,9 +1,0 @@
-{
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "files.json",
-	"type": "object",
-	"title": "File schema",
-	"allOf": [{
-		"$ref": "urn:base#/$defs/files"
-	}]
-}

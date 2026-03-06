@@ -1,9 +1,0 @@
-{
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "note.json",
-	"type": "object",
-	"title": "Note schema",
-	"allOf": [{
-		"$ref": "urn:base#/$defs/note"
-	}]
-}

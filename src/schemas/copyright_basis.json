@@ -1,9 +1,0 @@
-{
-	"$schema": "https://json-schema.org/draft/2020-12/schema",
-	"$id": "copyright_basis.json",
-	"type": "object",
-	"title": "Copyright Basis Schema",
-	"allOf": [{
-		"$ref": "urn:base#/$defs/copyright_basis"
-	}]
-}
