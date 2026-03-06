@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import traceback
-from os.path import join
+from pathlib import Path
 
 import boto3
 from aws_assume_role_lib import assume_role
@@ -18,8 +18,6 @@ from .mappings import (SourceAgentCorporateEntityToAgent,
 from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceAgentPerson, SourceArchivalObject,
                                SourceResource, SourceSubject)
-
-SERVICE_NAME = 'data_transform'
 
 
 def get_client_with_role(resource, aws_region, role_arn):
@@ -52,9 +50,13 @@ def get_config(environment, aws_region, ssm_role_arn, service_name):
 
 class Transformer:
 
-    def __init__(self, config):
+    def __init__(self):
         self.service_name = "data_transform"
-        self.config = config
+        self.config = get_config(
+            os.getenv('ENVIRONMENT'),
+            os.getenv('AWS_REGION'),
+            os.getenv('AWS_SSM_ROLE_ARN'),
+            self.service_name)
 
     def output_object_type(self, input_object_type):
         if input_object_type in (
@@ -129,10 +131,10 @@ class Transformer:
 
         base_schema = None
         if schema_base:
-            with open(join(base_dir, schema_base), "r", encoding="utf-8") as base_file:
+            with open(Path(base_dir, schema_base), "r", encoding="utf-8") as base_file:
                 base_schema = json.load(base_file)
 
-        with open(join(base_dir, schema_name), "r", encoding="utf-8") as object_file:
+        with open(Path(base_dir, schema_name), "r", encoding="utf-8") as object_file:
             object_schema = json.load(object_file)
 
         is_valid(data, object_schema, base_schema)
@@ -207,10 +209,9 @@ class Transformer:
                 object_type)
             transformed = self.get_transformed_object(
                 data, from_resource, mapping)
-            transformed.online_pending = self.get_online_pending(
+            transformed['online_pending'] = self.get_online_pending(
                 data.get("instances", []),
-                transformed.get("online", False),
-            )
+                transformed.get("online", False))
             self.validate_transformed(transformed, schema_name)
             self.send_success_message(transformed, object_type)
         except Exception as e:
@@ -222,13 +223,7 @@ class Transformer:
 def lambda_handler(event, context):
     """Process SQS batch."""
 
-    config = get_config(
-        os.getenv('ENVIRONMENT'),
-        os.getenv('AWS_REGION'),
-        os.getenv('AWS_SSM_ROLE_ARN'),
-        SERVICE_NAME)
-
-    transformer = Transformer(config)
+    transformer = Transformer()
 
     records = event.get("Records", [])
 
