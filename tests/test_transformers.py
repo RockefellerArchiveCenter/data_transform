@@ -250,3 +250,35 @@ class TransformerTest(unittest.TestCase):
         self.assertIsNone(self.transformer.es_id_from_uri(123))  # non-string
         self.assertEqual(self.transformer.es_id_from_uri("/a/b/123"), "123")
         self.assertEqual(self.transformer.es_id_from_uri("/a/b/123/"), "123")
+
+        @patch("requests.head")
+        def test_validate_transformed(self, mock_head):
+            """Validate every transform fixture."""
+            mock_head.return_value = Mock(status_code=200)
+
+            fixture_types = [
+                "agent_corporate_entity",
+                "agent_family",
+                "agent_person",
+                "archival_object",
+                "archival_object_collection",
+                "resource",
+                "subject",
+            ]
+
+            for fixture_type in fixture_types:
+                fixture_dir = self.fixtures_dir / fixture_type
+                self.assertTrue(
+                    fixture_dir.exists(),
+                    f"Missing fixture dir: {fixture_dir}")
+                from_resource, mapping, schema_name = self.transformer.get_mapping_classes(
+                    fixture_type
+                )
+                for fixture_path in sorted(fixture_dir.glob("*.json")):
+                    with self.subTest(fixture=str(fixture_path), fixture_type=fixture_type):
+                        source = load_fixture(fixture_path)
+                        transformed = self.transformer.get_transformed_object(
+                            source, from_resource, mapping
+                        )
+                        self.transformer.validate_transformed(
+                            transformed, schema_name)
