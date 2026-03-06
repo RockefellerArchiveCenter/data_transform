@@ -52,9 +52,7 @@ class TransformerTest(unittest.TestCase):
             transformed_len = len(transformed.get(transformed_key, []))
             self.assertEqual(
                 source_len,
-                transformed_len,
-                f"Found {source_len} {source_key} in source but {transformed_len} {transformed_key} in transformed.",
-            )
+                transformed_len)
 
     def check_agent_counts(self, source, transformed):
         for source_key, transformed_key in [
