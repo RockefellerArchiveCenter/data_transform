@@ -19,18 +19,6 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceRef, SourceResource, SourceStructuredDate,
                                SourceSubject)
 
-# Some odin versions don't accept `to_list=` on map_list_field.
-# original_map_list_field = odin.map_list_field
-
-
-# def map_list_field_compat(*args, **kwargs):
-#    kwargs.pop("to_list", None)
-#    return original_map_list_field(*args, **kwargs)
-
-
-# odin.map_list_field = map_list_field_compat
-
-
 def identifier_from_uri(uri):
     """Creates a short UUID.
 
