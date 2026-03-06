@@ -5,3 +5,4 @@ odin~=2.0
 requests~=2.32
 pycountry~=26.2
 rac_schema_validator~=1.0
+shortuuid~=1.0

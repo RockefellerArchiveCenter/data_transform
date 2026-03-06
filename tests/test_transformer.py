@@ -21,7 +21,8 @@ DEFAULT_CONFIG = {
     "SNS_ROLE_ARN": "rn:aws:iam::123456789:role/sns-role",
     "SNS_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:success",
     "ASSET_BASEURL": "https://assets.example.org",
-    "ASSET_BASEURL": "https://assets.example.org",
+    "DOWNLOAD_BASEURL": "https://downloads.example.org/files",
+    "MANIFEST_BASEURL": "https://manifests.example.org/iiif",
     "AUDIO_REFS": "/repositories/subjects/1,repositories/subjects/2",
     "MOVING_IMAGE_REFS": "/repositories/subjects/3,repositories/subjects/4",
     "PHOTOGRAPH_REFS": "/repositories/subjects/5",
@@ -290,7 +291,10 @@ class TransformerSNSTests(unittest.TestCase):
 
     def set_up_sns(self):
         client = boto3.client('sns', region_name=getenv('AWS_REGION'))
-        topic_arn = client.create_topic(Name='test-topic.fifo', Attributes={'FifoTopic': 'true'})['TopicArn']
+        topic_arn = client.create_topic(
+            Name='test-topic.fifo',
+            Attributes={
+                'FifoTopic': 'true'})['TopicArn']
         self.transformer.config['SNS_TOPIC_ARN'] = topic_arn
         sqs_conn = boto3.resource('sqs', region_name=getenv('AWS_REGION'))
         sqs_conn.create_queue(QueueName="test-queue")
@@ -301,11 +305,12 @@ class TransformerSNSTests(unittest.TestCase):
         )
         queue = sqs_conn.get_queue_by_name(QueueName="test-queue")
         return queue
-    
+
     @mock_aws
     def test_send_success_message(self):
         queue = self.set_up_sns()
-        self.transformer.send_success_message({"identifier": "12345"}, 'collection')
+        self.transformer.send_success_message(
+            {"identifier": "12345"}, 'collection')
         messages = queue.receive_messages(MaxNumberOfMessages=1)
         message_body = json.loads(messages[0].body)
         self.assertEqual(message_body['Message'], '{"identifier": "12345"}')
@@ -331,7 +336,8 @@ class TransformerSNSTests(unittest.TestCase):
     @mock_aws
     def test_send_error_message(self):
         queue = self.set_up_sns()
-        self.transformer.send_error_message(Exception('foo'), 'object', '12345')
+        self.transformer.send_error_message(
+            Exception('foo'), 'object', '12345')
         messages = queue.receive_messages(MaxNumberOfMessages=1)
         message_body = json.loads(messages[0].body)
         self.assertEqual(message_body['Message'], '')

@@ -13,7 +13,8 @@ from .mappings import (SourceAgentCorporateEntityToAgent,
                        SourceAgentFamilyToAgent, SourceAgentPersonToAgent,
                        SourceArchivalObjectToCollection,
                        SourceArchivalObjectToObject,
-                       SourceResourceToCollection, SourceSubjectToTerm, identifier_from_uri)
+                       SourceResourceToCollection, SourceSubjectToTerm,
+                       identifier_from_uri)
 from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceAgentPerson, SourceArchivalObject,
                                SourceResource, SourceSubject)
@@ -137,11 +138,13 @@ class Transformer:
         is_valid(data, object_schema, base_schema)
 
     def send_success_message(self, transformed, object_type):
-        client = get_client_with_role('sns', os.getenv('AWS_REGION'), self.config['SNS_ROLE_ARN'])
+        client = get_client_with_role('sns', os.getenv(
+            'AWS_REGION'), self.config['SNS_ROLE_ARN'])
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
             MessageGroupId=f'{self.service_name}-{transformed["identifier"]}',
-            MessageDeduplicationId=f'{self.service_name}-{transformed["identifier"]}-transform',
+            MessageDeduplicationId=f'{
+                self.service_name}-{transformed["identifier"]}-transform',
             Message=json.dumps(transformed),
             MessageAttributes={
                 'service': {
@@ -163,7 +166,8 @@ class Transformer:
             })
 
     def send_error_message(self, exception, object_type, object_id):
-        client = get_client_with_role('sns', os.getenv('AWS_REGION'), self.config['SNS_ROLE_ARN'])
+        client = get_client_with_role('sns', os.getenv(
+            'AWS_REGION'), self.config['SNS_ROLE_ARN'])
         tb = ''.join(traceback.format_exception(exception)[:-1])
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
@@ -210,7 +214,9 @@ class Transformer:
             self.validate_transformed(transformed, schema_name)
             self.send_success_message(transformed, object_type)
         except Exception as e:
-            self.send_error_message(e, object_type, identifier_from_uri(data['uri']))
+            self.send_error_message(
+                e, object_type, identifier_from_uri(
+                    data['uri']))
 
 
 def lambda_handler(event, context):
