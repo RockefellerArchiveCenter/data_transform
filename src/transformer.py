@@ -13,7 +13,7 @@ from .mappings import (SourceAgentCorporateEntityToAgent,
                        SourceAgentFamilyToAgent, SourceAgentPersonToAgent,
                        SourceArchivalObjectToCollection,
                        SourceArchivalObjectToObject,
-                       SourceResourceToCollection, SourceSubjectToTerm)
+                       SourceResourceToCollection, SourceSubjectToTerm, identifier_from_uri)
 from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceAgentPerson, SourceArchivalObject,
                                SourceResource, SourceSubject)
@@ -136,15 +136,69 @@ class Transformer:
 
         is_valid(data, object_schema, base_schema)
 
-    def send_success_message(self, transformed):
-        pass
+    def send_success_message(self, transformed, object_type):
+        client = get_client_with_role('sns', os.getenv('AWS_REGION'), self.config['SNS_ROLE_ARN'])
+        client.publish(
+            TopicArn=self.config['SNS_TOPIC_ARN'],
+            MessageGroupId=f'{self.service_name}-{transformed["identifier"]}',
+            MessageDeduplicationId=f'{self.service_name}-{transformed["identifier"]}-transform',
+            Message=json.dumps(transformed),
+            MessageAttributes={
+                'service': {
+                    'DataType': 'String',
+                    'StringValue': self.service_name,
+                },
+                'requested_action': {
+                    'DataType': 'String',
+                    'StringValue': 'index',
+                },
+                'es_id': {
+                    'DataType': 'String',
+                    'StringValue': transformed['identifier'],
+                },
+                'object_type': {
+                    'DataType': 'String',
+                    'StringValue': object_type,
+                }
+            })
 
-    def send_error_message(self, exception):
-        pass
+    def send_error_message(self, exception, object_type, object_id):
+        client = get_client_with_role('sns', os.getenv('AWS_REGION'), self.config['SNS_ROLE_ARN'])
+        tb = ''.join(traceback.format_exception(exception)[:-1])
+        client.publish(
+            TopicArn=self.config['SNS_TOPIC_ARN'],
+            MessageGroupId=f'{self.service_name}-{object_id}',
+            MessageDeduplicationId=f'{self.service_name}-{object_id}-failure',
+            Message=tb,
+            MessageAttributes={
+                'service': {
+                    'DataType': 'String',
+                    'StringValue': self.service_name,
+                },
+                'object_status': {
+                    'DataType': 'String',
+                    'StringValue': 'updated',
+                },
+                'object_type': {
+                    'DataType': 'String',
+                    'StringValue': object_type,
+                },
+                'object_id': {
+                    'DataType': 'String',
+                    'StringValue': object_id,
+                },
+                'outcome': {
+                    'DataType': 'String',
+                    'StringValue': 'FAILURE',
+                },
+                'message': {
+                    'DataType': 'String',
+                    'StringValue': str(exception),
+                }
+            })
 
     def run(self, object_type, data):
         try:
-            self.identifier = data.get("uri")
             from_resource, mapping, schema_name = self.get_mapping_classes(
                 object_type)
             transformed = self.get_transformed_object(
@@ -154,9 +208,9 @@ class Transformer:
                 transformed.get("online", False),
             )
             self.validate_transformed(transformed, schema_name)
-            self.send_success_message(transformed)
+            self.send_success_message(transformed, object_type)
         except Exception as e:
-            self.send_error_message(e)
+            self.send_error_message(e, object_type, identifier_from_uri(data['uri']))
 
 
 def lambda_handler(event, context):

@@ -1,10 +1,15 @@
 import json
 import unittest
+from os import getenv
 from pathlib import Path
 from unittest.mock import Mock, patch
 
+import boto3
+from moto import mock_aws
+from moto.core import DEFAULT_ACCOUNT_ID
+
 from src.resources.configs import NOTE_TYPE_CHOICES_TRANSFORM
-from src.transformers import Transformer
+from src.transformer import Transformer
 
 DEFAULT_CONFIG = {
     "SCHEMAS_BASE_DIR": "rac_schemas/schemas",
@@ -13,9 +18,8 @@ DEFAULT_CONFIG = {
     "SCHEMA_COLLECTION": "collection.json",
     "SCHEMA_OBJECT": "object.json",
     "SCHEMA_TERM": "term.json",
-    "SUCCESS_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:success",
-    "FAILURE_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:failure",
-    "SERVICE_NAME": "data_transform",
+    "SNS_ROLE_ARN": "rn:aws:iam::123456789:role/sns-role",
+    "SNS_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:success",
     "ASSET_BASEURL": "https://assets.example.org",
     "ASSET_BASEURL": "https://assets.example.org",
     "AUDIO_REFS": "/repositories/subjects/1,repositories/subjects/2",
@@ -29,7 +33,7 @@ def load_fixture(path: Path):
         return json.load(f)
 
 
-class TransformerTest(unittest.TestCase):
+class TransformerTests(unittest.TestCase):
     """Transformer tests (fetch_data-style TransformerService)."""
 
     def setUp(self):
@@ -198,11 +202,6 @@ class TransformerTest(unittest.TestCase):
             output = self.transformer.get_online_pending(instances, online)
             self.assertEqual(output, expected)
 
-    def mock_ssm_paginator(self, parameters):
-        paginator = Mock()
-        paginator.paginate.return_value = [{"Parameters": parameters}]
-        return paginator
-
     def test_get_mapping_classes_unsupported_types(self):
         with self.assertRaises(KeyError):
             self.transformer.get_mapping_classes("not_a_real_type")
@@ -251,34 +250,114 @@ class TransformerTest(unittest.TestCase):
         self.assertEqual(self.transformer.es_id_from_uri("/a/b/123"), "123")
         self.assertEqual(self.transformer.es_id_from_uri("/a/b/123/"), "123")
 
-        @patch("requests.head")
-        def test_validate_transformed(self, mock_head):
-            """Validate every transform fixture."""
-            mock_head.return_value = Mock(status_code=200)
+    @patch("requests.head")
+    def test_validate_transformed(self, mock_head):
+        """Validate every transform fixture."""
+        mock_head.return_value = Mock(status_code=200)
 
-            fixture_types = [
-                "agent_corporate_entity",
-                "agent_family",
-                "agent_person",
-                "archival_object",
-                "archival_object_collection",
-                "resource",
-                "subject",
-            ]
+        fixture_types = [
+            "agent_corporate_entity",
+            "agent_family",
+            "agent_person",
+            "archival_object",
+            "archival_object_collection",
+            "resource",
+            "subject",
+        ]
 
-            for fixture_type in fixture_types:
-                fixture_dir = self.fixtures_dir / fixture_type
-                self.assertTrue(
-                    fixture_dir.exists(),
-                    f"Missing fixture dir: {fixture_dir}")
-                from_resource, mapping, schema_name = self.transformer.get_mapping_classes(
-                    fixture_type
-                )
-                for fixture_path in sorted(fixture_dir.glob("*.json")):
-                    with self.subTest(fixture=str(fixture_path), fixture_type=fixture_type):
-                        source = load_fixture(fixture_path)
-                        transformed = self.transformer.get_transformed_object(
-                            source, from_resource, mapping
-                        )
-                        self.transformer.validate_transformed(
-                            transformed, schema_name)
+        for fixture_type in fixture_types:
+            fixture_dir = self.fixtures_dir / fixture_type
+            self.assertTrue(
+                fixture_dir.exists(),
+                f"Missing fixture dir: {fixture_dir}")
+            from_resource, mapping, schema_name = self.transformer.get_mapping_classes(
+                fixture_type
+            )
+            for fixture_path in sorted(fixture_dir.glob("*.json")):
+                with self.subTest(fixture=str(fixture_path), fixture_type=fixture_type):
+                    source = load_fixture(fixture_path)
+                    transformed = self.transformer.get_transformed_object(
+                        source, from_resource, mapping
+                    )
+                    self.transformer.validate_transformed(
+                        transformed, schema_name)
+
+
+class TransformerSNSTests(unittest.TestCase):
+
+    def setUp(self):
+        self.transformer = Transformer(DEFAULT_CONFIG)
+
+    def set_up_sns(self):
+        client = boto3.client('sns', region_name=getenv('AWS_REGION'))
+        topic_arn = client.create_topic(Name='test-topic.fifo', Attributes={'FifoTopic': 'true'})['TopicArn']
+        self.transformer.config['SNS_TOPIC_ARN'] = topic_arn
+        sqs_conn = boto3.resource('sqs', region_name=getenv('AWS_REGION'))
+        sqs_conn.create_queue(QueueName="test-queue")
+        client.subscribe(
+            TopicArn=topic_arn,
+            Protocol="sqs",
+            Endpoint=f"arn:aws:sqs:us-east-1:{DEFAULT_ACCOUNT_ID}:test-queue",
+        )
+        queue = sqs_conn.get_queue_by_name(QueueName="test-queue")
+        return queue
+    
+    @mock_aws
+    def test_send_success_message(self):
+        queue = self.set_up_sns()
+        self.transformer.send_success_message({"identifier": "12345"}, 'collection')
+        messages = queue.receive_messages(MaxNumberOfMessages=1)
+        message_body = json.loads(messages[0].body)
+        self.assertEqual(message_body['Message'], '{"identifier": "12345"}')
+        self.assertEqual(
+            message_body['MessageAttributes'],
+            {'service': {
+                'Type': 'String',
+                'Value': self.transformer.service_name,
+            },
+                'requested_action': {
+                'Type': 'String',
+                'Value': 'index',
+            },
+                'object_type': {
+                'Type': 'String',
+                'Value': 'collection',
+            },
+                'es_id': {
+                'Type': 'String',
+                'Value': '12345',
+            }})
+
+    @mock_aws
+    def test_send_error_message(self):
+        queue = self.set_up_sns()
+        self.transformer.send_error_message(Exception('foo'), 'object', '12345')
+        messages = queue.receive_messages(MaxNumberOfMessages=1)
+        message_body = json.loads(messages[0].body)
+        self.assertEqual(message_body['Message'], '')
+        self.assertEqual(
+            message_body['MessageAttributes'],
+            {'service': {
+                'Type': 'String',
+                'Value': self.transformer.service_name,
+            },
+                'object_status': {
+                'Type': 'String',
+                'Value': 'updated',
+            },
+                'object_type': {
+                'Type': 'String',
+                'Value': 'object',
+            },
+                'object_id': {
+                'Type': 'String',
+                'Value': '12345',
+            },
+                'outcome': {
+                'Type': 'String',
+                'Value': 'FAILURE',
+            },
+                'message': {
+                'Type': 'String',
+                'Value': 'foo',
+            }})
