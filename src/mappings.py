@@ -19,6 +19,7 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceRef, SourceResource, SourceStructuredDate,
                                SourceSubject)
 
+
 def identifier_from_uri(uri):
     """Creates a short UUID.
 
