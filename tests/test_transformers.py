@@ -16,7 +16,11 @@ DEFAULT_CONFIG = {
     "SUCCESS_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:success",
     "FAILURE_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:failure",
     "SERVICE_NAME": "data_transform",
-    "ASSET_BASEURL": "https://assets.example.org"
+    "ASSET_BASEURL": "https://assets.example.org",
+    "ASSET_BASEURL": "https://assets.example.org",
+    "AUDIO_REFS": "/repositories/subjects/1,repositories/subjects/2",
+    "MOVING_IMAGE_REFS": "/repositories/subjects/3,repositories/subjects/4",
+    "PHOTOGRAPH_REFS": "/repositories/subjects/5",
 }
 
 

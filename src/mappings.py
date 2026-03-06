@@ -1,12 +1,8 @@
 import json
-import logging
-import os
 import re
-import traceback
 import xml.etree.ElementTree as ET
 from urllib.parse import urlparse
 
-import boto3
 import odin
 import pycountry
 import requests
@@ -33,132 +29,6 @@ def map_list_field_compat(*args, **kwargs):
 
 
 odin.map_list_field = map_list_field_compat
-
-
-def assume_role_session(session, role_arn):
-    """Assumes a boto3 role session.
-    """
-    try:
-        from aws_assume_role_lib import assume_role
-        return assume_role(session, role_arn)
-    except Exception:
-        sts = session.client("sts")
-        resp = sts.assume_role(
-            RoleArn=role_arn,
-            RoleSessionName="data_transform_ssm")
-        creds = resp["Credentials"]
-        return boto3.Session(
-            aws_access_key_id=creds["AccessKeyId"],
-            aws_secret_access_key=creds["SecretAccessKey"],
-            aws_session_token=creds["SessionToken"],
-            region_name=session.region_name,
-        )
-
-
-def get_client_with_role(resource, aws_region, role_arn):
-    """Get a boto3 client authenticated with a specific IAM role."""
-    session = boto3.Session(region_name=aws_region)
-    assumed = assume_role_session(session, role_arn) if role_arn else session
-    return assumed.client(resource)
-
-
-def get_config(environment, aws_region, ssm_role_arn,
-               service_name="data_transform"):
-    """Fetch config values from SSM Parameter Store by path.
-
-    /{environment}/{service_name}/PARAM_NAME -> {PARAM_NAME: value}
-    """
-    ssm_parameter_path = f"/{environment}/{service_name}"
-    configuration = {}
-    if not environment or not aws_region or not ssm_role_arn:
-        return configuration
-
-    ssm_client = get_client_with_role("ssm", aws_region, ssm_role_arn)
-    try:
-        paginator = ssm_client.get_paginator("get_parameters_by_path")
-        for page in paginator.paginate(
-                Path=ssm_parameter_path, Recursive=True, WithDecryption=True):
-            for entry in page.get("Parameters", []):
-                name = entry.get("Name") or ""
-                key = name.split("/")[-1] if name else None
-                if key:
-                    configuration[key] = entry.get("Value")
-    except BaseException:
-        logging.error("Encountered an error loading config from SSM.")
-        traceback.print_exc()
-    return configuration
-
-
-def split_csv(value):
-    if not value or not str(value).strip():
-        return []
-    return [s.strip() for s in str(value).split(",") if s.strip()]
-
-
-# The goal is to avoid relying on lots of import-time environment variables.
-# The service loads config from SSM once, then calls `apply_runtime_config`.
-RUNTIME_CONFIG = {
-    "AUDIO_REFS": [],
-    "MOVING_IMAGE_REFS": [],
-    "PHOTOGRAPH_REFS": [],
-    "ASSET_BASEURL": "",
-}
-
-
-def apply_runtime_config(
-        config=None, env=None):
-    """Apply runtime config (SSM config + env overrides) to module globals.
-    """
-    global RUNTIME_CONFIG, AUDIO_REFS, MOVING_IMAGE_REFS, PHOTOGRAPH_REFS, ASSET_BASEURL
-
-    config = config or {}
-    env = env or os.environ
-
-    def cfg(name, default=""):
-        val = env.get(name)
-        if val is not None and str(val).strip() != "":
-            return str(val)
-        v2 = config.get(name)
-        if v2 is not None and str(v2).strip() != "":
-            return str(v2)
-        return default
-
-    AUDIO_REFS = split_csv(cfg("AUDIO_REFS", ""))
-    MOVING_IMAGE_REFS = split_csv(cfg("MOVING_IMAGE_REFS", ""))
-    PHOTOGRAPH_REFS = split_csv(cfg("PHOTOGRAPH_REFS", ""))
-
-    # ASSET_BASEURL intentionally stays as an env var in many deployments; but we
-    # still allow SSM to provide it. Env wins.
-    ASSET_BASEURL = cfg("ASSET_BASEURL", "").rstrip("/")
-
-    RUNTIME_CONFIG = {
-        "AUDIO_REFS": AUDIO_REFS,
-        "MOVING_IMAGE_REFS": MOVING_IMAGE_REFS,
-        "PHOTOGRAPH_REFS": PHOTOGRAPH_REFS,
-        "ASSET_BASEURL": ASSET_BASEURL,
-    }
-    return RUNTIME_CONFIG
-
-
-def runtime_config():
-    """Return the current runtime config for tests."""
-    return dict(RUNTIME_CONFIG)
-
-
-apply_runtime_config({}, os.environ)
-
-
-def env_list(name):
-    val = RUNTIME_CONFIG.get(name, [])
-    if isinstance(val, list):
-        return list(val)
-    return split_csv(str(val))
-
-
-AUDIO_REFS = env_list("AUDIO_REFS")
-MOVING_IMAGE_REFS = env_list("MOVING_IMAGE_REFS")
-PHOTOGRAPH_REFS = env_list("PHOTOGRAPH_REFS")
-ASSET_BASEURL = str(RUNTIME_CONFIG.get("ASSET_BASEURL", "")).rstrip("/")
 
 
 def identifier_from_uri(uri):
@@ -215,14 +85,15 @@ def convert_dates(value):
         )
 
 
-def has_online_asset(identifier):
-    if not ASSET_BASEURL:
+def has_online_asset(identifier, config):
+    if not config.get('ASSET_BASEURL'):
         return False
-    req = requests.head(f"{ASSET_BASEURL.rstrip('/')}/pdfs/{identifier}")
+    req = requests.head(
+        f"{config['ASSET_BASEURL'].rstrip('/')}/pdfs/{identifier}")
     return req.status_code == 200
 
 
-def has_online_instance(instances, uri):
+def has_online_instance(instances, uri, config):
     """Checks to see if there are digital objects."""
     try:
         digital_instances = [
@@ -231,7 +102,7 @@ def has_online_instance(instances, uri):
         digital_instances = [
             v for v in instances if v["instance_type"] == "digital_object"]
     if len(digital_instances):
-        if has_online_asset(identifier_from_uri(uri)):
+        if has_online_asset(identifier_from_uri(uri), config):
             return True
     return False
 
@@ -310,7 +181,7 @@ def transform_language(value, lang_materials):
         expression="English", identifier="eng")]
 
 
-def transform_formats(instances, subjects, ancestors):
+def transform_formats(instances, subjects, ancestors, config):
     """Transforms the format info from subject data."""
     ancestor_subjects = []
     for a in ancestors:
@@ -319,9 +190,9 @@ def transform_formats(instances, subjects, ancestors):
     combined_subjects = subjects + ancestor_subjects
     formats = ["documents"]
     for refs, format in [
-            (MOVING_IMAGE_REFS, "moving image"),
-            (AUDIO_REFS, "audio"),
-            (PHOTOGRAPH_REFS, "photographs")]:
+            (config['MOVING_IMAGE_REFS'].split(','), "moving image"),
+            (config['AUDIO_REFS'].split(','), "audio"),
+            (config['PHOTOGRAPH_REFS'].split(','), "photographs")]:
         if len([s for s in combined_subjects if s.ref in refs]):
             formats.append(format)
     return formats
@@ -661,7 +532,7 @@ class SourceResourceToCollection(odin.Mapping):
     @odin.map_list_field(from_field="instances", to_field="formats")
     def formats(self, value):
         return transform_formats(
-            value, self.source.subjects, self.source.ancestors)
+            value, self.source.subjects, self.source.ancestors, self.context)
 
     @odin.map_field(from_field="group", to_field="group")
     def group(self, value):
@@ -733,11 +604,11 @@ class SourceArchivalObjectToCollection(odin.Mapping):
     @odin.map_list_field(from_field="instances", to_field="formats")
     def formats(self, value):
         return transform_formats(
-            value, self.source.subjects, self.source.ancestors)
+            value, self.source.subjects, self.source.ancestors, self.context)
 
     @odin.map_field(from_field="instances", to_field="online")
     def online(self, value):
-        return has_online_instance(value, self.source.uri)
+        return has_online_instance(value, self.source.uri, self.context)
 
     @odin.map_field(from_field="group", to_field="group")
     def group(self, value):
@@ -803,11 +674,11 @@ class SourceArchivalObjectToObject(odin.Mapping):
     @odin.map_list_field(from_field="instances", to_field="formats")
     def formats(self, value):
         return transform_formats(
-            value, self.source.subjects, self.source.ancestors)
+            value, self.source.subjects, self.source.ancestors, self.context)
 
     @odin.map_field(from_field="instances", to_field="online")
     def online(self, value):
-        return has_online_instance(value, self.source.uri)
+        return has_online_instance(value, self.source.uri, self.context)
 
     @odin.map_field(from_field="instances", to_field="files", to_list=True)
     def files(self, value):

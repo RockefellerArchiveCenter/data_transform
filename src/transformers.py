@@ -100,9 +100,9 @@ class Transformer:
 
     def get_transformed_object(self, data, from_resource, mapping):
         from_obj = json_codec.loads(json.dumps(data), resource=from_resource)
-        transformed = json.loads(json_codec.dumps(mapping.apply(from_obj)))
-        transformed = self.remove_keys_from_dict(transformed)
-        return transformed
+        transformed = mapping.apply(from_obj, context=self.config)
+        transformed_json = json.loads(json_codec.dumps(transformed))
+        return self.remove_keys_from_dict(transformed_json)
 
     def remove_keys_from_dict(self, data, target_key="$"):
         modified_dict = {}
