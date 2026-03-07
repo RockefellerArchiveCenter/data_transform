@@ -2,7 +2,7 @@ import json
 import unittest
 from os import getenv
 from pathlib import Path
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, call, patch
 
 import boto3
 from moto import mock_aws
@@ -10,7 +10,7 @@ from moto.core import DEFAULT_ACCOUNT_ID
 
 from src.mappings import SourceAgentPersonToAgent
 from src.resources.source import SourceAgentPerson
-from src.transformer import Transformer
+from src.transformer import Transformer, lambda_handler
 
 DEFAULT_CONFIG = {
     "SCHEMAS_BASE_DIR": "rac_schemas/schemas",
@@ -37,9 +37,23 @@ def load_fixture(path: Path):
 
 class LambdaHandlerTests(unittest.TestCase):
 
-    def test_lambda_handler(self):
-        # TODO
-        pass
+    @patch('src.transformer.Transformer.__init__')
+    @patch('src.transformer.Transformer.run')
+    def test_lambda_handler(self, mock_run, mock_init):
+        mock_init.return_value = None
+        records = [
+            {"body": "{\"uri\": \"1234\"}", "messageAttributes": {
+                "object_type": {"stringValue": "archival_object"}}},
+            {"body": "{\"uri\": \"4321\"}", "messageAttributes": {
+                "object_type": {"stringValue": "resource"}}}
+        ]
+        lambda_handler({"Records": records}, None)
+
+        mock_init.assert_called_once()
+        mock_run.assert_has_calls([
+            call("archival_object", {"uri": "1234"}),
+            call("resource", {"uri": "4321"})
+        ])
 
 
 class TransformerMethodTests(unittest.TestCase):
