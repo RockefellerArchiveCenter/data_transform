@@ -1,7 +1,7 @@
 import json
 import logging
-import os
 import traceback
+from os import getenv
 from pathlib import Path
 
 import boto3
@@ -53,9 +53,9 @@ class Transformer:
     def __init__(self):
         self.service_name = "data_transform"
         self.config = get_config(
-            os.getenv('ENVIRONMENT'),
-            os.getenv('AWS_REGION'),
-            os.getenv('AWS_SSM_ROLE_ARN'),
+            getenv('ENVIRONMENT'),
+            getenv('AWS_REGION'),
+            getenv('AWS_SSM_ROLE_ARN'),
             self.service_name)
 
     def output_object_type(self, input_object_type):
@@ -140,7 +140,7 @@ class Transformer:
         is_valid(data, object_schema, base_schema)
 
     def send_success_message(self, transformed, object_type):
-        client = get_client_with_role('sns', os.getenv(
+        client = get_client_with_role('sns', getenv(
             'AWS_REGION'), self.config['SNS_ROLE_ARN'])
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
@@ -168,7 +168,7 @@ class Transformer:
             })
 
     def send_error_message(self, exception, object_type, object_id):
-        client = get_client_with_role('sns', os.getenv(
+        client = get_client_with_role('sns', getenv(
             'AWS_REGION'), self.config['SNS_ROLE_ARN'])
         tb = ''.join(traceback.format_exception(exception)[:-1])
         client.publish(
