@@ -1,8 +1,10 @@
 from unittest.mock import patch
 
-from src.mappings import (generate_download_identifier,
+from src.mappings import (convert_dates, generate_download_identifier,
                           generate_manifest_identifier, has_online_asset,
-                          has_online_instance, identifier_from_uri, strip_tags)
+                          has_online_instance, identifier_from_uri,
+                          language_name, strip_tags, transform_formats,
+                          transform_group, transform_language)
 
 
 def test_identifier_from_uri_is_deterministic():
@@ -78,3 +80,130 @@ def test_has_online_instance(mock_online_asset):
     mock_online_asset.return_value = False
     assert has_online_instance(instances, uri, {}) is False
     mock_online_asset.assert_called_once_with(identifier_from_uri(uri), {})
+
+
+@patch("src.mappings.odin.codecs.json_codec.loads")
+@patch("src.mappings.SourceDateToDate.apply")
+def test_convert_dates_uses_source_date(mock_apply, mock_loads):
+    mock_apply.return_value = ["converted"]
+    mock_loads.side_effect = lambda value, resource=None: value
+    value = [
+        {
+            "jsonmodel_type": "date",
+            "begin": "1900",
+            "end": "1901"
+        }
+    ]
+    result = convert_dates(value)
+    assert result == ["converted"]
+    mock_apply.assert_called_once()
+
+
+@patch("src.mappings.odin.codecs.json_codec.loads")
+@patch("src.mappings.SourceStructuredDateToDate.apply")
+def test_convert_dates_uses_structured_date(mock_apply, mock_loads):
+    mock_apply.return_value = ["converted"]
+    mock_loads.side_effect = lambda value, resource=None: value
+    value = [
+        {
+            "jsonmodel_type": "structured_date_label",
+            "date_label": "creation"
+        }
+    ]
+    result = convert_dates(value)
+    assert result == ["converted"]
+    mock_apply.assert_called_once()
+
+
+def test_language_name_variants():
+    assert language_name(None) is None
+    assert language_name("") is None
+    assert language_name("eng") == "English"
+    assert language_name("en") == "English"
+    assert language_name("fre") == "French"
+
+
+def test_transform_language_value():
+    result = transform_language("eng", None)
+    assert len(result) == 1
+    assert result[0].expression == "English"
+    assert result[0].identifier == "eng"
+
+
+def test_transform_language_lang_materials():
+    lang_materials = [
+        type(
+            "LangMaterial",
+            (),
+            {
+                "language_and_script": type(
+                    "LangScript", (), {"language": "fre"}
+                )()
+            },
+        )(),
+        type("LangMaterial", (), {"language_and_script": None})(),
+    ]
+    result = transform_language(None, lang_materials)
+    assert len(result) == 1
+    assert result[0].expression == "French"
+    assert result[0].identifier == "fre"
+
+
+def test_transform_language_defaults_english():
+    result = transform_language(None, None)
+    assert len(result) == 1
+    assert result[0].expression == "English"
+    assert result[0].identifier == "eng"
+
+
+def test_transform_language_unknown_code():
+    try:
+        transform_language("zzz", None)
+        assert False, "Expected ValueError"
+    except ValueError as exc:
+        assert str(exc) == "Unrecognized language code: zzz"
+
+
+def test_transform_formats_defaults_documents():
+    config = {
+        "MOVING_IMAGE_REFS": "mov1,mov2",
+        "AUDIO_REFS": "audio1,audio2",
+        "PHOTOGRAPH_REFS": "photo1,photo2",
+    }
+    result = transform_formats([], [], [], config)
+    assert result == ["documents"]
+
+
+def test_transform_formats_matching_formats():
+    config = {
+        "MOVING_IMAGE_REFS": "mov1,mov2",
+        "AUDIO_REFS": "audio1,audio2",
+        "PHOTOGRAPH_REFS": "photo1,photo2",
+    }
+    subjects = [
+        type("Subject", (), {"ref": "mov1"})(),
+        type("Subject", (), {"ref": "photo2"})(),
+    ]
+    ancestors = [
+        type(
+            "Ancestor",
+            (),
+            {"subjects": [type("Subject", (), {"ref": "audio2"})()]},
+        )()
+    ]
+    result = transform_formats([], subjects, ancestors, config)
+    assert result == ["documents", "moving image", "audio", "photographs"]
+
+
+@patch("src.mappings.SourceGroupToGroup.apply")
+def test_transform_group(mock_apply):
+    value = type(
+        "SourceGroup", (), {
+            "identifier": "/repositories/2/groups/5"})()
+    group = type("Group", (), {})()
+    mock_apply.return_value = group
+    result = transform_group(value, "collections")
+    assert result is group
+    assert result.identifier == f"/collections/{
+        identifier_from_uri(value.identifier)}"
+    mock_apply.assert_called_once_with(value)
