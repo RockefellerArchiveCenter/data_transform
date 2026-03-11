@@ -41,6 +41,8 @@ pygments==2.19.2
     # via pytest
 pytest==9.0.2
     # via -r tests/test_requirements.in
+python-box==7.4.1
+    # via -r tests/test_requirements.in
 python-dateutil==2.9.0.post0
     # via
     #   botocore
