@@ -1,31 +1,27 @@
 import json
 from types import SimpleNamespace
+from unittest import TestCase
+from unittest.mock import Mock, call, patch
 
 from box import Box
-from unittest import TestCase
-from unittest.mock import patch, Mock, call
-
 from odin.codecs import json_codec
 
-from src.mappings import (SourceRefToTermReference, 
-                          SourceAncestorToRecordReference, 
-                          SourceLinkedAgentToAgentReference, 
-                          SourceStructuredDateToDate,
-                          SourceDateToDate,
-                          SourceGroupToGroup,
-                          SourceNoteToNote,
-                          SourceResourceToCollection,
-                          SourceArchivalObjectToCollection,
-                          SourceArchivalObjectToObject,
-                          SourceSubjectToTerm,
+from src.mappings import (SourceAgentCorporateEntityToAgent,
                           SourceAgentCorporateEntityToAgentReference,
-                          SourceAgentCorporateEntityToAgent,
-                          SourceAgentFamilyToAgentReference,
                           SourceAgentFamilyToAgent,
+                          SourceAgentFamilyToAgentReference,
+                          SourceAgentPersonToAgent,
                           SourceAgentPersonToAgentReference,
-                          SourceAgentPersonToAgent)
+                          SourceAncestorToRecordReference,
+                          SourceArchivalObjectToCollection,
+                          SourceArchivalObjectToObject, SourceDateToDate,
+                          SourceGroupToGroup,
+                          SourceLinkedAgentToAgentReference, SourceNoteToNote,
+                          SourceRefToTermReference, SourceResourceToCollection,
+                          SourceStructuredDateToDate, SourceSubjectToTerm)
 
 # TODO factor out setUp to parent class
+
 
 class SourceRefToTermReferenceTests(TestCase):
 
@@ -36,7 +32,7 @@ class SourceRefToTermReferenceTests(TestCase):
 
     def test_title(self):
         for input, expected in [
-                ("This is a title", "This is a title"), 
+                ("This is a title", "This is a title"),
                 (" This is a  title ", "This is a  title")]:
             output = self.mapping.title(input)
             self.assertEqual(output, expected)
@@ -44,12 +40,13 @@ class SourceRefToTermReferenceTests(TestCase):
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
 
     def test_identifier(self):
         output = self.mapping.identifier("/repositories/2/archival_objects/1")
         self.assertEqual(output, 'YRa9EbvFzk9qcLdrsEhK6u')
+
 
 class SourceAncestorToRecordReferenceTests(TestCase):
 
@@ -60,7 +57,7 @@ class SourceAncestorToRecordReferenceTests(TestCase):
 
     def test_title(self):
         for input, expected in [
-                ("This is a title", "This is a title"), 
+                ("This is a title", "This is a title"),
                 (" This is a  title ", "This is a  title")]:
             output = self.mapping.title(input)
             self.assertEqual(output, expected)
@@ -73,12 +70,13 @@ class SourceAncestorToRecordReferenceTests(TestCase):
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
 
     def test_identifier(self):
         output = self.mapping.identifier("/repositories/2/archival_objects/1")
         self.assertEqual(output, 'YRa9EbvFzk9qcLdrsEhK6u')
+
 
 class SourceLinkedAgentToAgentReferenceTests(TestCase):
 
@@ -89,15 +87,15 @@ class SourceLinkedAgentToAgentReferenceTests(TestCase):
 
     def test_type(self):
         for input, expected in [
-                ('agent_corporate_entity', 'organization'), 
-                ('agent_person', 'person'), 
+                ('agent_corporate_entity', 'organization'),
+                ('agent_person', 'person'),
                 ('agent_family', 'family')]:
             output = self.mapping.type(input)
             self.assertEqual(output, expected)
 
     def test_title(self):
         for input, expected in [
-                ("This is a title", "This is a title"), 
+                ("This is a title", "This is a title"),
                 (" This is a  title ", "This is a  title")]:
             output = self.mapping.title(input)
             self.assertEqual(output, expected)
@@ -105,7 +103,7 @@ class SourceLinkedAgentToAgentReferenceTests(TestCase):
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
 
     def test_identifier(self):
@@ -137,19 +135,19 @@ class SourceStructuredDateToDateTests(TestCase):
         self.assertEqual(output, '1990')
         output = self.mapping.end('inclusive')
         self.assertEqual(output, '1991')
-    
+
     def test_expression(self):
         # single dates
         for date_obj in [{"date_expression": "1990"}, {"date_standardized": "1990", "date_expression": None}]:
             self.mapping.source = Box({"structured_date_single": date_obj})
             output = self.mapping.expression('single')
             self.assertEqual(output, '1990')
-        
+
         # inclusive date ranges
         for date_obj in [
                 {"begin_date_expression": "1990", "end_date_expression": "1991"},
                 {
-                    "begin_date_standardized": "1990", "end_date_standardized": "1991", 
+                    "begin_date_standardized": "1990", "end_date_standardized": "1991",
                     "begin_date_expression": None, "end_date_expression": None
                 }]:
             self.mapping.source = Box({"structured_date_range": date_obj})
@@ -170,7 +168,6 @@ class SourceDateToDateTests(TestCase):
         self.mapping.source = SimpleNamespace(**{"date_type": "inclusive", "begin": "1990"})
         self.assertEqual(self.mapping.end("1989"), "1989")
 
-
     def test_expression(self):
         self.mapping.source = SimpleNamespace(**{"begin": "1989", "end": "1990"})
         self.assertEqual(self.mapping.expression(""), "1989-1990")
@@ -178,6 +175,7 @@ class SourceDateToDateTests(TestCase):
         self.assertEqual(self.mapping.expression("1991-1992"), "1991-1992")
         self.mapping.source = SimpleNamespace(**{"begin": "1989", "end": None})
         self.assertEqual(self.mapping.expression(""), "1989-")
+
 
 class SourceGroupToGroupTests(TestCase):
 
@@ -202,6 +200,7 @@ class SourceGroupToGroupTests(TestCase):
         mock_convert.return_value = "1990"
         self.assertEqual(self.mapping.dates("2000"), "1990")
         mock_convert.assert_called_once_with("2000")
+
 
 class SourceNoteToNoteTests(TestCase):
 
@@ -231,10 +230,10 @@ class SourceNoteToNoteTests(TestCase):
         value = SimpleNamespace(**{"jsonmodel_type": "note_definedlist", "items": [{"1": "1"}, {"2": "2"}]})
         output = self.mapping.map_subnotes(value)
         self.assertEqual(
-            json.loads(json_codec.dumps(output)), 
+            json.loads(json_codec.dumps(output)),
             {
-                '$': 'src.resources.rac.Subnote', 
-                'content': [], 
+                '$': 'src.resources.rac.Subnote',
+                'content': [],
                 'items': [{'1': '1'}, {'2': '2'}],
                 'type': 'definedlist'
             })
@@ -242,18 +241,18 @@ class SourceNoteToNoteTests(TestCase):
         value = SimpleNamespace(**{"jsonmodel_type": "note_orderedlist", "items": ["1", "2", "3"]})
         output = self.mapping.map_subnotes(value)
         self.assertEqual(
-            json.loads(json_codec.dumps(output)), 
+            json.loads(json_codec.dumps(output)),
             {
-                '$': 'src.resources.rac.Subnote', 
-                'content': [], 
+                '$': 'src.resources.rac.Subnote',
+                'content': [],
                 'items': [{'0': '1'}, {'1': '2'}, {'2': '3'}],
                 'type': 'orderedlist'
             })
 
         mock_bibliography = Mock(return_value="foo")
         value = SimpleNamespace(**{
-            "jsonmodel_type": "note_bibliography", 
-            "items": [{"1": "1"}, {"2": "2"}], 
+            "jsonmodel_type": "note_bibliography",
+            "items": [{"1": "1"}, {"2": "2"}],
             "content": ["note content"]})
         self.mapping.bibliograpy_subnotes = mock_bibliography
         self.assertEqual(self.mapping.map_subnotes(value), "foo")
@@ -261,8 +260,8 @@ class SourceNoteToNoteTests(TestCase):
 
         mock_index = Mock(return_value="foo")
         value = SimpleNamespace(**{
-            "jsonmodel_type": "note_index", 
-            "items": [{"1": "1"}, {"2": "2"}], 
+            "jsonmodel_type": "note_index",
+            "items": [{"1": "1"}, {"2": "2"}],
             "content": ["note content"]})
         self.mapping.index_subnotes = mock_index
         self.assertEqual(self.mapping.map_subnotes(value), "foo")
@@ -270,7 +269,7 @@ class SourceNoteToNoteTests(TestCase):
 
         mock_chronology = Mock(return_value="foo")
         value = SimpleNamespace(**{
-            "jsonmodel_type": "note_chronology", 
+            "jsonmodel_type": "note_chronology",
             "items": [{"1": "1"}, {"2": "2"}]})
         self.mapping.chronology_subnotes = mock_chronology
         self.assertEqual(self.mapping.map_subnotes(value), "foo")
@@ -281,7 +280,7 @@ class SourceNoteToNoteTests(TestCase):
         output = self.mapping.map_subnotes(value)
         self.assertEqual(output.__dict__, {'type': 'text', 'content': ['foo', 'foo'], 'items': []})
         self.assertEqual(mock_strip_tags.call_count, 2)
-        
+
     def test_subnotes(self):
         for note_type in ["note_multipart", "note_bioghist"]:
             mock_map_subnotes = Mock(return_value="foo")
@@ -295,13 +294,13 @@ class SourceNoteToNoteTests(TestCase):
         self.mapping.source = SimpleNamespace(**{"jsonmodel_type": "note_singlepart", "content": "[\"Note content\"]"})
         output = self.mapping.subnotes(None)
         self.assertEqual(
-            json.loads(json_codec.dumps(output)), 
+            json.loads(json_codec.dumps(output)),
             [{'type': 'text', 'content': ['Note content'], 'items': [], '$': 'src.resources.rac.Subnote'}])
 
         mock_index = Mock(return_value="foo")
         self.mapping.source = SimpleNamespace(**{
-            "jsonmodel_type": "note_index", 
-            "items": [1, 2, 3], 
+            "jsonmodel_type": "note_index",
+            "items": [1, 2, 3],
             "content": ["note content"]})
         self.mapping.index_subnotes = mock_index
         self.assertEqual(self.mapping.subnotes(None), "foo")
@@ -309,8 +308,8 @@ class SourceNoteToNoteTests(TestCase):
 
         mock_bibliography = Mock(return_value="foo")
         self.mapping.source = SimpleNamespace(**{
-            "jsonmodel_type": "note_bibliography", 
-            "items": [1, 2, 3], 
+            "jsonmodel_type": "note_bibliography",
+            "items": [1, 2, 3],
             "content": ["note content"]})
         self.mapping.bibliograpy_subnotes = mock_bibliography
         self.assertEqual(self.mapping.subnotes(None), "foo")
@@ -318,7 +317,7 @@ class SourceNoteToNoteTests(TestCase):
 
         mock_chronology = Mock(return_value="foo")
         self.mapping.source = SimpleNamespace(**{
-            "jsonmodel_type": "note_chronology", 
+            "jsonmodel_type": "note_chronology",
             "items": [1, 2, 3]})
         self.mapping.chronology_subnotes = mock_chronology
         self.assertEqual(self.mapping.subnotes(None), "foo")
@@ -331,7 +330,7 @@ class SourceNoteToNoteTests(TestCase):
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [
-                {'type': 'text', 'content': ['foo'], 'items': [], '$': 'src.resources.rac.Subnote'}, 
+                {'type': 'text', 'content': ['foo'], 'items': [], '$': 'src.resources.rac.Subnote'},
                 {'type': 'orderedlist', 'content': None, 'items': [], '$': 'src.resources.rac.Subnote'}
             ])
         mock_strip.assert_called_once_with('"This is a subnote"')
@@ -340,7 +339,7 @@ class SourceNoteToNoteTests(TestCase):
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [
-                {'type': 'text', 'content': ['foo'], 'items': [], '$': 'src.resources.rac.Subnote'}, 
+                {'type': 'text', 'content': ['foo'], 'items': [], '$': 'src.resources.rac.Subnote'},
                 {'type': 'orderedlist', 'content': [{'1': '1'}], 'items': [], '$': 'src.resources.rac.Subnote'}
             ])
 
@@ -350,14 +349,14 @@ class SourceNoteToNoteTests(TestCase):
             json.loads(json_codec.dumps(output)),
             [
                 {
-                    'type': 'text', 
-                    'content': ['This is a subnote'], 
-                    'items': [], 
-                    '$': 'src.resources.rac.Subnote'}, 
+                    'type': 'text',
+                    'content': ['This is a subnote'],
+                    'items': [],
+                    '$': 'src.resources.rac.Subnote'},
                 {
-                    'type': 'definedlist', 
-                    'content': [], 
-                    'items': [{'label': 'item type', 'value': 'item value'}], 
+                    'type': 'definedlist',
+                    'content': [],
+                    'items': [{'label': 'item type', 'value': 'item value'}],
                     '$': 'src.resources.rac.Subnote'
                 }
             ])
@@ -367,11 +366,12 @@ class SourceNoteToNoteTests(TestCase):
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             {
-                'type': 'definedlist', 
-                'content': [], 
-                'items': [{'label': None, 'value': None}], 
+                'type': 'definedlist',
+                'content': [],
+                'items': [{'label': None, 'value': None}],
                 '$': 'src.resources.rac.Subnote'
             })
+
 
 class SourceResourceToCollectionTests(TestCase):
 
@@ -385,17 +385,17 @@ class SourceResourceToCollectionTests(TestCase):
         mock_strip.return_value = "foo"
         self.assertEqual(self.mapping.title("input"), "foo")
         mock_strip.assert_called_once_with("input")
-        
+
     @patch('src.mappings.SourceNoteToNote.apply')
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            SimpleNamespace(**{"publish": False, "type": "abstract"}), 
-            SimpleNamespace(**{"publish": True, "type": "physloc"}), 
+            SimpleNamespace(**{"publish": False, "type": "abstract"}),
+            SimpleNamespace(**{"publish": True, "type": "physloc"}),
             SimpleNamespace(**{"publish": True, "type": "abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with([SimpleNamespace(**{"publish": True, "type": "abstract"})])
-        
+
     @patch('src.mappings.SourceDateToDate.apply')
     def test_dates(self, mock_apply):
         mock_apply.return_value = ["converted"]
@@ -407,22 +407,22 @@ class SourceResourceToCollectionTests(TestCase):
         mock_transform.return_value = [{"expression": "English", "identifier": "eng"}]
         self.mapping.source = SimpleNamespace(**{"lang_materials": None})
         self.assertEqual(
-            self.mapping.languages(["en"]), 
+            self.mapping.languages(["en"]),
             [{"expression": "English", "identifier": "eng"}])
         mock_transform.assert_called_once_with(["en"], None)
 
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
-        
+
     @patch('src.mappings.identifier_from_uri')
     def test_uri(self, mock_id):
         mock_id.return_value = "1234"
         self.assertEqual(self.mapping.uri("foo"), "/collections/1234")
         mock_id.assert_called_once_with("foo")
-        
+
     @patch('src.mappings.SourceRefToTermReference.apply')
     def test_terms(self, mock_apply):
         mock_apply.return_value = ["converted"]
@@ -472,7 +472,7 @@ class SourceResourceToCollectionTests(TestCase):
         self.mapping.context = None
         self.assertEqual(self.mapping.formats(["foo"]), ["documents"])
         mock_formats.assert_called_once_with(["foo"], ["subject"], ["anceestor"], None)
-        
+
     @patch('src.mappings.transform_group')
     def test_group(self, mock_group):
         mock_group.return_value = {"foo": "bar"}
@@ -484,8 +484,9 @@ class SourceResourceToCollectionTests(TestCase):
         mock_id.return_value = "1234"
         self.assertEqual(
             self.mapping.parent([SimpleNamespace(**{"ref": "/repositories/2/archival_objects/1"})]),
-            "1234")        
+            "1234")
         self.assertEqual(None, None)
+
 
 class SourceArchivalObjectToCollectionTests(TestCase):
 
@@ -498,8 +499,8 @@ class SourceArchivalObjectToCollectionTests(TestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            SimpleNamespace(**{"publish": False, "type": "abstract"}), 
-            SimpleNamespace(**{"publish": True, "type": "physloc"}), 
+            SimpleNamespace(**{"publish": False, "type": "abstract"}),
+            SimpleNamespace(**{"publish": True, "type": "physloc"}),
             SimpleNamespace(**{"publish": True, "type": "abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with([SimpleNamespace(**{"publish": True, "type": "abstract"})])
@@ -516,7 +517,7 @@ class SourceArchivalObjectToCollectionTests(TestCase):
         mock_transform.return_value = [{"expression": "English", "identifier": "eng"}]
         self.mapping.source = SimpleNamespace(**{"lang_materials": None})
         self.assertEqual(
-            self.mapping.languages(["en"]), 
+            self.mapping.languages(["en"]),
             [{"expression": "English", "identifier": "eng"}])
         mock_transform.assert_called_once_with(["en"], None)
 
@@ -565,9 +566,9 @@ class SourceArchivalObjectToCollectionTests(TestCase):
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
-        
+
     @patch('src.mappings.identifier_from_uri')
     def test_uri(self, mock_id):
         mock_id.return_value = "1234"
@@ -601,8 +602,9 @@ class SourceArchivalObjectToCollectionTests(TestCase):
         mock_id.return_value = "1234"
         self.assertEqual(
             self.mapping.parent([SimpleNamespace(**{"ref": "/repositories/2/archival_objects/1"})]),
-            "1234")        
+            "1234")
         self.assertEqual(None, None)
+
 
 class SourceArchivalObjectToObjectTests(TestCase):
 
@@ -615,8 +617,8 @@ class SourceArchivalObjectToObjectTests(TestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            SimpleNamespace(**{"publish": False, "type": "abstract"}), 
-            SimpleNamespace(**{"publish": True, "type": "physloc"}), 
+            SimpleNamespace(**{"publish": False, "type": "abstract"}),
+            SimpleNamespace(**{"publish": True, "type": "physloc"}),
             SimpleNamespace(**{"publish": True, "type": "abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with([SimpleNamespace(**{"publish": True, "type": "abstract"})])
@@ -637,16 +639,16 @@ class SourceArchivalObjectToObjectTests(TestCase):
         mock_transform.return_value = [{"expression": "English", "identifier": "eng"}]
         self.mapping.source = SimpleNamespace(**{"lang_materials": None})
         self.assertEqual(
-            self.mapping.languages(["en"]), 
+            self.mapping.languages(["en"]),
             [{"expression": "English", "identifier": "eng"}])
         mock_transform.assert_called_once_with(["en"], None)
 
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
-        
+
     @patch('src.mappings.identifier_from_uri')
     def test_uri(self, mock_id):
         mock_id.return_value = "1234"
@@ -714,14 +716,14 @@ class SourceArchivalObjectToObjectTests(TestCase):
             Box({"digital_object": {"title": "digital object title", "publish": False}}),
             Box({"digital_object": None})])
         self.assertEqual(
-            json.loads(json_codec.dumps(output)), 
+            json.loads(json_codec.dumps(output)),
             [{
-                'title': 'digital object title', 
-                'download': 'download_id', 
-                'manifest': 'manifest_id', 
+                'title': 'digital object title',
+                'download': 'download_id',
+                'manifest': 'manifest_id',
                 '$': 'src.resources.rac.FileObject'
             }])
-        
+
         mock_download_id.assert_called_once_with(
             {}, {"title": "digital object title", "publish": True}, "https://context.org")
         mock_manifest_id.assert_called_once_with(
@@ -738,7 +740,7 @@ class SourceArchivalObjectToObjectTests(TestCase):
         mock_id.return_value = "1234"
         self.assertEqual(
             self.mapping.parent([SimpleNamespace(**{"ref": "/repositories/2/archival_objects/1"})]),
-            "1234")        
+            "1234")
         self.assertEqual(None, None)
 
 
@@ -757,10 +759,10 @@ class SourceSubjectToTermTests(TestCase):
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{
-                'identifier': 'foo', 
-                'source': 'archivesspace', 
+                'identifier': 'foo',
+                'source': 'archivesspace',
                 '$': 'src.resources.rac.ExternalIdentifier'}])
 
     @patch('src.mappings.identifier_from_uri')
@@ -782,14 +784,14 @@ class SourceAgentCorporateEntityToAgentReferenceTests(TestCase):
     def setUp(self, mock_init):
         mock_init.return_value = None
         self.mapping = SourceAgentCorporateEntityToAgentReference()
-    
+
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{
-                'identifier': 'foo', 
-                'source': 'archivesspace', 
+                'identifier': 'foo',
+                'source': 'archivesspace',
                 '$': 'src.resources.rac.ExternalIdentifier'}])
 
     def test_reference_type(self):
@@ -816,8 +818,8 @@ class SourceAgentCorporateEntityToAgentTests(TestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            SimpleNamespace(**{"publish": False, "jsonmodel_type": "note_abstract"}), 
-            SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_physloc"}), 
+            SimpleNamespace(**{"publish": False, "jsonmodel_type": "note_abstract"}),
+            SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_physloc"}),
             SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with(
@@ -834,9 +836,9 @@ class SourceAgentCorporateEntityToAgentTests(TestCase):
         output = self.mapping.external_identifiers([
             SimpleNamespace(**{"record_identifier": "12345", "source": "cartographer"})])
         self.assertEqual(
-            json.loads(json_codec.dumps(output)), 
+            json.loads(json_codec.dumps(output)),
             [
-                {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'}, 
+                {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'},
                 {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
             ])
 
@@ -878,7 +880,7 @@ class SourceAgentFamilyToAgentReferenceTests(TestCase):
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
 
     def test_reference_type(self):
@@ -905,8 +907,8 @@ class SourceAgentFamilyToAgentTests(TestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            SimpleNamespace(**{"publish": False, "jsonmodel_type": "note_abstract"}), 
-            SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_physloc"}), 
+            SimpleNamespace(**{"publish": False, "jsonmodel_type": "note_abstract"}),
+            SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_physloc"}),
             SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with(
@@ -923,9 +925,9 @@ class SourceAgentFamilyToAgentTests(TestCase):
         output = self.mapping.external_identifiers([
             SimpleNamespace(**{"record_identifier": "12345", "source": "cartographer"})])
         self.assertEqual(
-            json.loads(json_codec.dumps(output)), 
+            json.loads(json_codec.dumps(output)),
             [
-                {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'}, 
+                {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'},
                 {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
             ])
 
@@ -954,6 +956,7 @@ class SourceAgentFamilyToAgentTests(TestCase):
         self.assertEqual(self.mapping.group("foo"), {"foo": "bar"})
         mock_group.assert_called_once_with("foo", "agents")
 
+
 class SourceAgentPersonToAgentReferenceTests(TestCase):
 
     @patch('src.mappings.SourceAgentPersonToAgentReference.__init__')
@@ -964,7 +967,7 @@ class SourceAgentPersonToAgentReferenceTests(TestCase):
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
         self.assertEqual(json.loads(
-            json_codec.dumps(output)), 
+            json_codec.dumps(output)),
             [{'identifier': 'foo', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}])
 
     def test_reference_type(self):
@@ -1005,8 +1008,8 @@ class SourceAgentPersonToAgentTests(TestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            SimpleNamespace(**{"publish": False, "jsonmodel_type": "note_abstract"}), 
-            SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_physloc"}), 
+            SimpleNamespace(**{"publish": False, "jsonmodel_type": "note_abstract"}),
+            SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_physloc"}),
             SimpleNamespace(**{"publish": True, "jsonmodel_type": "note_abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with(
@@ -1023,12 +1026,12 @@ class SourceAgentPersonToAgentTests(TestCase):
         output = self.mapping.external_identifiers([
             SimpleNamespace(**{"record_identifier": "12345", "source": "cartographer"})])
         self.assertEqual(
-            json.loads(json_codec.dumps(output)), 
+            json.loads(json_codec.dumps(output)),
             [
-                {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'}, 
+                {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'},
                 {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
             ])
-        
+
     @patch('src.mappings.identifier_from_uri')
     def test_uri(self, mock_id):
         mock_id.return_value = "1234"
