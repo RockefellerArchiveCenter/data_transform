@@ -20,15 +20,17 @@ from src.mappings import (SourceAgentCorporateEntityToAgent,
                           SourceRefToTermReference, SourceResourceToCollection,
                           SourceStructuredDateToDate, SourceSubjectToTerm)
 
-# TODO factor out setUp to parent class
+
+class BaseTestCase(TestCase):
+
+    def setUp(self):
+        patch_str = f"src.mappings.{self.mapping_class.__name__}.__init__"
+        with patch(patch_str, return_value=None):
+            self.mapping = self.mapping_class()
 
 
-class SourceRefToTermReferenceTests(TestCase):
-
-    @patch('src.mappings.SourceRefToTermReference.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceRefToTermReference()
+class SourceRefToTermReferenceTests(BaseTestCase):
+    mapping_class = SourceRefToTermReference
 
     def test_title(self):
         for input, expected in [
@@ -48,12 +50,8 @@ class SourceRefToTermReferenceTests(TestCase):
         self.assertEqual(output, 'YRa9EbvFzk9qcLdrsEhK6u')
 
 
-class SourceAncestorToRecordReferenceTests(TestCase):
-
-    @patch('src.mappings.SourceAncestorToRecordReference.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceAncestorToRecordReference()
+class SourceAncestorToRecordReferenceTests(BaseTestCase):
+    mapping_class = SourceAncestorToRecordReference
 
     def test_title(self):
         for input, expected in [
@@ -78,12 +76,8 @@ class SourceAncestorToRecordReferenceTests(TestCase):
         self.assertEqual(output, 'YRa9EbvFzk9qcLdrsEhK6u')
 
 
-class SourceLinkedAgentToAgentReferenceTests(TestCase):
-
-    @patch('src.mappings.SourceLinkedAgentToAgentReference.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceLinkedAgentToAgentReference()
+class SourceLinkedAgentToAgentReferenceTests(BaseTestCase):
+    mapping_class = SourceLinkedAgentToAgentReference
 
     def test_type(self):
         for input, expected in [
@@ -111,12 +105,8 @@ class SourceLinkedAgentToAgentReferenceTests(TestCase):
         self.assertEqual(output, 'YRa9EbvFzk9qcLdrsEhK6u')
 
 
-class SourceStructuredDateToDateTests(TestCase):
-
-    @patch('src.mappings.SourceStructuredDateToDate.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceStructuredDateToDate()
+class SourceStructuredDateToDateTests(BaseTestCase):
+    mapping_class = SourceStructuredDateToDate
 
     def test_begin(self):
         self.mapping.source = Box({
@@ -155,12 +145,8 @@ class SourceStructuredDateToDateTests(TestCase):
             self.assertEqual(output, '1990-1991')
 
 
-class SourceDateToDateTests(TestCase):
-
-    @patch('src.mappings.SourceDateToDate.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceDateToDate()
+class SourceDateToDateTests(BaseTestCase):
+    mapping_class = SourceDateToDate
 
     def test_end(self):
         self.mapping.source = SimpleNamespace(**{"date_type": "single", "begin": "1990"})
@@ -177,12 +163,8 @@ class SourceDateToDateTests(TestCase):
         self.assertEqual(self.mapping.expression(""), "1989-")
 
 
-class SourceGroupToGroupTests(TestCase):
-
-    @patch('src.mappings.SourceGroupToGroup.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceGroupToGroup()
+class SourceGroupToGroupTests(BaseTestCase):
+    mapping_class = SourceGroupToGroup
 
     def test_category(self):
         for identifier, expected in [
@@ -202,12 +184,8 @@ class SourceGroupToGroupTests(TestCase):
         mock_convert.assert_called_once_with("2000")
 
 
-class SourceNoteToNoteTests(TestCase):
-
-    @patch('src.mappings.SourceNoteToNote.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceNoteToNote()
+class SourceNoteToNoteTests(BaseTestCase):
+    mapping_class = SourceNoteToNote
 
     def test_title(self):
         # Label on source note object
@@ -373,12 +351,8 @@ class SourceNoteToNoteTests(TestCase):
             })
 
 
-class SourceResourceToCollectionTests(TestCase):
-
-    @patch('src.mappings.SourceResourceToCollection.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceResourceToCollection()
+class SourceResourceToCollectionTests(BaseTestCase):
+    mapping_class = SourceResourceToCollection
 
     @patch('src.mappings.strip_tags')
     def test_title(self, mock_strip):
@@ -488,12 +462,8 @@ class SourceResourceToCollectionTests(TestCase):
         self.assertEqual(None, None)
 
 
-class SourceArchivalObjectToCollectionTests(TestCase):
-
-    @patch('src.mappings.SourceArchivalObjectToCollection.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceArchivalObjectToCollection()
+class SourceArchivalObjectToCollectionTests(BaseTestCase):
+    mapping_class = SourceArchivalObjectToCollection
 
     @patch('src.mappings.SourceNoteToNote.apply')
     def test_notes(self, mock_apply):
@@ -606,12 +576,8 @@ class SourceArchivalObjectToCollectionTests(TestCase):
         self.assertEqual(None, None)
 
 
-class SourceArchivalObjectToObjectTests(TestCase):
-
-    @patch('src.mappings.SourceArchivalObjectToObject.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceArchivalObjectToObject()
+class SourceArchivalObjectToObjectTests(BaseTestCase):
+    mapping_class = SourceArchivalObjectToObject
 
     @patch('src.mappings.SourceNoteToNote.apply')
     def test_notes(self, mock_apply):
@@ -744,12 +710,8 @@ class SourceArchivalObjectToObjectTests(TestCase):
         self.assertEqual(None, None)
 
 
-class SourceSubjectToTermTests(TestCase):
-
-    @patch('src.mappings.SourceSubjectToTerm.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceSubjectToTerm()
+class SourceSubjectToTermTests(BaseTestCase):
+    mapping_class = SourceSubjectToTerm
 
     def test_type(self):
         self.assertEqual(
@@ -778,12 +740,8 @@ class SourceSubjectToTermTests(TestCase):
         mock_group.assert_called_once_with("foo", "terms")
 
 
-class SourceAgentCorporateEntityToAgentReferenceTests(TestCase):
-
-    @patch('src.mappings.SourceAgentCorporateEntityToAgentReference.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceAgentCorporateEntityToAgentReference()
+class SourceAgentCorporateEntityToAgentReferenceTests(BaseTestCase):
+    mapping_class = SourceAgentCorporateEntityToAgentReference
 
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
@@ -807,12 +765,8 @@ class SourceAgentCorporateEntityToAgentReferenceTests(TestCase):
         self.assertEqual(self.mapping.role(), "creator")
 
 
-class SourceAgentCorporateEntityToAgentTests(TestCase):
-
-    @patch('src.mappings.SourceAgentCorporateEntityToAgent.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceAgentCorporateEntityToAgent()
+class SourceAgentCorporateEntityToAgentTests(BaseTestCase):
+    mapping_class = SourceAgentCorporateEntityToAgent
 
     @patch('src.mappings.SourceNoteToNote.apply')
     def test_notes(self, mock_apply):
@@ -870,12 +824,8 @@ class SourceAgentCorporateEntityToAgentTests(TestCase):
         mock_group.assert_called_once_with("foo", "agents")
 
 
-class SourceAgentFamilyToAgentReferenceTests(TestCase):
-
-    @patch('src.mappings.SourceAgentFamilyToAgentReference.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceAgentFamilyToAgentReference()
+class SourceAgentFamilyToAgentReferenceTests(BaseTestCase):
+    mapping_class = SourceAgentFamilyToAgentReference
 
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
@@ -896,12 +846,8 @@ class SourceAgentFamilyToAgentReferenceTests(TestCase):
         self.assertEqual(self.mapping.role(), "creator")
 
 
-class SourceAgentFamilyToAgentTests(TestCase):
-
-    @patch('src.mappings.SourceAgentFamilyToAgent.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceAgentFamilyToAgent()
+class SourceAgentFamilyToAgentTests(BaseTestCase):
+    mapping_class = SourceAgentFamilyToAgent
 
     @patch('src.mappings.SourceNoteToNote.apply')
     def test_notes(self, mock_apply):
@@ -957,12 +903,8 @@ class SourceAgentFamilyToAgentTests(TestCase):
         mock_group.assert_called_once_with("foo", "agents")
 
 
-class SourceAgentPersonToAgentReferenceTests(TestCase):
-
-    @patch('src.mappings.SourceAgentPersonToAgentReference.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceAgentPersonToAgentReference()
+class SourceAgentPersonToAgentReferenceTests(BaseTestCase):
+    mapping_class = SourceAgentPersonToAgentReference
 
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
@@ -983,12 +925,8 @@ class SourceAgentPersonToAgentReferenceTests(TestCase):
         self.assertEqual(self.mapping.role(), "creator")
 
 
-class SourceAgentPersonToAgentTests(TestCase):
-
-    @patch('src.mappings.SourceAgentPersonToAgent.__init__')
-    def setUp(self, mock_init):
-        mock_init.return_value = None
-        self.mapping = SourceAgentPersonToAgent()
+class SourceAgentPersonToAgentTests(BaseTestCase):
+    mapping_class = SourceAgentPersonToAgent
 
     def test_parse_name(self):
         for input, expected in [
