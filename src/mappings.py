@@ -182,8 +182,7 @@ def transform_formats(instances, subjects, ancestors, config):
 def transform_group(value, prefix):
     """Makes a source group from the identifier URI."""
     group = SourceGroupToGroup.apply(value)
-    group.identifier = "/{}/{}".format(prefix,
-                                       identifier_from_uri(value.identifier))
+    group.identifier = f"/{prefix}/{identifier_from_uri(value.identifier)}"
     return group
 
 
@@ -200,8 +199,7 @@ class SourceRefToTermReference(odin.Mapping):
     def title(self, value):
         return value.strip()
 
-    @odin.map_list_field(from_field="ref",
-                         to_field="external_identifiers")
+    @odin.map_list_field(from_field="ref", to_field="external_identifiers")
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
@@ -261,8 +259,7 @@ class SourceLinkedAgentToAgentReference(odin.Mapping):
     def title(self, value):
         return strip_tags(value.strip())
 
-    @odin.map_list_field(from_field="ref",
-                         to_field="external_identifiers")
+    @odin.map_list_field(from_field="ref", to_field="external_identifiers")
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
@@ -299,12 +296,12 @@ class SourceStructuredDateToDate(odin.Mapping):
     def expression(self, value):
         if value == "single":
             date_obj = self.source.structured_date_single
-            return date_obj.date_expression if date_obj.date_expression else date_obj.date_standardized
+            return date_obj.date_expression or date_obj.date_standardized
         else:
             date_obj = self.source.structured_date_range
-            begin = date_obj.begin_date_expression if date_obj.begin_date_expression else date_obj.begin_date_standardized
-            end = date_obj.end_date_expression if date_obj.end_date_expression else date_obj.end_date_standardized
-            return "{}-{}".format(begin, end)
+            begin = date_obj.begin_date_expression or date_obj.begin_date_standardized
+            end = date_obj.end_date_expression or date_obj.end_date_standardized
+            return f"{begin}-{end}"
 
 
 class SourceDateToDate(odin.Mapping):
@@ -323,8 +320,10 @@ class SourceDateToDate(odin.Mapping):
     @odin.map_field(from_field="expression", to_field="expression")
     def expression(self, value):
         if not value:
-            value = "{}-{}".format(self.source.begin,
-                                   self.source.end) if self.source.end else "{}-".format(self.source.begin)
+            if self.source.end:
+                value = f"{self.source.begin}-{self.source.end}"
+            else:
+                value = f"{self.source.begin}-"
         return value
 
 
@@ -383,8 +382,7 @@ class SourceNoteToNote(odin.Mapping):
 
     @odin.map_field(from_field="type", to_field="type")
     def type(self, value):
-        return value if value else self.source.jsonmodel_type.split("note_", 1)[
-            1]
+        return value or self.source.jsonmodel_type.split("note_", 1)[1]
 
     def map_subnotes(self, value):
         """Maps Subnotes to values based on the note type."""
@@ -405,13 +403,11 @@ class SourceNoteToNote(odin.Mapping):
                 if isinstance(value.content, list) else [strip_tags(value.content)])
         return subnote
 
-    @odin.map_list_field(from_field="subnotes",
-                         to_field="subnotes")
+    @odin.map_list_field(from_field="subnotes", to_field="subnotes")
     def subnotes(self, value):
         """Handles different note types."""
         if self.source.jsonmodel_type in ["note_multipart", "note_bioghist"]:
-            # <-- list, not generator
-            subnotes = (self.map_subnotes(v) for v in value)
+            subnotes = [self.map_subnotes(v) for v in value]
         elif self.source.jsonmodel_type in ["note_singlepart"]:
             content = [self.source.content.strip("][\"\'")]
             subnotes = [
@@ -465,8 +461,8 @@ class SourceResourceToCollection(odin.Mapping):
 
     @odin.map_list_field(from_field="notes", to_field="notes")
     def notes(self, value):
-        return SourceNoteToNote.apply([v for v in value if (
-            v.publish and v.type in NOTE_TYPE_CHOICES_TRANSFORM)])
+        transform_notes = [v for v in value if (v.publish and v.type in NOTE_TYPE_CHOICES_TRANSFORM)]
+        return SourceNoteToNote.apply(transform_notes)
 
     @odin.map_list_field(from_field="dates", to_field="dates")
     def dates(self, value):
@@ -476,14 +472,13 @@ class SourceResourceToCollection(odin.Mapping):
     def languages(self, value):
         return transform_language(value, self.source.lang_materials)
 
-    @odin.map_field(from_field="uri",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="uri", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
     @odin.map_field(from_field="uri", to_field="uri")
     def uri(self, value):
-        return "/collections/{}".format(identifier_from_uri(value))
+        return f"/collections/{identifier_from_uri(value)}"
 
     @odin.map_list_field(from_field="subjects", to_field="terms")
     def terms(self, value):
@@ -491,24 +486,23 @@ class SourceResourceToCollection(odin.Mapping):
 
     @odin.map_list_field(from_field="linked_agents", to_field="creators")
     def creators(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.role == "creator"]
+        transform_agents = [v for v in value if v.role == "creator"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
-    @odin.map_list_field(from_field="linked_agents",
-                         to_field="people")
+    @odin.map_list_field(from_field="linked_agents", to_field="people")
     def people(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_person"]
+        transform_agents = [v for v in value if v.type == "agent_person"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="linked_agents", to_field="organizations")
     def organizations(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_corporate_entity"]
+        transform_agents = [v for v in value if v.type == "agent_corporate_entity"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="linked_agents", to_field="families")
     def families(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_family"]
+        transform_agents = [v for v in value if v.type == "agent_family"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="instances", to_field="formats")
     def formats(self, value):
@@ -531,17 +525,14 @@ class SourceArchivalObjectToCollection(odin.Mapping):
 
     @odin.map_list_field(from_field="notes", to_field="notes")
     def notes(self, value):
-        return SourceNoteToNote.apply([v for v in value if (
-            v.publish and v.type in NOTE_TYPE_CHOICES_TRANSFORM)])
+        transform_notes = [v for v in value if (v.publish and v.type in NOTE_TYPE_CHOICES_TRANSFORM)]
+        return SourceNoteToNote.apply(transform_notes)
 
     @odin.map_field
     def title(self, value):
         title = value.strip() if value else self.source.display_string.strip()
         if getattr(self.source, "component_id", None):
-            title = "{}, {} {}".format(
-                title,
-                self.source.level.capitalize(),
-                self.source.component_id)
+            title = f"{title}, {self.source.level.capitalize()} {self.source.component_id}"
         return strip_tags(title)
 
     @odin.map_field(from_field="language", to_field="languages", to_list=True)
@@ -554,33 +545,32 @@ class SourceArchivalObjectToCollection(odin.Mapping):
 
     @odin.map_list_field(from_field="linked_agents", to_field="creators")
     def creators(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.role == "creator"]
+        transform_agents = [v for v in value if v.role == "creator"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="linked_agents",
                          to_field="people")
     def people(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_person"]
+        transform_agents = [v for v in value if v.type == "agent_person"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="linked_agents", to_field="organizations")
     def organizations(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_corporate_entity"]
+        transform_agents = [v for v in value if v.type == "agent_corporate_entity"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="linked_agents", to_field="families")
     def families(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_family"]
+        transform_agents = [v for v in value if v.type == "agent_family"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
-    @odin.map_field(from_field="uri",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="uri", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
     @odin.map_field(from_field="uri", to_field="uri")
     def uri(self, value):
-        return "/collections/{}".format(identifier_from_uri(value))
+        return f"/collections/{identifier_from_uri(value)}"
 
     @odin.map_list_field(from_field="instances", to_field="formats")
     def formats(self, value):
@@ -607,8 +597,8 @@ class SourceArchivalObjectToObject(odin.Mapping):
 
     @odin.map_list_field(from_field="notes", to_field="notes")
     def notes(self, value):
-        return SourceNoteToNote.apply([v for v in value if (
-            v.publish and v.type in NOTE_TYPE_CHOICES_TRANSFORM)])
+        transform_notes = [v for v in value if (v.publish and v.type in NOTE_TYPE_CHOICES_TRANSFORM)]
+        return SourceNoteToNote.apply(transform_notes)
 
     @odin.map_list_field(from_field="dates", to_field="dates")
     def dates(self, value):
@@ -623,34 +613,34 @@ class SourceArchivalObjectToObject(odin.Mapping):
     def languages(self, value):
         return transform_language(value, self.source.lang_materials)
 
-    @odin.map_field(from_field="uri",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="uri", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
     @odin.map_field(from_field="uri", to_field="uri")
     def uri(self, value):
-        return "/objects/{}".format(identifier_from_uri(value))
+        return f"/objects/{identifier_from_uri(value)}"
 
     @odin.map_field(from_field="subjects", to_field="terms")
     def terms(self, value):
         return SourceRefToTermReference.apply(value)
 
-    @odin.map_list_field(from_field="linked_agents",
-                         to_field="people")
+    @odin.map_list_field(from_field="linked_agents", to_field="people")
     def people(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_person"]
+        transform_agents = [v for v in value if v.type == "agent_person"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="linked_agents", to_field="organizations")
     def organizations(self, value):
+        transform_agents = [
+            v for v in value if v.type == "agent_corporate_entity"]
         return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_corporate_entity"]
+            v) for v in transform_agents]
 
     @odin.map_list_field(from_field="linked_agents", to_field="families")
     def families(self, value):
-        return [SourceLinkedAgentToAgentReference.apply(
-            v) for v in value if v.type == "agent_family"]
+        transform_agents = [v for v in value if v.type == "agent_family"]
+        return [SourceLinkedAgentToAgentReference.apply(v) for v in transform_agents]
 
     @odin.map_list_field(from_field="instances", to_field="formats")
     def formats(self, value):
@@ -701,14 +691,13 @@ class SourceSubjectToTerm(odin.Mapping):
     def type(self, value):
         return next(iter(value), None).term_type
 
-    @odin.map_field(from_field="uri",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="uri", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
     @odin.map_field(from_field="uri", to_field="uri")
     def uri(self, value):
-        return "/terms/{}".format(identifier_from_uri(value))
+        return f"/terms/{identifier_from_uri(value)}"
 
     @odin.map_field(from_field="group", to_field="group")
     def group(self, value):
@@ -720,8 +709,7 @@ class SourceAgentCorporateEntityToAgentReference(odin.Mapping):
     from_obj = SourceAgentCorporateEntity
     to_obj = AgentReference
 
-    @odin.map_field(from_field="uri",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="uri", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
@@ -749,27 +737,26 @@ class SourceAgentCorporateEntityToAgent(odin.Mapping):
 
     @odin.map_list_field(from_field="notes", to_field="notes")
     def notes(self, value):
-        return SourceNoteToNote.apply([v for v in value if (
-            v.publish and v.jsonmodel_type.split("_")[-1] in NOTE_TYPE_CHOICES_TRANSFORM)])
+        transform_notes = [v for v in value if (v.publish and v.jsonmodel_type.split("_")[-1] in NOTE_TYPE_CHOICES_TRANSFORM)]
+        return SourceNoteToNote.apply(transform_notes)
 
     @odin.map_field(from_field="dates_of_existence", to_field="dates")
     def dates(self, value):
         return convert_dates(value)
 
-    @odin.map_field(from_field="agent_record_identifiers",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="agent_record_identifiers", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
-        external_ids = [
-            ExternalIdentifier(
-                identifier=v.record_identifier,
-                source=v.source) for v in value] if value else []
-        return external_ids + \
-            [ExternalIdentifier(identifier=self.source.uri,
-                                source="archivesspace")]
+        external_ids = []
+        for v in value:
+            external_ids.append(
+                ExternalIdentifier(identifier=v.record_identifier, source=v.source))
+        external_ids.append(
+            ExternalIdentifier(identifier=self.source.uri, source="archivesspace"))
+        return external_ids
 
     @odin.map_field(from_field="uri", to_field="uri")
     def uri(self, value):
-        return "/agents/{}".format(identifier_from_uri(value))
+        return f"/agents/{identifier_from_uri(value)}"
 
     @odin.assign_field(to_field="agent_type")
     def agent_types(self):
@@ -793,8 +780,7 @@ class SourceAgentFamilyToAgentReference(odin.Mapping):
     from_obj = SourceAgentFamily
     to_obj = AgentReference
 
-    @odin.map_field(from_field="uri",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="uri", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         return [ExternalIdentifier(identifier=value, source="archivesspace")]
 
@@ -822,8 +808,8 @@ class SourceAgentFamilyToAgent(odin.Mapping):
 
     @odin.map_list_field(from_field="notes", to_field="notes")
     def notes(self, value):
-        return SourceNoteToNote.apply([v for v in value if (
-            v.publish and v.jsonmodel_type.split("_")[-1] in NOTE_TYPE_CHOICES_TRANSFORM)])
+        transform_notes = [v for v in value if (v.publish and v.jsonmodel_type.split("_")[-1] in NOTE_TYPE_CHOICES_TRANSFORM)]
+        return SourceNoteToNote.apply(transform_notes)
 
     @odin.map_field(from_field="dates_of_existence", to_field="dates")
     def dates(self, value):
@@ -832,17 +818,16 @@ class SourceAgentFamilyToAgent(odin.Mapping):
     @odin.map_field(from_field="agent_record_identifiers",
                     to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
-        external_ids = [
-            ExternalIdentifier(
-                identifier=v.record_identifier,
-                source=v.source) for v in value] if value else []
-        return external_ids + \
-            [ExternalIdentifier(identifier=self.source.uri,
-                                source="archivesspace")]
+        external_ids = []
+        for v in value:
+            external_ids.append(ExternalIdentifier(identifier=v.record_identifier, source=v.source))
+        external_ids.append(
+            ExternalIdentifier(identifier=self.source.uri, source="archivesspace"))
+        return external_ids
 
     @odin.map_field(from_field="uri", to_field="uri")
     def uri(self, value):
-        return "/agents/{}".format(identifier_from_uri(value))
+        return f"/agents/{identifier_from_uri(value)}"
 
     @odin.assign_field(to_field="agent_type")
     def agent_types(self):
@@ -905,27 +890,26 @@ class SourceAgentPersonToAgent(odin.Mapping):
 
     @odin.map_list_field(from_field="notes", to_field="notes")
     def notes(self, value):
-        return SourceNoteToNote.apply([v for v in value if (
-            v.publish and v.jsonmodel_type.split("_")[-1] in NOTE_TYPE_CHOICES_TRANSFORM)])
+        transform_notes = [v for v in value if (v.publish and v.jsonmodel_type.split("_")[-1] in NOTE_TYPE_CHOICES_TRANSFORM)]
+        return SourceNoteToNote.apply(transform_notes)
 
     @odin.map_field(from_field="dates_of_existence", to_field="dates")
     def dates(self, value):
         return convert_dates(value)
 
-    @odin.map_field(from_field="agent_record_identifiers",
-                    to_field="external_identifiers", to_list=True)
+    @odin.map_field(from_field="agent_record_identifiers", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
-        external_ids = [
-            ExternalIdentifier(
-                identifier=v.record_identifier,
-                source=v.source) for v in value] if value else []
-        return external_ids + \
-            [ExternalIdentifier(identifier=self.source.uri,
-                                source="archivesspace")]
+        external_ids = []
+        for v in value:
+            external_ids.append(
+                ExternalIdentifier(identifier=v.record_identifier, source=v.source))
+        external_ids.append(
+            ExternalIdentifier(identifier=self.source.uri, source="archivesspace"))
+        return external_ids
 
     @odin.map_field(from_field="uri", to_field="uri")
     def uri(self, value):
-        return "/agents/{}".format(identifier_from_uri(value))
+        return f"/agents/{identifier_from_uri(value)}"
 
     @odin.assign_field(to_field="agent_type")
     def agent_types(self):
@@ -935,8 +919,7 @@ class SourceAgentPersonToAgent(odin.Mapping):
     def category(self):
         return "person"
 
-    @odin.map_field(from_field="jsonmodel_type",
-                    to_field="people", to_list=True)
+    @odin.map_field(from_field="jsonmodel_type", to_field="people", to_list=True)
     def people(self, value):
         return [SourceAgentPersonToAgentReference.apply(self.source)]
 
