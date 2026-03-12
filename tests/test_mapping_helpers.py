@@ -5,6 +5,7 @@ from src.mappings import (convert_dates, generate_download_identifier,
                           has_online_instance, identifier_from_uri,
                           language_name, strip_tags, transform_formats,
                           transform_group, transform_language)
+from tests.test_helpers import RecursiveNamespace
 
 
 def test_identifier_from_uri_is_deterministic():
@@ -49,19 +50,19 @@ def test_strip_tags_xml_and_regex():
 
 @patch("requests.head")
 def test_has_online_asset(mock_head):
-    mock_head.return_value = type("R", (), {"status_code": 200})()
+    mock_head.return_value = RecursiveNamespace.from_obj({"status_code": 200})
     assert has_online_asset(
         "abc", {"ASSET_BASEURL": "https://assets.example.org"}
     ) is True
     mock_head.assert_called_once_with("https://assets.example.org/pdfs/abc")
 
     mock_head.reset_mock()
-    mock_head.return_value = type("R", (), {"status_code": 404})()
+    mock_head.return_value = RecursiveNamespace.from_obj({"status_code": 404})
     assert has_online_asset("abc", {}) is False
     mock_head.assert_not_called()
 
     mock_head.reset_mock()
-    mock_head.return_value = type("R", (), {"status_code": 404})()
+    mock_head.return_value = RecursiveNamespace.from_obj({"status_code": 404})
     assert has_online_asset("abc", {"ASSET_BASEURL": ""}) is False
     mock_head.assert_not_called()
 
@@ -69,8 +70,10 @@ def test_has_online_asset(mock_head):
 @patch("src.mappings.has_online_asset")
 def test_has_online_instance(mock_online_asset):
     mock_online_asset.return_value = True
-    instances = [{"instance_type": "digital_object"},
-                 {"instance_type": "text"}]
+    instances = [
+        {"instance_type": "digital_object"},
+        {"instance_type": "text"},
+    ]
     uri = "/repositories/2/resources/123"
 
     assert has_online_instance(instances, uri, {}) is True
@@ -132,16 +135,12 @@ def test_transform_language_value():
 
 def test_transform_language_lang_materials():
     lang_materials = [
-        type(
-            "LangMaterial",
-            (),
-            {
-                "language_and_script": type(
-                    "LangScript", (), {"language": "fre"}
-                )()
-            },
-        )(),
-        type("LangMaterial", (), {"language_and_script": None})(),
+        RecursiveNamespace.from_obj({
+            "language_and_script": {"language": "fre"}
+        }),
+        RecursiveNamespace.from_obj({
+            "language_and_script": None
+        }),
     ]
     result = transform_language(None, lang_materials)
     assert len(result) == 1
@@ -181,15 +180,13 @@ def test_transform_formats_matching_formats():
         "PHOTOGRAPH_REFS": "photo1,photo2",
     }
     subjects = [
-        type("Subject", (), {"ref": "mov1"})(),
-        type("Subject", (), {"ref": "photo2"})(),
+        RecursiveNamespace.from_obj({"ref": "mov1"}),
+        RecursiveNamespace.from_obj({"ref": "photo2"}),
     ]
     ancestors = [
-        type(
-            "Ancestor",
-            (),
-            {"subjects": [type("Subject", (), {"ref": "audio2"})()]},
-        )()
+        RecursiveNamespace.from_obj({
+            "subjects": [RecursiveNamespace.from_obj({"ref": "audio2"})]
+        })
     ]
     result = transform_formats([], subjects, ancestors, config)
     assert result == ["documents", "moving image", "audio", "photographs"]
@@ -197,13 +194,14 @@ def test_transform_formats_matching_formats():
 
 @patch("src.mappings.SourceGroupToGroup.apply")
 def test_transform_group(mock_apply):
-    value = type(
-        "SourceGroup", (), {
-            "identifier": "/repositories/2/groups/5"})()
-    group = type("Group", (), {})()
+    value = RecursiveNamespace.from_obj({
+        "identifier": "/repositories/2/groups/5"
+    })
+    group = RecursiveNamespace.from_obj({})
     mock_apply.return_value = group
     result = transform_group(value, "collections")
     assert result is group
-    assert result.identifier == f"/collections/{
-        identifier_from_uri(value.identifier)}"
+    assert result.identifier == (
+        f"/collections/{identifier_from_uri(value.identifier)}"
+    )
     mock_apply.assert_called_once_with(value)
