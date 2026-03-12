@@ -1,6 +1,5 @@
 from types import SimpleNamespace
 
-
 EMPTY = object()
 
 

@@ -148,17 +148,17 @@ class SourceDateToDateTests(BaseTestCase):
     mapping_class = SourceDateToDate
 
     def test_end(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"date_type": "single", "begin": "1990"})
+        self.mapping.source = RecursiveNamespace.from_obj({"date_type": "single", "begin": "1990"})
         self.assertEqual(self.mapping.end("1989"), "1990")
-        self.mapping.source = RecursiveNamespace.from_obj(**{"date_type": "inclusive", "begin": "1990"})
+        self.mapping.source = RecursiveNamespace.from_obj({"date_type": "inclusive", "begin": "1990"})
         self.assertEqual(self.mapping.end("1989"), "1989")
 
     def test_expression(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"begin": "1989", "end": "1990"})
+        self.mapping.source = RecursiveNamespace.from_obj({"begin": "1989", "end": "1990"})
         self.assertEqual(self.mapping.expression(""), "1989-1990")
         self.assertEqual(self.mapping.expression(None), "1989-1990")
         self.assertEqual(self.mapping.expression("1991-1992"), "1991-1992")
-        self.mapping.source = RecursiveNamespace.from_obj(**{"begin": "1989", "end": None})
+        self.mapping.source = RecursiveNamespace.from_obj({"begin": "1989", "end": None})
         self.assertEqual(self.mapping.expression(""), "1989-")
 
 
@@ -172,7 +172,7 @@ class SourceGroupToGroupTests(BaseTestCase):
                 ("/families/1", "person"),
                 ("/people/1", "person"),
                 ("/resources", "collection")]:
-            self.mapping.source = RecursiveNamespace.from_obj(**{"identifier": identifier})
+            self.mapping.source = RecursiveNamespace.from_obj({"identifier": identifier})
             output = self.mapping.category()
             self.assertEqual(output, expected)
 
@@ -188,23 +188,23 @@ class SourceNoteToNoteTests(BaseTestCase):
 
     def test_title(self):
         # Label on source note object
-        self.mapping.source = RecursiveNamespace.from_obj(**{"label": "Explicit Label"})
+        self.mapping.source = RecursiveNamespace.from_obj({"label": "Explicit Label"})
         self.assertEqual(self.mapping.title("abstract"), "Explicit Label")
         # Label passed in value
-        self.mapping.source = RecursiveNamespace.from_obj(**{"label": None})
+        self.mapping.source = RecursiveNamespace.from_obj({"label": None})
         self.assertEqual(self.mapping.title("abstract"), "Abstract")
         # label inferred from jsonmodel_type
-        self.mapping.source = RecursiveNamespace.from_obj(**{"label": None, "jsonmodel_type": "note_bibliography"})
+        self.mapping.source = RecursiveNamespace.from_obj({"label": None, "jsonmodel_type": "note_bibliography"})
         self.assertEqual(self.mapping.title(None), "Bibliography")
 
     def test_type(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"jsonmodel_type": "note_bibliography"})
+        self.mapping.source = RecursiveNamespace.from_obj({"jsonmodel_type": "note_bibliography"})
         self.assertEqual(self.mapping.type(None), "bibliography")
         self.assertEqual(self.mapping.type("abstract"), "abstract")
 
     @patch('src.mappings.strip_tags')
     def test_map_subnotes(self, mock_strip_tags):
-        value = RecursiveNamespace.from_obj(**{"jsonmodel_type": "note_definedlist", "items": [{"1": "1"}, {"2": "2"}]})
+        value = RecursiveNamespace.from_obj({"jsonmodel_type": "note_definedlist", "items": [{"1": "1"}, {"2": "2"}]})
         output = self.mapping.map_subnotes(value)
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
@@ -215,7 +215,7 @@ class SourceNoteToNoteTests(BaseTestCase):
                 'type': 'definedlist'
             })
 
-        value = RecursiveNamespace.from_obj(**{"jsonmodel_type": "note_orderedlist", "items": ["1", "2", "3"]})
+        value = RecursiveNamespace.from_obj({"jsonmodel_type": "note_orderedlist", "items": ["1", "2", "3"]})
         output = self.mapping.map_subnotes(value)
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
@@ -227,7 +227,7 @@ class SourceNoteToNoteTests(BaseTestCase):
             })
 
         mock_bibliography = Mock(return_value="foo")
-        value = RecursiveNamespace.from_obj(**{
+        value = RecursiveNamespace.from_obj({
             "jsonmodel_type": "note_bibliography",
             "items": [{"1": "1"}, {"2": "2"}],
             "content": ["note content"]})
@@ -236,7 +236,7 @@ class SourceNoteToNoteTests(BaseTestCase):
         mock_bibliography.assert_called_once_with(['note content'], [{'1': '1'}, {'2': '2'}])
 
         mock_index = Mock(return_value="foo")
-        value = RecursiveNamespace.from_obj(**{
+        value = RecursiveNamespace.from_obj({
             "jsonmodel_type": "note_index",
             "items": [{"1": "1"}, {"2": "2"}],
             "content": ["note content"]})
@@ -245,14 +245,14 @@ class SourceNoteToNoteTests(BaseTestCase):
         mock_index.assert_called_once_with(['note content'], [{'1': '1'}, {'2': '2'}])
 
         mock_chronology = Mock(return_value="foo")
-        value = RecursiveNamespace.from_obj(**{
+        value = RecursiveNamespace.from_obj({
             "jsonmodel_type": "note_chronology",
             "items": [{"1": "1"}, {"2": "2"}]})
         self.mapping.chronology_subnotes = mock_chronology
         self.assertEqual(self.mapping.map_subnotes(value), "foo")
         mock_chronology.assert_called_once_with([{'1': '1'}, {'2': '2'}])
 
-        value = RecursiveNamespace.from_obj(**{"jsonmodel_type": "note_text", "content": ["note content", "more note content"]})
+        value = RecursiveNamespace.from_obj({"jsonmodel_type": "note_text", "content": ["note content", "more note content"]})
         mock_strip_tags.return_value = "foo"
         output = self.mapping.map_subnotes(value)
         self.assertEqual(output.__dict__, {'type': 'text', 'content': ['foo', 'foo'], 'items': []})
@@ -268,14 +268,14 @@ class SourceNoteToNoteTests(BaseTestCase):
                 call(1),
                 call(2)])
 
-        self.mapping.source = RecursiveNamespace.from_obj(**{"jsonmodel_type": "note_singlepart", "content": "[\"Note content\"]"})
+        self.mapping.source = RecursiveNamespace.from_obj({"jsonmodel_type": "note_singlepart", "content": "[\"Note content\"]"})
         output = self.mapping.subnotes(None)
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [{'type': 'text', 'content': ['Note content'], 'items': [], '$': 'src.resources.rac.Subnote'}])
 
         mock_index = Mock(return_value="foo")
-        self.mapping.source = RecursiveNamespace.from_obj(**{
+        self.mapping.source = RecursiveNamespace.from_obj({
             "jsonmodel_type": "note_index",
             "items": [1, 2, 3],
             "content": ["note content"]})
@@ -284,7 +284,7 @@ class SourceNoteToNoteTests(BaseTestCase):
         mock_index.assert_called_once_with(["note content"], [1, 2, 3])
 
         mock_bibliography = Mock(return_value="foo")
-        self.mapping.source = RecursiveNamespace.from_obj(**{
+        self.mapping.source = RecursiveNamespace.from_obj({
             "jsonmodel_type": "note_bibliography",
             "items": [1, 2, 3],
             "content": ["note content"]})
@@ -293,7 +293,7 @@ class SourceNoteToNoteTests(BaseTestCase):
         mock_bibliography.assert_called_once_with(["note content"], [1, 2, 3])
 
         mock_chronology = Mock(return_value="foo")
-        self.mapping.source = RecursiveNamespace.from_obj(**{
+        self.mapping.source = RecursiveNamespace.from_obj({
             "jsonmodel_type": "note_chronology",
             "items": [1, 2, 3]})
         self.mapping.chronology_subnotes = mock_chronology
@@ -363,11 +363,11 @@ class SourceResourceToCollectionTests(BaseTestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            RecursiveNamespace.from_obj(**{"publish": False, "type": "abstract"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "type": "physloc"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "type": "abstract"})])
+            RecursiveNamespace.from_obj({"publish": False, "type": "abstract"}),
+            RecursiveNamespace.from_obj({"publish": True, "type": "physloc"}),
+            RecursiveNamespace.from_obj({"publish": True, "type": "abstract"})])
         self.assertEqual(output, ["converted"])
-        mock_apply.assert_called_once_with([RecursiveNamespace.from_obj(**{"publish": True, "type": "abstract"})])
+        mock_apply.assert_called_once_with([RecursiveNamespace.from_obj({"publish": True, "type": "abstract"})])
 
     @patch('src.mappings.SourceDateToDate.apply')
     def test_dates(self, mock_apply):
@@ -378,7 +378,7 @@ class SourceResourceToCollectionTests(BaseTestCase):
     @patch('src.mappings.transform_language')
     def test_languages(self, mock_transform):
         mock_transform.return_value = [{"expression": "English", "identifier": "eng"}]
-        self.mapping.source = RecursiveNamespace.from_obj(**{"lang_materials": None})
+        self.mapping.source = RecursiveNamespace.from_obj({"lang_materials": None})
         self.assertEqual(
             self.mapping.languages(["en"]),
             [{"expression": "English", "identifier": "eng"}])
@@ -406,42 +406,42 @@ class SourceResourceToCollectionTests(BaseTestCase):
     def test_creators(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.creators([
-            RecursiveNamespace.from_obj(**{"role": "creator"}),
-            RecursiveNamespace.from_obj(**{"role": "subject"}),
+            RecursiveNamespace.from_obj({"role": "creator"}),
+            RecursiveNamespace.from_obj({"role": "subject"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"role": "creator"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"role": "creator"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_people(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.people([
-            RecursiveNamespace.from_obj(**{"type": "agent_person"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_family"}),
+            RecursiveNamespace.from_obj({"type": "agent_person"}),
+            RecursiveNamespace.from_obj({"type": "agent_family"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_person"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_person"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_organizations(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.organizations([
-            RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_person"}),
+            RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}),
+            RecursiveNamespace.from_obj({"type": "agent_person"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_families(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.families([
-            RecursiveNamespace.from_obj(**{"type": "agent_family"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}),
+            RecursiveNamespace.from_obj({"type": "agent_family"}),
+            RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_family"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_family"}))
 
     @patch('src.mappings.transform_formats')
     def test_formats(self, mock_formats):
         mock_formats.return_value = ["documents"]
-        self.mapping.source = RecursiveNamespace.from_obj(**{"subjects": ["subject"], "ancestors": ["anceestor"]})
+        self.mapping.source = RecursiveNamespace.from_obj({"subjects": ["subject"], "ancestors": ["anceestor"]})
         self.mapping.context = None
         self.assertEqual(self.mapping.formats(["foo"]), ["documents"])
         mock_formats.assert_called_once_with(["foo"], ["subject"], ["anceestor"], None)
@@ -456,7 +456,7 @@ class SourceResourceToCollectionTests(BaseTestCase):
     def test_parent(self, mock_id):
         mock_id.return_value = "1234"
         self.assertEqual(
-            self.mapping.parent([RecursiveNamespace.from_obj(**{"ref": "/repositories/2/archival_objects/1"})]),
+            self.mapping.parent([RecursiveNamespace.from_obj({"ref": "/repositories/2/archival_objects/1"})]),
             "1234")
         self.assertEqual(None, None)
 
@@ -468,23 +468,23 @@ class SourceArchivalObjectToCollectionTests(BaseTestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            RecursiveNamespace.from_obj(**{"publish": False, "type": "abstract"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "type": "physloc"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "type": "abstract"})])
+            RecursiveNamespace.from_obj({"publish": False, "type": "abstract"}),
+            RecursiveNamespace.from_obj({"publish": True, "type": "physloc"}),
+            RecursiveNamespace.from_obj({"publish": True, "type": "abstract"})])
         self.assertEqual(output, ["converted"])
-        mock_apply.assert_called_once_with([RecursiveNamespace.from_obj(**{"publish": True, "type": "abstract"})])
+        mock_apply.assert_called_once_with([RecursiveNamespace.from_obj({"publish": True, "type": "abstract"})])
 
     def test_title(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"display_string": "display string title"})
+        self.mapping.source = RecursiveNamespace.from_obj({"display_string": "display string title"})
         self.assertEqual(self.mapping.title(None), "display string title")
         self.assertEqual(self.mapping.title("explicit title"), "explicit title")
-        self.mapping.source = RecursiveNamespace.from_obj(**{"component_id": "1", "level": "series"})
+        self.mapping.source = RecursiveNamespace.from_obj({"component_id": "1", "level": "series"})
         self.assertEqual(self.mapping.title("explicit title"), "explicit title, Series 1")
 
     @patch('src.mappings.transform_language')
     def test_languages(self, mock_transform):
         mock_transform.return_value = [{"expression": "English", "identifier": "eng"}]
-        self.mapping.source = RecursiveNamespace.from_obj(**{"lang_materials": None})
+        self.mapping.source = RecursiveNamespace.from_obj({"lang_materials": None})
         self.assertEqual(
             self.mapping.languages(["en"]),
             [{"expression": "English", "identifier": "eng"}])
@@ -500,37 +500,37 @@ class SourceArchivalObjectToCollectionTests(BaseTestCase):
     def test_creators(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.creators([
-            RecursiveNamespace.from_obj(**{"role": "creator"}),
-            RecursiveNamespace.from_obj(**{"role": "subject"}),
+            RecursiveNamespace.from_obj({"role": "creator"}),
+            RecursiveNamespace.from_obj({"role": "subject"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"role": "creator"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"role": "creator"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_people(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.people([
-            RecursiveNamespace.from_obj(**{"type": "agent_person"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_family"}),
+            RecursiveNamespace.from_obj({"type": "agent_person"}),
+            RecursiveNamespace.from_obj({"type": "agent_family"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_person"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_person"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_organizations(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.organizations([
-            RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_person"}),
+            RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}),
+            RecursiveNamespace.from_obj({"type": "agent_person"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_families(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.families([
-            RecursiveNamespace.from_obj(**{"type": "agent_family"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}),
+            RecursiveNamespace.from_obj({"type": "agent_family"}),
+            RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_family"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_family"}))
 
     def test_external_identifiers(self):
         output = self.mapping.external_identifiers("foo")
@@ -547,7 +547,7 @@ class SourceArchivalObjectToCollectionTests(BaseTestCase):
     @patch('src.mappings.transform_formats')
     def test_formats(self, mock_formats):
         mock_formats.return_value = ["documents"]
-        self.mapping.source = RecursiveNamespace.from_obj(**{"subjects": ["subject"], "ancestors": ["anceestor"]})
+        self.mapping.source = RecursiveNamespace.from_obj({"subjects": ["subject"], "ancestors": ["anceestor"]})
         self.mapping.context = None
         self.assertEqual(self.mapping.formats(["foo"]), ["documents"])
         mock_formats.assert_called_once_with(["foo"], ["subject"], ["anceestor"], None)
@@ -555,7 +555,7 @@ class SourceArchivalObjectToCollectionTests(BaseTestCase):
     @patch('src.mappings.has_online_instance')
     def test_online(self, mock_online_instance):
         mock_online_instance.return_value = False
-        self.mapping.source = RecursiveNamespace.from_obj(**{"uri": "uri"})
+        self.mapping.source = RecursiveNamespace.from_obj({"uri": "uri"})
         self.mapping.context = None
         self.assertFalse(self.mapping.online("value"))
         mock_online_instance.assert_called_once_with("value", "uri", None)
@@ -570,7 +570,7 @@ class SourceArchivalObjectToCollectionTests(BaseTestCase):
     def test_parent(self, mock_id):
         mock_id.return_value = "1234"
         self.assertEqual(
-            self.mapping.parent([RecursiveNamespace.from_obj(**{"ref": "/repositories/2/archival_objects/1"})]),
+            self.mapping.parent([RecursiveNamespace.from_obj({"ref": "/repositories/2/archival_objects/1"})]),
             "1234")
         self.assertEqual(None, None)
 
@@ -582,14 +582,14 @@ class SourceArchivalObjectToObjectTests(BaseTestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            RecursiveNamespace.from_obj(**{"publish": False, "type": "abstract"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "type": "physloc"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "type": "abstract"})])
+            RecursiveNamespace.from_obj({"publish": False, "type": "abstract"}),
+            RecursiveNamespace.from_obj({"publish": True, "type": "physloc"}),
+            RecursiveNamespace.from_obj({"publish": True, "type": "abstract"})])
         self.assertEqual(output, ["converted"])
-        mock_apply.assert_called_once_with([RecursiveNamespace.from_obj(**{"publish": True, "type": "abstract"})])
+        mock_apply.assert_called_once_with([RecursiveNamespace.from_obj({"publish": True, "type": "abstract"})])
 
     def test_title(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"display_string": "display string title"})
+        self.mapping.source = RecursiveNamespace.from_obj({"display_string": "display string title"})
         self.assertEqual(self.mapping.title(None), "display string title")
         self.assertEqual(self.mapping.title("explicit title"), "explicit title")
 
@@ -602,7 +602,7 @@ class SourceArchivalObjectToObjectTests(BaseTestCase):
     @patch('src.mappings.transform_language')
     def test_languages(self, mock_transform):
         mock_transform.return_value = [{"expression": "English", "identifier": "eng"}]
-        self.mapping.source = RecursiveNamespace.from_obj(**{"lang_materials": None})
+        self.mapping.source = RecursiveNamespace.from_obj({"lang_materials": None})
         self.assertEqual(
             self.mapping.languages(["en"]),
             [{"expression": "English", "identifier": "eng"}])
@@ -630,33 +630,33 @@ class SourceArchivalObjectToObjectTests(BaseTestCase):
     def test_people(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.people([
-            RecursiveNamespace.from_obj(**{"type": "agent_person"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_family"}),
+            RecursiveNamespace.from_obj({"type": "agent_person"}),
+            RecursiveNamespace.from_obj({"type": "agent_family"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_person"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_person"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_organizations(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.organizations([
-            RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_person"}),
+            RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}),
+            RecursiveNamespace.from_obj({"type": "agent_person"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}))
 
     @patch('src.mappings.SourceLinkedAgentToAgentReference.apply')
     def test_families(self, mock_apply):
         mock_apply.return_value = "converted"
         self.assertEqual(self.mapping.families([
-            RecursiveNamespace.from_obj(**{"type": "agent_family"}),
-            RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}),
+            RecursiveNamespace.from_obj({"type": "agent_family"}),
+            RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}),
         ]), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_family"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_family"}))
 
     @patch('src.mappings.transform_formats')
     def test_formats(self, mock_formats):
         mock_formats.return_value = ["documents"]
-        self.mapping.source = RecursiveNamespace.from_obj(**{"subjects": ["subject"], "ancestors": ["anceestor"]})
+        self.mapping.source = RecursiveNamespace.from_obj({"subjects": ["subject"], "ancestors": ["anceestor"]})
         self.mapping.context = None
         self.assertEqual(self.mapping.formats(["foo"]), ["documents"])
         mock_formats.assert_called_once_with(["foo"], ["subject"], ["anceestor"], None)
@@ -664,7 +664,7 @@ class SourceArchivalObjectToObjectTests(BaseTestCase):
     @patch('src.mappings.has_online_instance')
     def test_online(self, mock_online_instance):
         mock_online_instance.return_value = False
-        self.mapping.source = RecursiveNamespace.from_obj(**{"uri": "uri"})
+        self.mapping.source = RecursiveNamespace.from_obj({"uri": "uri"})
         self.mapping.context = None
         self.assertFalse(self.mapping.online("value"))
         mock_online_instance.assert_called_once_with("value", "uri", None)
@@ -704,7 +704,7 @@ class SourceArchivalObjectToObjectTests(BaseTestCase):
     def test_parent(self, mock_id):
         mock_id.return_value = "1234"
         self.assertEqual(
-            self.mapping.parent([RecursiveNamespace.from_obj(**{"ref": "/repositories/2/archival_objects/1"})]),
+            self.mapping.parent([RecursiveNamespace.from_obj({"ref": "/repositories/2/archival_objects/1"})]),
             "1234")
         self.assertEqual(None, None)
 
@@ -714,7 +714,7 @@ class SourceSubjectToTermTests(BaseTestCase):
 
     def test_type(self):
         self.assertEqual(
-            self.mapping.type([RecursiveNamespace.from_obj(**{"term_type": "foo"})]),
+            self.mapping.type([RecursiveNamespace.from_obj({"term_type": "foo"})]),
             "foo")
 
     def test_external_identifiers(self):
@@ -771,12 +771,12 @@ class SourceAgentCorporateEntityToAgentTests(BaseTestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            RecursiveNamespace.from_obj(**{"publish": False, "jsonmodel_type": "note_abstract"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_physloc"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_abstract"})])
+            RecursiveNamespace.from_obj({"publish": False, "jsonmodel_type": "note_abstract"}),
+            RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_physloc"}),
+            RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with(
-            [RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_abstract"})])
+            [RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_abstract"})])
 
     @patch('src.mappings.convert_dates')
     def test_dates(self, mock_convert):
@@ -785,9 +785,9 @@ class SourceAgentCorporateEntityToAgentTests(BaseTestCase):
         mock_convert.assert_called_once_with("2000")
 
     def test_external_identifiers(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"uri": "/agents/1234"})
+        self.mapping.source = RecursiveNamespace.from_obj({"uri": "/agents/1234"})
         output = self.mapping.external_identifiers([
-            RecursiveNamespace.from_obj(**{"record_identifier": "12345", "source": "cartographer"})])
+            RecursiveNamespace.from_obj({"record_identifier": "12345", "source": "cartographer"})])
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [
@@ -815,11 +815,11 @@ class SourceAgentCorporateEntityToAgentTests(BaseTestCase):
     @patch('src.mappings.SourceAgentCorporateEntityToAgentReference.apply')
     def test_organizations(self, mock_apply):
         mock_apply.return_value = "converted"
-        self.mapping.source = RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"})
+        self.mapping.source = RecursiveNamespace.from_obj({"type": "agent_corporate_entity"})
         self.assertEqual(
             self.mapping.organizations(None),
             ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"type": "agent_corporate_entity"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"type": "agent_corporate_entity"}))
 
     @patch('src.mappings.transform_group')
     def test_group(self, mock_group):
@@ -857,12 +857,12 @@ class SourceAgentFamilyToAgentTests(BaseTestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            RecursiveNamespace.from_obj(**{"publish": False, "jsonmodel_type": "note_abstract"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_physloc"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_abstract"})])
+            RecursiveNamespace.from_obj({"publish": False, "jsonmodel_type": "note_abstract"}),
+            RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_physloc"}),
+            RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with(
-            [RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_abstract"})])
+            [RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_abstract"})])
 
     @patch('src.mappings.convert_dates')
     def test_dates(self, mock_convert):
@@ -871,9 +871,9 @@ class SourceAgentFamilyToAgentTests(BaseTestCase):
         mock_convert.assert_called_once_with("2000")
 
     def test_external_identifiers(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"uri": "/agents/1234"})
+        self.mapping.source = RecursiveNamespace.from_obj({"uri": "/agents/1234"})
         output = self.mapping.external_identifiers([
-            RecursiveNamespace.from_obj(**{"record_identifier": "12345", "source": "cartographer"})])
+            RecursiveNamespace.from_obj({"record_identifier": "12345", "source": "cartographer"})])
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [
@@ -901,9 +901,9 @@ class SourceAgentFamilyToAgentTests(BaseTestCase):
     @patch('src.mappings.SourceAgentFamilyToAgentReference.apply')
     def test_families(self, mock_apply):
         mock_apply.return_value = "converted"
-        self.mapping.source = RecursiveNamespace.from_obj(**{"foo": "bar"})
+        self.mapping.source = RecursiveNamespace.from_obj({"foo": "bar"})
         self.assertEqual(self.mapping.families(None), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"foo": "bar"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"foo": "bar"}))
 
     @patch('src.mappings.transform_group')
     def test_group(self, mock_group):
@@ -939,9 +939,9 @@ class SourceAgentPersonToAgentTests(BaseTestCase):
 
     def test_parse_name(self):
         for input, expected in [
-            (RecursiveNamespace.from_obj(**{"rest_of_name": " Mickey", "primary_name": "Mouse "}), "Mickey Mouse"),
-            (RecursiveNamespace.from_obj(**{"rest_of_name": " Cher", "primary_name": None}), "Cher"),
-            (RecursiveNamespace.from_obj(**{"rest_of_name": None, "primary_name": " Rocker Duck"}), "Rocker Duck"),
+            (RecursiveNamespace.from_obj({"rest_of_name": " Mickey", "primary_name": "Mouse "}), "Mickey Mouse"),
+            (RecursiveNamespace.from_obj({"rest_of_name": " Cher", "primary_name": None}), "Cher"),
+            (RecursiveNamespace.from_obj({"rest_of_name": None, "primary_name": " Rocker Duck"}), "Rocker Duck"),
         ]:
             self.assertEqual(self.mapping.parse_name(input), expected)
 
@@ -955,12 +955,12 @@ class SourceAgentPersonToAgentTests(BaseTestCase):
     def test_notes(self, mock_apply):
         mock_apply.return_value = ["converted"]
         output = self.mapping.notes([
-            RecursiveNamespace.from_obj(**{"publish": False, "jsonmodel_type": "note_abstract"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_physloc"}),
-            RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_abstract"})])
+            RecursiveNamespace.from_obj({"publish": False, "jsonmodel_type": "note_abstract"}),
+            RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_physloc"}),
+            RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_abstract"})])
         self.assertEqual(output, ["converted"])
         mock_apply.assert_called_once_with(
-            [RecursiveNamespace.from_obj(**{"publish": True, "jsonmodel_type": "note_abstract"})])
+            [RecursiveNamespace.from_obj({"publish": True, "jsonmodel_type": "note_abstract"})])
 
     @patch('src.mappings.convert_dates')
     def test_dates(self, mock_convert):
@@ -969,9 +969,9 @@ class SourceAgentPersonToAgentTests(BaseTestCase):
         mock_convert.assert_called_once_with("2000")
 
     def test_external_identifiers(self):
-        self.mapping.source = RecursiveNamespace.from_obj(**{"uri": "/agents/1234"})
+        self.mapping.source = RecursiveNamespace.from_obj({"uri": "/agents/1234"})
         output = self.mapping.external_identifiers([
-            RecursiveNamespace.from_obj(**{"record_identifier": "12345", "source": "cartographer"})])
+            RecursiveNamespace.from_obj({"record_identifier": "12345", "source": "cartographer"})])
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [
@@ -999,16 +999,16 @@ class SourceAgentPersonToAgentTests(BaseTestCase):
     @patch('src.mappings.SourceAgentPersonToAgentReference.apply')
     def test_people(self, mock_apply):
         mock_apply.return_value = "converted"
-        self.mapping.source = RecursiveNamespace.from_obj(**{"foo": "bar"})
+        self.mapping.source = RecursiveNamespace.from_obj({"foo": "bar"})
         self.assertEqual(self.mapping.people(None), ["converted"])
-        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj(**{"foo": "bar"}))
+        mock_apply.assert_called_once_with(RecursiveNamespace.from_obj({"foo": "bar"}))
 
     @patch('src.mappings.transform_group')
     @patch('src.mappings.SourceAgentPersonToAgent.parse_name')
     def test_group(self, mock_parse, mock_group):
         mock_group.return_value = {"foo": "bar"}
         mock_parse.return_value = "display name"
-        self.mapping.source = RecursiveNamespace.from_obj(**{"display_name": "display name"})
+        self.mapping.source = RecursiveNamespace.from_obj({"display_name": "display name"})
         self.assertEqual(self.mapping.group(RecursiveNamespace.from_obj({})), {"foo": "bar"})
-        mock_group.assert_called_once_with(RecursiveNamespace.from_obj(**{"title": "display name"}), "agents")
+        mock_group.assert_called_once_with(RecursiveNamespace.from_obj({"title": "display name"}), "agents")
         mock_parse.assert_called_once_with("display name")
