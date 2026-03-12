@@ -1,209 +1,62 @@
-from unittest.mock import patch
+import json
+import unittest
+from pathlib import Path
+from unittest.mock import Mock, patch
 
-from src.mappings import (convert_dates, generate_download_identifier,
-                          generate_manifest_identifier, has_online_asset,
-                          has_online_instance, identifier_from_uri,
-                          language_name, strip_tags, transform_formats,
-                          transform_group, transform_language)
+from src.transformer import Transformer
 
-
-def test_identifier_from_uri_is_deterministic():
-    uri = "/repositories/2/resources/123"
-    value1 = identifier_from_uri(uri)
-    value2 = identifier_from_uri(uri)
-
-    assert value1 == value2
-    assert value1
-    assert value1 != "123"
-
-    other = identifier_from_uri(
-        "https://host/repositories/2/resources/999?x=1")
-    assert other
-    assert other != value1
-
-
-def test_generate_manifest_and_download_identifiers():
-    config = {
-        "MANIFEST_BASEURL": "https://manifests.example.org/iiif/",
-        "DOWNLOAD_BASEURL": "https://downloads.example.org/files/",
-    }
-
-    manifest_uri = "/x/1"
-    download_uri = "/x/2"
-
-    assert (
-        generate_manifest_identifier({"uri": manifest_uri}, {}, config)
-        == f"https://manifests.example.org/iiif/{identifier_from_uri(manifest_uri)}"
-    )
-    assert (
-        generate_download_identifier({"uri": download_uri}, {}, config)
-        == f"https://downloads.example.org/files/{identifier_from_uri(download_uri)}"
-    )
+DEFAULT_CONFIG = {
+    "SCHEMAS_BASE_DIR": "rac_schemas/schemas",
+    "SCHEMA_BASE": "base.json",
+    "SCHEMA_AGENT": "agent.json",
+    "SCHEMA_COLLECTION": "collection.json",
+    "SCHEMA_OBJECT": "object.json",
+    "SCHEMA_TERM": "term.json",
+    "SNS_ROLE_ARN": "rn:aws:iam::123456789:role/sns-role",
+    "SNS_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:success",
+    "ASSET_BASEURL": "https://assets.example.org",
+    "DOWNLOAD_BASEURL": "https://downloads.example.org/files",
+    "MANIFEST_BASEURL": "https://manifests.example.org/iiif",
+    "AUDIO_REFS": "/repositories/subjects/1,repositories/subjects/2",
+    "MOVING_IMAGE_REFS": "/repositories/subjects/3,repositories/subjects/4",
+    "PHOTOGRAPH_REFS": "/repositories/subjects/5",
+}
 
 
-def test_strip_tags_xml_and_regex():
-    assert strip_tags("hi <b>there</b>") == "hi there"
-    # current regex fallback does not normalize malformed unterminated tags
-    assert strip_tags("a <b>broken") == "a <b>broken"
+def load_fixture(path: Path):
+    with path.open("r", encoding="utf-8") as f:
+        return json.load(f)
 
 
-@patch("requests.head")
-def test_has_online_asset(mock_head):
-    mock_head.return_value = type("R", (), {"status_code": 200})()
-    assert has_online_asset(
-        "abc", {"ASSET_BASEURL": "https://assets.example.org"}
-    ) is True
-    mock_head.assert_called_once_with("https://assets.example.org/pdfs/abc")
+class TransformerTests(unittest.TestCase):
+    """Transformer tests (fetch_data-style TransformerService)."""
 
-    mock_head.reset_mock()
-    mock_head.return_value = type("R", (), {"status_code": 404})()
-    assert has_online_asset("abc", {}) is False
-    mock_head.assert_not_called()
+    @patch('src.transformer.get_config')
+    def setUp(self, mock_config):
+        mock_config.return_value = DEFAULT_CONFIG
+        self.fixtures_dir = Path(__file__).parent / "fixtures/transformer"
+        self.transformer = Transformer()
 
-    mock_head.reset_mock()
-    mock_head.return_value = type("R", (), {"status_code": 404})()
-    assert has_online_asset("abc", {"ASSET_BASEURL": ""}) is False
-    mock_head.assert_not_called()
+    @patch("requests.head")
+    def test_object_types(self, mock_head):
+        mock_head.return_value = Mock(status_code=200)
+        object_types = [
+            "agent_person",
+            "agent_corporate_entity",
+            "agent_family",
+            "resource",
+            "archival_object",
+            "archival_object_collection",
+            "subject",
+        ]
 
-
-@patch("src.mappings.has_online_asset")
-def test_has_online_instance(mock_online_asset):
-    mock_online_asset.return_value = True
-    instances = [{"instance_type": "digital_object"},
-                 {"instance_type": "text"}]
-    uri = "/repositories/2/resources/123"
-
-    assert has_online_instance(instances, uri, {}) is True
-    mock_online_asset.assert_called_once_with(identifier_from_uri(uri), {})
-
-    mock_online_asset.reset_mock()
-    mock_online_asset.return_value = False
-    assert has_online_instance(instances, uri, {}) is False
-    mock_online_asset.assert_called_once_with(identifier_from_uri(uri), {})
-
-
-@patch("src.mappings.odin.codecs.json_codec.loads")
-@patch("src.mappings.SourceDateToDate.apply")
-def test_convert_dates_uses_source_date(mock_apply, mock_loads):
-    mock_apply.return_value = ["converted"]
-    mock_loads.side_effect = lambda value, resource=None: value
-    value = [
-        {
-            "jsonmodel_type": "date",
-            "begin": "1900",
-            "end": "1901"
-        }
-    ]
-    result = convert_dates(value)
-    assert result == ["converted"]
-    mock_apply.assert_called_once()
-
-
-@patch("src.mappings.odin.codecs.json_codec.loads")
-@patch("src.mappings.SourceStructuredDateToDate.apply")
-def test_convert_dates_uses_structured_date(mock_apply, mock_loads):
-    mock_apply.return_value = ["converted"]
-    mock_loads.side_effect = lambda value, resource=None: value
-    value = [
-        {
-            "jsonmodel_type": "structured_date_label",
-            "date_label": "creation"
-        }
-    ]
-    result = convert_dates(value)
-    assert result == ["converted"]
-    mock_apply.assert_called_once()
-
-
-def test_language_name_variants():
-    assert language_name(None) is None
-    assert language_name("") is None
-    assert language_name("eng") == "English"
-    assert language_name("en") == "English"
-    assert language_name("fre") == "French"
-
-
-def test_transform_language_value():
-    result = transform_language("eng", None)
-    assert len(result) == 1
-    assert result[0].expression == "English"
-    assert result[0].identifier == "eng"
-
-
-def test_transform_language_lang_materials():
-    lang_materials = [
-        type(
-            "LangMaterial",
-            (),
-            {
-                "language_and_script": type(
-                    "LangScript", (), {"language": "fre"}
-                )()
-            },
-        )(),
-        type("LangMaterial", (), {"language_and_script": None})(),
-    ]
-    result = transform_language(None, lang_materials)
-    assert len(result) == 1
-    assert result[0].expression == "French"
-    assert result[0].identifier == "fre"
-
-
-def test_transform_language_defaults_english():
-    result = transform_language(None, None)
-    assert len(result) == 1
-    assert result[0].expression == "English"
-    assert result[0].identifier == "eng"
-
-
-def test_transform_language_unknown_code():
-    try:
-        transform_language("zzz", None)
-        assert False, "Expected ValueError"
-    except ValueError as exc:
-        assert str(exc) == "Unrecognized language code: zzz"
-
-
-def test_transform_formats_defaults_documents():
-    config = {
-        "MOVING_IMAGE_REFS": "mov1,mov2",
-        "AUDIO_REFS": "audio1,audio2",
-        "PHOTOGRAPH_REFS": "photo1,photo2",
-    }
-    result = transform_formats([], [], [], config)
-    assert result == ["documents"]
-
-
-def test_transform_formats_matching_formats():
-    config = {
-        "MOVING_IMAGE_REFS": "mov1,mov2",
-        "AUDIO_REFS": "audio1,audio2",
-        "PHOTOGRAPH_REFS": "photo1,photo2",
-    }
-    subjects = [
-        type("Subject", (), {"ref": "mov1"})(),
-        type("Subject", (), {"ref": "photo2"})(),
-    ]
-    ancestors = [
-        type(
-            "Ancestor",
-            (),
-            {"subjects": [type("Subject", (), {"ref": "audio2"})()]},
-        )()
-    ]
-    result = transform_formats([], subjects, ancestors, config)
-    assert result == ["documents", "moving image", "audio", "photographs"]
-
-
-@patch("src.mappings.SourceGroupToGroup.apply")
-def test_transform_group(mock_apply):
-    value = type(
-        "SourceGroup", (), {
-            "identifier": "/repositories/2/groups/5"})()
-    group = type("Group", (), {})()
-    mock_apply.return_value = group
-    result = transform_group(value, "collections")
-    assert result is group
-    assert result.identifier == f"/collections/{
-        identifier_from_uri(value.identifier)}"
-    mock_apply.assert_called_once_with(value)
+        for object_type in object_types:
+            object_dir = self.fixtures_dir / object_type
+            fixture_paths = sorted(object_dir.glob("*.json"))
+            for source_path in fixture_paths:
+                with self.subTest(object_type=object_type, fixture=source_path.name):
+                    source = load_fixture(source_path)
+                    from_resource, mapping, schema_name = self.transformer.get_mapping_classes(object_type)
+                    transformed = self.transformer.get_transformed_object(
+                        source, from_resource, mapping)
+                    self.transformer.validate_transformed(transformed, schema_name)

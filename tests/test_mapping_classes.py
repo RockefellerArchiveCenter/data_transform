@@ -795,6 +795,11 @@ class SourceAgentCorporateEntityToAgentTests(BaseTestCase):
                 {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'},
                 {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
             ])
+        self.assertEqual(
+            json.loads(json_codec.dumps(self.mapping.external_identifiers(None))),
+            [
+                {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
+            ])
 
     @patch('src.mappings.identifier_from_uri')
     def test_uri(self, mock_id):
@@ -874,6 +879,11 @@ class SourceAgentFamilyToAgentTests(BaseTestCase):
             json.loads(json_codec.dumps(output)),
             [
                 {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'},
+                {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
+            ])
+        self.assertEqual(
+            json.loads(json_codec.dumps(self.mapping.external_identifiers(None))),
+            [
                 {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
             ])
 
@@ -967,6 +977,11 @@ class SourceAgentPersonToAgentTests(BaseTestCase):
             json.loads(json_codec.dumps(output)),
             [
                 {'identifier': '12345', 'source': 'cartographer', '$': 'src.resources.rac.ExternalIdentifier'},
+                {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
+            ])
+        self.assertEqual(
+            json.loads(json_codec.dumps(self.mapping.external_identifiers(None))),
+            [
                 {'identifier': '/agents/1234', 'source': 'archivesspace', '$': 'src.resources.rac.ExternalIdentifier'}
             ])
 
