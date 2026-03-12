@@ -747,7 +747,7 @@ class SourceAgentCorporateEntityToAgent(odin.Mapping):
     @odin.map_field(from_field="agent_record_identifiers", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         external_ids = []
-        for v in value:
+        for v in value or []:
             external_ids.append(
                 ExternalIdentifier(identifier=v.record_identifier, source=v.source))
         external_ids.append(
@@ -819,7 +819,7 @@ class SourceAgentFamilyToAgent(odin.Mapping):
                     to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         external_ids = []
-        for v in value:
+        for v in value or []:
             external_ids.append(ExternalIdentifier(identifier=v.record_identifier, source=v.source))
         external_ids.append(
             ExternalIdentifier(identifier=self.source.uri, source="archivesspace"))
@@ -900,7 +900,7 @@ class SourceAgentPersonToAgent(odin.Mapping):
     @odin.map_field(from_field="agent_record_identifiers", to_field="external_identifiers", to_list=True)
     def external_identifiers(self, value):
         external_ids = []
-        for v in value:
+        for v in value or []:
             external_ids.append(
                 ExternalIdentifier(identifier=v.record_identifier, source=v.source))
         external_ids.append(
