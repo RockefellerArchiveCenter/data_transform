@@ -37,14 +37,14 @@ def identifier_from_uri(uri):
 
 def generate_download_identifier(source_object, digital_object, config):
     """Generates a URI for a downloadable object."""
-    return f'{config["DOWNLOAD_BASEURL"].rstrip(
-        "/")}/{identifier_from_uri(source_object["uri"])}'
+    object_id = identifier_from_uri(source_object["uri"])
+    return f'{config["DOWNLOAD_BASEURL"].rstrip("/")}/{object_id}'
 
 
 def generate_manifest_identifier(source_object, digital_object, config):
     """Generates a URI for a IIIF Presentation manifest."""
-    return f'{config["MANIFEST_BASEURL"].rstrip(
-        "/")}/{identifier_from_uri(source_object["uri"])}'
+    object_id = identifier_from_uri(source_object["uri"])
+    return f'{config["MANIFEST_BASEURL"].rstrip("/")}/{object_id}'
 
 
 def convert_dates(value):
@@ -68,8 +68,7 @@ def convert_dates(value):
 def has_online_asset(identifier, config):
     if not config.get('ASSET_BASEURL'):
         return False
-    req = requests.head(
-        f"{config['ASSET_BASEURL'].rstrip('/')}/pdfs/{identifier}")
+    req = requests.head(f"{config['ASSET_BASEURL'].rstrip('/')}/pdfs/{identifier}")
     return req.status_code == 200
 
 
@@ -137,8 +136,7 @@ def language_name(code):
     lang = pycountry.languages.get(alpha_3=norm)
 
     if not lang:
-        lang = pycountry.languages.get(
-            bibliographic=code)
+        lang = pycountry.languages.get(bibliographic=code)
 
     if not lang and len(code) == 2:
         lang = pycountry.languages.get(alpha_2=code)
@@ -156,8 +154,7 @@ def transform_language(value, lang_materials):
         langz.append(Language(expression=name, identifier=value))
     elif lang_materials:
         for lang in [lng for lng in lang_materials if lng.language_and_script]:
-            langz += transform_language(
-                lang.language_and_script.language, None)
+            langz += transform_language(lang.language_and_script.language, None)
     return langz if len(langz) else [Language(
         expression="English", identifier="eng")]
 

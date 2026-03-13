@@ -73,9 +73,10 @@ class Transformer:
         raise KeyError(f"Unsupported object_type: {input_object_type}")
 
     def es_id_from_uri(self, uri):
-        if not uri or not isinstance(uri, str):
+        try:
+            return uri.rstrip("/").split("/")[-1]
+        except BaseException:
             return None
-        return uri.rstrip("/").split("/")[-1] or None
 
     def get_mapping_classes(self, object_type):
         schema_agent = self.config["SCHEMA_AGENT"]
