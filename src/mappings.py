@@ -389,7 +389,7 @@ class SourceNoteToNote(odin.Mapping):
             items_list = [{idx: item} for idx, item in enumerate(value.items)]
             subnote = Subnote(type="orderedlist", items=items_list)
         elif value.jsonmodel_type == "note_bibliography":
-            subnote = self.bibliograpy_subnotes(value.content, value.items)
+            subnote = self.bibliography_subnotes(value.content, value.items)
         elif value.jsonmodel_type == "note_index":
             subnote = self.index_subnotes(value.content, value.items)
         elif value.jsonmodel_type == "note_chronology":
@@ -414,14 +414,14 @@ class SourceNoteToNote(odin.Mapping):
             subnotes = self.index_subnotes(
                 self.source.content, self.source.items)
         elif self.source.jsonmodel_type == "note_bibliography":
-            subnotes = self.bibliograpy_subnotes(
+            subnotes = self.bibliography_subnotes(
                 self.source.content, self.source.items)
         elif self.source.jsonmodel_type == "note_chronology":
             subnotes = self.chronology_subnotes(self.source.items)
 
         return subnotes
 
-    def bibliograpy_subnotes(self, raw_content, items):
+    def bibliography_subnotes(self, raw_content, items):
         data = []
         # Here content is a list passed as a string, so we have to reconvert.
         content = [raw_content.strip("][\'")]

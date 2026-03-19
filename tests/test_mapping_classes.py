@@ -231,7 +231,7 @@ class SourceNoteToNoteTests(BaseTestCase):
             "jsonmodel_type": "note_bibliography",
             "items": [{"1": "1"}, {"2": "2"}],
             "content": ["note content"]})
-        self.mapping.bibliograpy_subnotes = mock_bibliography
+        self.mapping.bibliography_subnotes = mock_bibliography
         self.assertEqual(self.mapping.map_subnotes(value), "foo")
         mock_bibliography.assert_called_once_with(['note content'], [{'1': '1'}, {'2': '2'}])
 
@@ -288,7 +288,7 @@ class SourceNoteToNoteTests(BaseTestCase):
             "jsonmodel_type": "note_bibliography",
             "items": [1, 2, 3],
             "content": ["note content"]})
-        self.mapping.bibliograpy_subnotes = mock_bibliography
+        self.mapping.bibliography_subnotes = mock_bibliography
         self.assertEqual(self.mapping.subnotes(None), "foo")
         mock_bibliography.assert_called_once_with(["note content"], [1, 2, 3])
 
@@ -303,7 +303,7 @@ class SourceNoteToNoteTests(BaseTestCase):
     @patch('src.mappings.strip_tags')
     def test_bibliography_subnotes(self, mock_strip):
         mock_strip.return_value = "foo"
-        output = self.mapping.bibliograpy_subnotes("[\"This is a subnote\"]", None)
+        output = self.mapping.bibliography_subnotes("[\"This is a subnote\"]", None)
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [
@@ -312,7 +312,7 @@ class SourceNoteToNoteTests(BaseTestCase):
             ])
         mock_strip.assert_called_once_with('"This is a subnote"')
 
-        output = self.mapping.bibliograpy_subnotes("[\"This is a subnote\"]", [{"1": "1"}])
+        output = self.mapping.bibliography_subnotes("[\"This is a subnote\"]", [{"1": "1"}])
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
             [
