@@ -1,0 +1,136 @@
+{
+    "agent_contacts": [
+        {
+            "address_1": "30 Rockefeller Plaza, Mezzanine Level Room 53 49th Street Side",
+            "address_2": "Opposite 50th between 5th and 6th ",
+            "city": "New York",
+            "country": "USA",
+            "create_time": "2014-12-06T02:40:38Z",
+            "created_by": "admin",
+            "email": "mstern@rockco.com",
+            "jsonmodel_type": "agent_contact",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "name": "Rockefeller family",
+            "note": "Label: Additional Contacts\nContent: \nElizabeth Haviland \u2013 Assistant to Clayton W. Frye (also LSR Estate)\n30 Rockefeller Plaza, Suite 5600\nEmail: ehaviland@rockco.com\nPhone: 212-649-5651\nFax: 212-649-5841\n\n\nLabel: Family Financial Contact\nContent: \nFely Co: Rockefeller Family Financial \nEmail: fco@rockco.com\n\n\n",
+            "region": "NY",
+            "system_mtime": "2014-12-06T02:40:38Z",
+            "telephones": [
+                {
+                    "create_time": "2014-12-06T02:40:38Z",
+                    "jsonmodel_type": "telephone",
+                    "last_modified_by": "admin",
+                    "number": "(212) 649-5901\t",
+                    "system_mtime": "2014-12-06T02:40:38Z",
+                    "uri": "/telephone/3",
+                    "user_mtime": "2014-12-06T02:40:38Z"
+                }
+            ],
+            "user_mtime": "2014-12-06T02:40:38Z"
+        }
+    ],
+    "agent_type": "agent_family",
+    "create_time": "2014-12-06T02:40:38Z",
+    "created_by": "admin",
+    "dates_of_existence": [],
+    "display_name": {
+        "authorized": true,
+        "create_time": "2014-12-06T02:40:38Z",
+        "created_by": "admin",
+        "family_name": "Rockefeller family",
+        "is_display_name": true,
+        "jsonmodel_type": "name_family",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "rules": "dacs",
+        "sort_name": "Rockefeller family",
+        "sort_name_auto_generate": true,
+        "system_mtime": "2014-12-06T02:40:38Z",
+        "use_dates": [],
+        "user_mtime": "2014-12-06T02:40:38Z"
+    },
+    "external_documents": [],
+    "group": {
+        "creators": [
+            {
+                "ref": "/agents/families/1",
+                "role": "creator",
+                "title": "Rockefeller family",
+                "type": "agent_family"
+            }
+        ],
+        "dates": [],
+        "identifier": "/agents/families/1",
+        "title": "Rockefeller family"
+    },
+    "is_linked_to_published_record": true,
+    "jsonmodel_type": "agent_family",
+    "last_modified_by": "admin",
+    "linked_agent_roles": [
+        "creator",
+        "source",
+        "subject"
+    ],
+    "lock_version": 1101,
+    "names": [
+        {
+            "authorized": true,
+            "create_time": "2014-12-06T02:40:38Z",
+            "created_by": "admin",
+            "family_name": "Rockefeller family",
+            "is_display_name": true,
+            "jsonmodel_type": "name_family",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "rules": "dacs",
+            "sort_name": "Rockefeller family",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:40:38Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:40:38Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:40:38Z",
+            "created_by": "admin",
+            "family_name": "R family",
+            "is_display_name": false,
+            "jsonmodel_type": "name_family",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "sort_name": "R family",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:40:38Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:40:38Z"
+        },
+        {
+            "authorized": false,
+            "create_time": "2014-12-06T02:40:38Z",
+            "created_by": "admin",
+            "family_name": "RFAM",
+            "is_display_name": false,
+            "jsonmodel_type": "name_family",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "sort_name": "RFAM",
+            "sort_name_auto_generate": true,
+            "system_mtime": "2014-12-06T02:40:38Z",
+            "use_dates": [],
+            "user_mtime": "2014-12-06T02:40:38Z"
+        }
+    ],
+    "notes": [],
+    "publish": true,
+    "related_agents": [],
+    "system_mtime": "2019-03-21T19:54:01Z",
+    "title": "Rockefeller family",
+    "uri": "/agents/families/1",
+    "used_within_published_repositories": [
+        "/repositories/2"
+    ],
+    "used_within_repositories": [
+        "/repositories/2"
+    ],
+    "user_mtime": "2014-12-06T02:40:38Z"
+}
