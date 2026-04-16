@@ -141,8 +141,7 @@ class Transformer:
         is_valid(data, object_schema, base_schema)
 
     def send_success_message(self, transformed, object_type):
-        client = get_client_with_role('sns', getenv(
-            'AWS_REGION'), self.config['SNS_ROLE_ARN'])
+        client = get_client_with_role('sns', getenv('AWS_REGION'), getenv('SNS_ROLE_ARN'))
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
             MessageGroupId=f'{self.service_name}-{transformed["identifier"]}',
@@ -169,8 +168,7 @@ class Transformer:
             })
 
     def send_error_message(self, exception, object_type, object_id):
-        client = get_client_with_role('sns', getenv(
-            'AWS_REGION'), self.config['SNS_ROLE_ARN'])
+        client = get_client_with_role('sns', getenv('AWS_REGION'), getenv('SNS_ROLE_ARN'))
         tb = ''.join(traceback.format_exception(exception)[:-1])
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
