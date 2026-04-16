@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from os import getenv
 from pathlib import Path
@@ -19,7 +20,6 @@ DEFAULT_CONFIG = {
     "SCHEMA_COLLECTION": "collection.json",
     "SCHEMA_OBJECT": "object.json",
     "SCHEMA_TERM": "term.json",
-    "SNS_ROLE_ARN": "rn:aws:iam::123456789:role/sns-role",
     "SNS_TOPIC_ARN": "arn:aws:sns:us-east-1:000000000000:success",
     "ASSET_BASEURL": "https://assets.example.org",
     "DOWNLOAD_BASEURL": "https://downloads.example.org/files",
@@ -238,8 +238,14 @@ class TransformerSNSTests(unittest.TestCase):
         return queue
 
     @mock_aws
-    def test_send_success_message(self):
+    @patch.dict(os.environ, {
+        "AWS_REGION": "us-east-1",
+        "SNS_ROLE_ARN": f"arn:aws:iam::{DEFAULT_ACCOUNT_ID}:role/test-sns-role",
+    }, clear=False)
+    @patch('src.transformer.get_client_with_role')
+    def test_send_success_message(self, mock_get_client_with_role):
         queue = self.set_up_sns()
+        mock_get_client_with_role.return_value = boto3.client('sns', region_name=getenv('AWS_REGION'))
         self.transformer.send_success_message(
             {"identifier": "12345"}, 'collection')
         messages = queue.receive_messages(MaxNumberOfMessages=1)
@@ -265,8 +271,14 @@ class TransformerSNSTests(unittest.TestCase):
             }})
 
     @mock_aws
-    def test_send_error_message(self):
+    @patch.dict(os.environ, {
+        "AWS_REGION": "us-east-1",
+        "SNS_ROLE_ARN": f"arn:aws:iam::{DEFAULT_ACCOUNT_ID}:role/test-sns-role",
+    }, clear=False)
+    @patch('src.transformer.get_client_with_role')
+    def test_send_error_message(self, mock_get_client_with_role):
         queue = self.set_up_sns()
+        mock_get_client_with_role.return_value = boto3.client('sns', region_name=getenv('AWS_REGION'))
         self.transformer.send_error_message(
             Exception('foo'), 'object', '12345')
         messages = queue.receive_messages(MaxNumberOfMessages=1)
