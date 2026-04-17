@@ -1,0 +1,25 @@
+[
+    {
+        "create_time": "2020-09-21T17:01:58Z",
+        "created_by": "admin",
+        "instance_type": "mixed materials",
+        "is_representative": false,
+        "jsonmodel_type": "instance",
+        "last_modified_by": "admin",
+        "lock_version": 0,
+        "sub_container": {
+            "create_time": "2020-09-21T17:01:58Z",
+            "created_by": "admin",
+            "jsonmodel_type": "sub_container",
+            "last_modified_by": "admin",
+            "lock_version": 0,
+            "system_mtime": "2020-09-21T17:01:58Z",
+            "top_container": {
+                "ref": "/repositories/101/top_containers/99"
+            },
+            "user_mtime": "2020-09-21T17:01:58Z"
+        },
+        "system_mtime": "2020-09-21T17:01:58Z",
+        "user_mtime": "2020-09-21T17:01:58Z"
+    }
+]

@@ -1,0 +1,12 @@
+*.DS_Store
+.archivessnake.yml
+*.pickle
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media
+.pytest_cache/
+.tox/
+.coverage
