@@ -1,8 +1,0 @@
-aws_assume_role_lib~=1.1
-boto3~=1.42
-jsonschema~=4.23
-odin~=2.0
-requests~=2.32
-pycountry~=26.2
-rac_schema_validator~=1.0
-shortuuid~=1.0
