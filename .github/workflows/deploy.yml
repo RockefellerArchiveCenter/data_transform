@@ -14,7 +14,7 @@ jobs:
 
     env:
       LAMBDA_NAME: data_transform
-      LAMBDA_HANDLER_CODE: src/transformers.py
+      LAMBDA_HANDLER_CODE: src/transformer.py
       BASENAME: transformers.py
 
     steps:
@@ -23,19 +23,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Export secrets to environment variables
-        uses: oNaiPs/secrets-to-env-action@v1.7
-        with:
-          secrets: ${{ toJSON(secrets) }}
+      - name: Install requirements
+        run: |
+            mkdir package
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt --target ./package
+            cd package
+            zip -r ../${LAMBDA_NAME}.zip .
+            cd ..
 
       - name: Make zip file
         run: |
-          rm -rf package
-          mkdir -p package/schemas
-          cp "${{ env.LAMBDA_HANDLER_CODE }}" "package/${{ env.BASENAME }}"
+          cp ${{ env.LAMBDA_HANDLER_CODE }} ${{ env.BASENAME }}
+          mkdir package/schemas
           cp -R rac_schemas/schemas/. package/schemas/
-          cd package
-          zip -r "../${{ env.LAMBDA_NAME }}.zip" .
+          zip ${{ env.LAMBDA_NAME }}.zip ${{ env.BASENAME }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5.1.1
@@ -48,9 +50,9 @@ jobs:
           role-duration-seconds: 900
 
       - name: Upload file to S3
-        run: aws s3 cp $LAMBDA_NAME.zip s3://$LAMBDA_BUCKET_NAME/$LAMBDA_NAME.zip
+        run: aws s3 cp ${{ env.LAMBDA_NAME }}.zip s3://${{ secrets.LAMBDA_BUCKET_NAME }}/${{ env.LAMBDA_NAME }}.zip
 
       - name: Deploy lambda package
         run: aws lambda update-function-code
-          --function-name arn:aws:lambda:$AWS_REGION:${{ secrets.AWS_ACCOUNT_ID }}:function:$LAMBDA_NAME
-          --zip-file fileb://$LAMBDA_NAME.zip
+          --function-name arn:aws:lambda:${{ secrets.AWS_REGION }}:${{ secrets.AWS_LAMBDA_ACCOUNT_ID }}:function:${{ env.LAMBDA_NAME }}
+          --zip-file fileb://${{ env.LAMBDA_NAME }}.zip
