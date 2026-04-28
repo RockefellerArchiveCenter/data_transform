@@ -67,7 +67,6 @@ class TransformerMethodTests(unittest.TestCase):
         mock_config.assert_called_once_with(
             getenv('ENVIRONMENT'),
             getenv('AWS_REGION'),
-            getenv('AWS_SSM_ROLE_ARN'),
             self.transformer.service_name)
 
     @patch('src.transformer.Transformer.get_mapping_classes')
@@ -240,12 +239,9 @@ class TransformerSNSTests(unittest.TestCase):
     @mock_aws
     @patch.dict(os.environ, {
         "AWS_REGION": "us-east-1",
-        "SNS_ROLE_ARN": f"arn:aws:iam::{DEFAULT_ACCOUNT_ID}:role/test-sns-role",
     }, clear=False)
-    @patch('src.transformer.get_client_with_role')
-    def test_send_success_message(self, mock_get_client_with_role):
+    def test_send_success_message(self):
         queue = self.set_up_sns()
-        mock_get_client_with_role.return_value = boto3.client('sns', region_name=getenv('AWS_REGION'))
         self.transformer.send_success_message(
             {"identifier": "12345"}, 'collection')
         messages = queue.receive_messages(MaxNumberOfMessages=1)
@@ -273,12 +269,9 @@ class TransformerSNSTests(unittest.TestCase):
     @mock_aws
     @patch.dict(os.environ, {
         "AWS_REGION": "us-east-1",
-        "SNS_ROLE_ARN": f"arn:aws:iam::{DEFAULT_ACCOUNT_ID}:role/test-sns-role",
     }, clear=False)
-    @patch('src.transformer.get_client_with_role')
-    def test_send_error_message(self, mock_get_client_with_role):
+    def test_send_error_message(self):
         queue = self.set_up_sns()
-        mock_get_client_with_role.return_value = boto3.client('sns', region_name=getenv('AWS_REGION'))
         self.transformer.send_error_message(
             Exception('foo'), 'object', '12345')
         messages = queue.receive_messages(MaxNumberOfMessages=1)

@@ -5,7 +5,6 @@ from os import getenv
 from pathlib import Path
 
 import boto3
-from aws_assume_role_lib import assume_role
 from odin.codecs import json_codec
 from rac_schema_validator import is_valid
 
@@ -20,19 +19,12 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceResource, SourceSubject)
 
 
-def get_client_with_role(resource, aws_region, role_arn):
-    """Gets Boto3 client which authenticates with a specific IAM role."""
-    session = boto3.Session(region_name=aws_region)
-    assumed_role_session = assume_role(session, role_arn)
-    return assumed_role_session.client(resource)
-
-
-def get_config(environment, aws_region, ssm_role_arn, service_name):
+def get_config(environment, aws_region, service_name):
     """Fetch config values from SSM Parameter Store by path."""
     ssm_parameter_path = f"/{environment}/{service_name}"
     configuration = {}
 
-    ssm_client = get_client_with_role("ssm", aws_region, ssm_role_arn)
+    ssm_client = boto3.client("ssm", region_name=aws_region)
     try:
         paginator = ssm_client.get_paginator("get_parameters_by_path")
         for page in paginator.paginate(
@@ -55,7 +47,6 @@ class Transformer:
         self.config = get_config(
             getenv('ENVIRONMENT'),
             getenv('AWS_REGION'),
-            getenv('AWS_SSM_ROLE_ARN'),
             self.service_name)
 
     def output_object_type(self, input_object_type):
@@ -141,7 +132,7 @@ class Transformer:
         is_valid(data, object_schema, base_schema)
 
     def send_success_message(self, transformed, object_type):
-        client = get_client_with_role('sns', getenv('AWS_REGION'), getenv('SNS_ROLE_ARN'))
+        client = boto3.client('sns', region_name=getenv('AWS_REGION'))
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
             MessageGroupId=f'{self.service_name}-{transformed["identifier"]}',
@@ -168,7 +159,7 @@ class Transformer:
             })
 
     def send_error_message(self, exception, object_type, object_id):
-        client = get_client_with_role('sns', getenv('AWS_REGION'), getenv('SNS_ROLE_ARN'))
+        client = boto3.client('sns', region_name=getenv('AWS_REGION'))
         tb = ''.join(traceback.format_exception(exception)[:-1])
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
