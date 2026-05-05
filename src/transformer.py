@@ -135,9 +135,9 @@ class Transformer:
         client = boto3.client('sns', region_name=getenv('AWS_REGION'))
         client.publish(
             TopicArn=self.config['SNS_TOPIC_ARN'],
-            MessageGroupId=f'{self.service_name}-{transformed["identifier"]}',
+            MessageGroupId=f'{self.service_name}-{transformed["uri"]}',
             MessageDeduplicationId=f'{
-                self.service_name}-{transformed["identifier"]}-transform',
+                self.service_name}-{transformed["uri"]}-transform',
             Message=json.dumps(transformed),
             MessageAttributes={
                 'service': {
@@ -150,7 +150,7 @@ class Transformer:
                 },
                 'es_id': {
                     'DataType': 'String',
-                    'StringValue': transformed['identifier'],
+                    'StringValue': transformed['uri'],
                 },
                 'object_type': {
                     'DataType': 'String',
