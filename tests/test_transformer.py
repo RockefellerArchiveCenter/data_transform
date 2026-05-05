@@ -237,16 +237,14 @@ class TransformerSNSTests(unittest.TestCase):
         return queue
 
     @mock_aws
-    @patch.dict(os.environ, {
-        "AWS_REGION": "us-east-1",
-    }, clear=False)
+    @patch.dict(os.environ, {"AWS_REGION": "us-east-1"}, clear=False)
     def test_send_success_message(self):
         queue = self.set_up_sns()
         self.transformer.send_success_message(
-            {"identifier": "12345"}, 'collection')
+            {"uri": "12345"}, 'collection')
         messages = queue.receive_messages(MaxNumberOfMessages=1)
         message_body = json.loads(messages[0].body)
-        self.assertEqual(message_body['Message'], '{"identifier": "12345"}')
+        self.assertEqual(message_body['Message'], '{"uri": "12345"}')
         self.assertEqual(
             message_body['MessageAttributes'],
             {'service': {
@@ -267,9 +265,7 @@ class TransformerSNSTests(unittest.TestCase):
             }})
 
     @mock_aws
-    @patch.dict(os.environ, {
-        "AWS_REGION": "us-east-1",
-    }, clear=False)
+    @patch.dict(os.environ, {"AWS_REGION": "us-east-1"}, clear=False)
     def test_send_error_message(self):
         queue = self.set_up_sns()
         self.transformer.send_error_message(

@@ -150,7 +150,7 @@ class Transformer:
                 },
                 'es_id': {
                     'DataType': 'String',
-                    'StringValue': transformed['identifier'],
+                    'StringValue': transformed['uri'],
                 },
                 'object_type': {
                     'DataType': 'String',
