@@ -35,7 +35,7 @@ jobs:
       - name: Make zip file
         run: |
           zip -r ${{ env.LAMBDA_NAME }}.zip rac_schemas/schemas/
-          zip ${{ env.LAMBDA_NAME }}.zip ${{ env.LAMBDA_HANDLER_CODE_DIR }}
+          zip -r ${{ env.LAMBDA_NAME }}.zip ${{ env.LAMBDA_HANDLER_CODE_DIR }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5.1.1
