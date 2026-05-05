@@ -154,7 +154,7 @@ class Transformer:
                 },
                 'object_type': {
                     'DataType': 'String',
-                    'StringValue': object_type,
+                    'StringValue': self.output_object_type(object_type),
                 }
             })
 

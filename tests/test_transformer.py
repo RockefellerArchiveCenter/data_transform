@@ -241,7 +241,7 @@ class TransformerSNSTests(unittest.TestCase):
     def test_send_success_message(self):
         queue = self.set_up_sns()
         self.transformer.send_success_message(
-            {"uri": "12345"}, 'collection')
+            {"uri": "12345"}, 'resource')
         messages = queue.receive_messages(MaxNumberOfMessages=1)
         message_body = json.loads(messages[0].body)
         self.assertEqual(message_body['Message'], '{"uri": "12345"}')
