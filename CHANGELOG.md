@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.1](https://github.com/RockefellerArchiveCenter/data_transform/compare/v1.0.0...v1.0.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* **deps:** Scheduled dependency updates ([a311b21](https://github.com/RockefellerArchiveCenter/data_transform/commit/a311b21aea9c4fcbbeb03eb1e6847a06739807bc))
+* **deps:** Scheduled dependency updates ([a311b21](https://github.com/RockefellerArchiveCenter/data_transform/commit/a311b21aea9c4fcbbeb03eb1e6847a06739807bc))
+* **deps:** Scheduled dependency updates ([a582913](https://github.com/RockefellerArchiveCenter/data_transform/commit/a582913777aa3f30582117c40b89927268243eea))
+* **deps:** Scheduled dependency updates ([a582913](https://github.com/RockefellerArchiveCenter/data_transform/commit/a582913777aa3f30582117c40b89927268243eea))
+* **deps:** Scheduled dependency updates ([757e933](https://github.com/RockefellerArchiveCenter/data_transform/commit/757e93353baaa12e8778183eb16eced5b80cb0b9))
+
 ## 1.0.0 (2026-06-18)
 
 
