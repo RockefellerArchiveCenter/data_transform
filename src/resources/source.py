@@ -65,10 +65,17 @@ class SourceStructuredDate(odin.Resource):
     structured_date_range = odin.DictAs(SourceStructuredDateRange, null=True)
 
 
+class SourceDigitalObjectFileVersion(odin.Resource):
+    """A file version for digital objects."""
+    use_statement = odin.StringField(choices=configs.FILE_VERSION_USE_STATEMENT_CHOICES)
+
+
 class SourceDigitalObject(odin.Resource):
+    """A digital representation of an archival object."""
     title = odin.StringField()
     digital_object_id = odin.StringField()
     publish = odin.BooleanField()
+    file_versions = odin.ListOf(SourceDigitalObjectFileVersion, null=True)
 
 
 class SourceExtent(odin.Resource):

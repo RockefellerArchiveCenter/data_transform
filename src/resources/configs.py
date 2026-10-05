@@ -509,3 +509,9 @@ TERM_TYPE_CHOICES = (
     ('temporal', 'Temporal'),
     ('topical', 'Topical'),
 )
+
+FILE_VERSION_USE_STATEMENT_CHOICES = (
+    ('aip', 'aip'),
+    ('download', 'download'),
+    ('iiif-manifest', 'iiif-manifest'),
+)
