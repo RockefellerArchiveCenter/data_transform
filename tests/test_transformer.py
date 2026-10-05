@@ -185,6 +185,23 @@ class TransformerMethodTests(unittest.TestCase):
         self.assertEqual(cleaned["lst"][0], "a")
         self.assertEqual(cleaned["lst"][1], {"c": 4})
 
+    def test_remove_keys_from_dict_removes_null_values(self):
+        payload = {
+            "uri": "/x/1",
+            "null": None,
+            "nested": {"keep": 1, "items": [{"a": 1}, {"b": None}]},
+            "lst": ["a", {"c": None}],
+        }
+        cleaned = self.transformer.remove_keys_from_dict(
+            payload, target_key="$")
+        self.assertEqual(
+            cleaned,
+            {
+                "uri": "/x/1",
+                "nested": {"keep": 1, "items": [{"a": 1}, {}]},
+                "lst": ["a", {}],
+            })
+
     @patch('src.transformer.is_valid')
     def test_validate_transformed(self, mock_is_valid):
         schema_name = 'agent.json'
