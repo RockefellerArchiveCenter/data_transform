@@ -92,11 +92,11 @@ class TransformerMethodTests(unittest.TestCase):
         mock_online_pending.return_value = False
         mock_validate.return_value = True
 
-        self.transformer.run('agent_person', {})
+        self.transformer.run('agent_person', {"uri": "54321"})
 
         mock_mapping.assert_called_once_with('agent_person')
         mock_get_transformed.assert_called_once_with(
-            {}, SourceAgentPerson, SourceAgentPersonToAgent)
+            {"uri": "54321"}, SourceAgentPerson, SourceAgentPersonToAgent)
         mock_validate.assert_called_once_with(
             transformed_object, self.transformer.config['SCHEMA_AGENT'])
         mock_success_message.assert_called_once_with(
@@ -184,6 +184,23 @@ class TransformerMethodTests(unittest.TestCase):
         self.assertEqual(cleaned["nested"]["items"][1], {"b": 3})
         self.assertEqual(cleaned["lst"][0], "a")
         self.assertEqual(cleaned["lst"][1], {"c": 4})
+
+    def test_remove_keys_from_dict_removes_null_values(self):
+        payload = {
+            "uri": "/x/1",
+            "null": None,
+            "nested": {"keep": 1, "items": [{"a": 1}, {"b": None}]},
+            "lst": ["a", {"c": None}],
+        }
+        cleaned = self.transformer.remove_keys_from_dict(
+            payload, target_key="$")
+        self.assertEqual(
+            cleaned,
+            {
+                "uri": "/x/1",
+                "nested": {"keep": 1, "items": [{"a": 1}, {}]},
+                "lst": ["a", {}],
+            })
 
     @patch('src.transformer.is_valid')
     def test_validate_transformed(self, mock_is_valid):

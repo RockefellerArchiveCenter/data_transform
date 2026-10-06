@@ -672,27 +672,65 @@ class SourceArchivalObjectToObjectTests(BaseTestCase):
     @patch('src.mappings.generate_download_identifier')
     @patch('src.mappings.generate_manifest_identifier')
     def test_files(self, mock_manifest_id, mock_download_id):
+        # TODO add tests for file versions
         mock_manifest_id.return_value = "manifest_id"
         mock_download_id.return_value = "download_id"
         self.mapping.source = RecursiveNamespace.from_obj({})
         self.mapping.context = "https://context.org"
         output = self.mapping.files([
-            RecursiveNamespace.from_obj({"digital_object": {"title": "digital object title", "publish": True}}),
-            RecursiveNamespace.from_obj({"digital_object": {"title": "digital object title", "publish": False}}),
-            RecursiveNamespace.from_obj({"digital_object": None})])
+            RecursiveNamespace.from_obj({
+                "digital_object": {
+                    "title": "digital object title",
+                    "publish": True,
+                    "file_versions": [
+                        RecursiveNamespace.from_obj({"use_statement": "download"}),
+                        RecursiveNamespace.from_obj({"use_statement": "iiif-manifest"})
+                    ]}}),
+            RecursiveNamespace.from_obj({
+                "digital_object": {
+                    "title": "digital object title",
+                    "publish": True,
+                    "file_versions": [
+                        RecursiveNamespace.from_obj({"use_statement": "download"})]}}),
+            RecursiveNamespace.from_obj({
+                "digital_object": {
+                    "title": "digital object title",
+                    "publish": True,
+                    "file_versions": [
+                        RecursiveNamespace.from_obj({"use_statement": "aip"})]}}),
+            RecursiveNamespace.from_obj({
+                "digital_object": {
+                    "title": "digital object title",
+                    "publish": False,
+                    "file_versions": []}}),
+            RecursiveNamespace.from_obj({"digital_object": None})
+        ])
         self.assertEqual(
             json.loads(json_codec.dumps(output)),
-            [{
-                'title': 'digital object title',
-                'download': 'download_id',
-                'manifest': 'manifest_id',
-                '$': 'src.resources.rac.FileObject'
-            }])
+            [
+                {
+                    "$": "src.resources.rac.FileObject",
+                    "title": "digital object title",
+                    "download": "download_id",
+                    "manifest": "manifest_id"
+                },
+                {
+                    "$": "src.resources.rac.FileObject",
+                    "title": "digital object title",
+                    "download": "download_id",
+                    "manifest": None
+                }
+            ])
 
-        mock_download_id.assert_called_once_with(
-            {}, {"title": "digital object title", "publish": True}, "https://context.org")
+        mock_download_id.assert_has_calls([
+            call({}, {'title': 'digital object title', 'publish': True, 'file_versions': [
+                 {'use_statement': 'download'}, {'use_statement': 'iiif-manifest'}]}, 'https://context.org'),
+            call({}, {'title': 'digital object title', 'publish': True, 'file_versions': [{'use_statement': 'download'}]}, 'https://context.org')
+        ])
         mock_manifest_id.assert_called_once_with(
-            {}, {"title": "digital object title", "publish": True}, "https://context.org")
+            {}, {'title': 'digital object title', 'publish': True, 'file_versions': [
+                {'use_statement': 'download'}, {'use_statement': 'iiif-manifest'}]}, 'https://context.org'
+        )
 
     @patch('src.mappings.transform_group')
     def test_group(self, mock_group):
