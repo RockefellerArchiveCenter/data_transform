@@ -1,6 +1,8 @@
 import json
+import logging
 import re
 import xml.etree.ElementTree as ET
+from os import getenv
 
 import odin
 import pycountry
@@ -18,6 +20,9 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceGroup, SourceLinkedAgent, SourceNote,
                                SourceRef, SourceResource, SourceStructuredDate,
                                SourceSubject)
+
+logger = logging.getLogger()
+logger.setLevel(getenv('LOGGING_LEVEL', logging.INFO))
 
 
 def identifier_from_uri(uri):
@@ -71,7 +76,8 @@ def has_online_asset(identifier, config):
     try:
         req = requests.head(f"{config['ASSET_BASEURL'].rstrip('/')}/pdfs/{identifier}")
         return req.status_code == 200
-    except Exception:
+    except Exception as e:
+        logging.info(e)
         return False
 
 
