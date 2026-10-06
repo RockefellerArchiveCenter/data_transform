@@ -92,11 +92,11 @@ class TransformerMethodTests(unittest.TestCase):
         mock_online_pending.return_value = False
         mock_validate.return_value = True
 
-        self.transformer.run('agent_person', {})
+        self.transformer.run('agent_person', {"uri": "54321"})
 
         mock_mapping.assert_called_once_with('agent_person')
         mock_get_transformed.assert_called_once_with(
-            {}, SourceAgentPerson, SourceAgentPersonToAgent)
+            {"uri": "54321"}, SourceAgentPerson, SourceAgentPersonToAgent)
         mock_validate.assert_called_once_with(
             transformed_object, self.transformer.config['SCHEMA_AGENT'])
         mock_success_message.assert_called_once_with(

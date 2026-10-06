@@ -18,6 +18,9 @@ from .resources.source import (SourceAgentCorporateEntity, SourceAgentFamily,
                                SourceAgentPerson, SourceArchivalObject,
                                SourceResource, SourceSubject)
 
+logger = logging.getLogger()
+logger.setLevel(getenv('LOGGING_LEVEL', logging.INFO))
+
 
 def get_config(environment, aws_region, service_name):
     """Fetch config values from SSM Parameter Store by path."""
@@ -194,17 +197,23 @@ class Transformer:
             })
 
     def run(self, object_type, data):
+        logging.debug(f"Running transform for {object_type} {data['uri']}")
         try:
             from_resource, mapping, schema_name = self.get_mapping_classes(
                 object_type)
             transformed = self.get_transformed_object(
                 data, from_resource, mapping)
+            logging.debug(f"Object {data['uri']} transformed")
             transformed['online_pending'] = self.get_online_pending(
                 data.get("instances", []),
                 transformed.get("online", False))
+            logging.debug(f"Online pending set for object {data['uri']}")
             self.validate_transformed(transformed, schema_name)
+            logging.debug(f"Transformed object {data['uri']} validated")
             self.send_success_message(transformed, object_type)
+            logging.info(f"Transformation for {object_type} {data['uri']} complete")
         except Exception as e:
+            logging.error(e)
             self.send_error_message(
                 e, object_type, identifier_from_uri(
                     data['uri']))
@@ -212,6 +221,7 @@ class Transformer:
 
 def lambda_handler(event, context):
     """Process SQS batch."""
+    logger.info("Message batch received.")
 
     transformer = Transformer()
 
