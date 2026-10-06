@@ -75,7 +75,7 @@ class SourceDigitalObject(odin.Resource):
     title = odin.StringField()
     digital_object_id = odin.StringField()
     publish = odin.BooleanField()
-    file_versions = odin.ListOf(SourceDigitalObjectFileVersion, null=True)
+    file_versions = odin.ListOf(SourceDigitalObjectFileVersion)
 
 
 class SourceExtent(odin.Resource):
