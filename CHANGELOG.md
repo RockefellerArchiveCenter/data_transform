@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.5](https://github.com/RockefellerArchiveCenter/data_transform/compare/v1.0.4...v1.0.5) (2026-10-06)
+
+
+### Bug Fixes
+
+* improve application logging ([137a5b0](https://github.com/RockefellerArchiveCenter/data_transform/commit/137a5b0d8ab940db566760c2869edb75440a42d3))
+* Support digital objects with no IIIF manifest ([ee40f87](https://github.com/RockefellerArchiveCenter/data_transform/commit/ee40f8734b0f4402adf247c7424c76c5ffef2107))
+* Supports mapping digital objects with no IIIF Manifest ([6abc429](https://github.com/RockefellerArchiveCenter/data_transform/commit/6abc42967544851856dc45192ac190ecd2a73066))
+
 ## [1.0.4](https://github.com/RockefellerArchiveCenter/data_transform/compare/v1.0.3...v1.0.4) (2026-10-05)
 
 
