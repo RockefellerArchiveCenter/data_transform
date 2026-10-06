@@ -68,8 +68,11 @@ def convert_dates(value):
 def has_online_asset(identifier, config):
     if not config.get('ASSET_BASEURL'):
         return False
-    req = requests.head(f"{config['ASSET_BASEURL'].rstrip('/')}/pdfs/{identifier}")
-    return req.status_code == 200
+    try:
+        req = requests.head(f"{config['ASSET_BASEURL'].rstrip('/')}/pdfs/{identifier}")
+        return req.status_code == 200
+    except Exception:
+        return False
 
 
 def has_online_instance(instances, uri, config):
