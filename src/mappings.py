@@ -653,21 +653,20 @@ class SourceArchivalObjectToObject(odin.Mapping):
         files = []
         for instance in value:
             if instance.digital_object and instance.digital_object.publish:
-                files.append(
-                    FileObject(
-                        title=instance.digital_object.title,
-                        download=generate_download_identifier(
-                            self.source.to_dict(),
-                            instance.digital_object.to_dict(),
-                            self.context
-                        ),
-                        manifest=generate_manifest_identifier(
-                            self.source.to_dict(),
-                            instance.digital_object.to_dict(),
-                            self.context
-                        )
+                file_object = FileObject(title=instance.digital_object.title)
+                if any([f.use_statement == 'download' for f in instance.digital_object.file_versions]):
+                    file_object.download = generate_download_identifier(
+                        self.source.to_dict(),
+                        instance.digital_object.to_dict(),
+                        self.context
                     )
-                )
+                if any([f.use_statement == 'iiif-manifest' for f in instance.digital_object.file_versions]):
+                    file_object.manifest = generate_manifest_identifier(
+                        self.source.to_dict(),
+                        instance.digital_object.to_dict(),
+                        self.context)
+                if any([file_object.download, file_object.manifest]):
+                    files.append(file_object)
         return files
 
     @odin.map_field(from_field="group", to_field="group")

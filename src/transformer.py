@@ -103,7 +103,7 @@ class Transformer:
         modified_dict = {}
         if hasattr(data, "items"):
             for key, value in data.items():
-                if key != target_key:
+                if (value is not None and key != target_key):
                     if isinstance(value, dict):
                         modified_dict[key] = self.remove_keys_from_dict(
                             value, target_key=target_key)
