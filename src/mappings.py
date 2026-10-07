@@ -6,7 +6,6 @@ from os import getenv
 
 import odin
 import pycountry
-import requests
 import shortuuid
 
 from .resources.configs import NOTE_TYPE_CHOICES, NOTE_TYPE_CHOICES_TRANSFORM
@@ -70,28 +69,18 @@ def convert_dates(value):
         )
 
 
-def has_online_asset(identifier, config):
-    if not config.get('ASSET_BASEURL'):
-        return False
-    try:
-        req = requests.head(f"{config['ASSET_BASEURL'].rstrip('/')}/pdfs/{identifier}")
-        return req.status_code == 200
-    except Exception as e:
-        logging.info(e)
-        return False
-
-
-def has_online_instance(instances, uri, config):
+def has_online_instance(instances):
     """Checks to see if there are digital objects."""
     try:
         digital_instances = [
             v for v in instances if v.instance_type == "digital_object"]
+        published_instances = [v for v in digital_instances if v.digital_object.publish is True]
     except AttributeError:
         digital_instances = [
             v for v in instances if v["instance_type"] == "digital_object"]
-    if len(digital_instances):
-        if has_online_asset(identifier_from_uri(uri), config):
-            return True
+        published_instances = [v for v in digital_instances if v["digital_object"]["publish"] is True]
+    if len(published_instances):
+        return True
     return False
 
 
@@ -585,7 +574,7 @@ class SourceArchivalObjectToCollection(odin.Mapping):
 
     @odin.map_field(from_field="instances", to_field="online")
     def online(self, value):
-        return has_online_instance(value, self.source.uri, self.context)
+        return has_online_instance(value)
 
     @odin.map_field(from_field="group", to_field="group")
     def group(self, value):
@@ -655,7 +644,7 @@ class SourceArchivalObjectToObject(odin.Mapping):
 
     @odin.map_field(from_field="instances", to_field="online")
     def online(self, value):
-        return has_online_instance(value, self.source.uri, self.context)
+        return has_online_instance(value)
 
     @odin.map_field(from_field="instances", to_field="files", to_list=True)
     def files(self, value):

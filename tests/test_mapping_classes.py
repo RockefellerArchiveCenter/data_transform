@@ -558,7 +558,7 @@ class SourceArchivalObjectToCollectionTests(BaseTestCase):
         self.mapping.source = RecursiveNamespace.from_obj({"uri": "uri"})
         self.mapping.context = None
         self.assertFalse(self.mapping.online("value"))
-        mock_online_instance.assert_called_once_with("value", "uri", None)
+        mock_online_instance.assert_called_once_with("value")
 
     @patch('src.mappings.transform_group')
     def test_group(self, mock_group):
@@ -667,7 +667,7 @@ class SourceArchivalObjectToObjectTests(BaseTestCase):
         self.mapping.source = RecursiveNamespace.from_obj({"uri": "uri"})
         self.mapping.context = None
         self.assertFalse(self.mapping.online("value"))
-        mock_online_instance.assert_called_once_with("value", "uri", None)
+        mock_online_instance.assert_called_once_with("value")
 
     @patch('src.mappings.generate_download_identifier')
     @patch('src.mappings.generate_manifest_identifier')
