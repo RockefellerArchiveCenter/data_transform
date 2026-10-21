@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.6](https://github.com/RockefellerArchiveCenter/data_transform/compare/v1.0.5...v1.0.6) (2026-10-21)
+
+
+### Bug Fixes
+
+* update pip ([61bcc5b](https://github.com/RockefellerArchiveCenter/data_transform/commit/61bcc5b7017abc26fa00da932d3684349b36dc69))
+* update pip ([dd00b02](https://github.com/RockefellerArchiveCenter/data_transform/commit/dd00b02fc996a4dca0c124bc8eb510790f2cf61f))
+* update pip and deps ([1254d68](https://github.com/RockefellerArchiveCenter/data_transform/commit/1254d688ea4e4df32fecbb815018b8518ab83903))
+* update pip and deps ([1254d68](https://github.com/RockefellerArchiveCenter/data_transform/commit/1254d688ea4e4df32fecbb815018b8518ab83903))
+* update pip and deps ([61bcc5b](https://github.com/RockefellerArchiveCenter/data_transform/commit/61bcc5b7017abc26fa00da932d3684349b36dc69))
+
 ## [1.0.5](https://github.com/RockefellerArchiveCenter/data_transform/compare/v1.0.4...v1.0.5) (2026-10-06)
 
 
