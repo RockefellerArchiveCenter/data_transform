@@ -4,15 +4,15 @@ attrs==26.1.0
     #   referencing
 aws-assume-role-lib==1.7.0
     # via -r requirements.in
-boto3==1.43.116
+boto3==1.43.123
     # via
     #   -r requirements.in
     #   aws-assume-role-lib
-botocore==1.43.116
+botocore==1.43.123
     # via
     #   boto3
     #   s3transfer
-certifi==2026.10.19
+certifi==2026.10.23
     # via requests
 charset-normalizer==3.5.2
     # via requests
@@ -34,7 +34,7 @@ pycountry==26.2.16
     # via -r requirements.in
 python-dateutil==2.9.0.post0
     # via botocore
-rac-schema-validator==1.1.6
+rac-schema-validator==1.1.7
     # via -r requirements.in
 referencing==0.37.0
     # via
