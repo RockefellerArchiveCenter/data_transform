@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.8](https://github.com/RockefellerArchiveCenter/data_transform/compare/v1.0.7...v1.0.8) (2026-11-03)
+
+
+### Bug Fixes
+
+* removes checking for download asset when setting online flag ([c8d3799](https://github.com/RockefellerArchiveCenter/data_transform/commit/c8d3799d469d2163b8b866d8da518537d643d23f))
+* use the supplied download url rather than constructing it ([705aab5](https://github.com/RockefellerArchiveCenter/data_transform/commit/705aab54a06148281e26f9f627aaefa54d934579))
+
 ## [1.0.7](https://github.com/RockefellerArchiveCenter/data_transform/compare/v1.0.6...v1.0.7) (2026-11-02)
 
 
