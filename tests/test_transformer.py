@@ -71,7 +71,6 @@ class TransformerMethodTests(unittest.TestCase):
 
     @patch('src.transformer.Transformer.get_mapping_classes')
     @patch('src.transformer.Transformer.get_transformed_object')
-    @patch('src.transformer.Transformer.get_online_pending')
     @patch('src.transformer.Transformer.validate_transformed')
     @patch('src.transformer.Transformer.send_success_message')
     @patch('src.transformer.Transformer.send_error_message')
@@ -80,7 +79,6 @@ class TransformerMethodTests(unittest.TestCase):
             mock_error_message,
             mock_success_message,
             mock_validate,
-            mock_online_pending,
             mock_get_transformed,
             mock_mapping):
         transformed_object = {"uri": "12345"}
@@ -89,7 +87,6 @@ class TransformerMethodTests(unittest.TestCase):
             SourceAgentPersonToAgent,
             self.transformer.config['SCHEMA_AGENT'])
         mock_get_transformed.return_value = transformed_object
-        mock_online_pending.return_value = False
         mock_validate.return_value = True
 
         self.transformer.run('agent_person', {"uri": "54321"})
@@ -137,24 +134,6 @@ class TransformerMethodTests(unittest.TestCase):
         # Invalid object type
         with self.assertRaises(KeyError):
             self.transformer.get_mapping_classes("not_a_real_type")
-
-    def test_get_online_pending(self):
-        online_dir = self.fixtures_dir / "online_instance"
-        if not online_dir.exists():
-            self.skipTest(f"Missing fixture directory: {online_dir}")
-
-        cases = [
-            ("no_online_instances.json", False, False),
-            ("online_instance.json", False, True),
-            ("no_online_instances.json", True, False),
-            ("online_instance.json", True, False),
-            ("unpublished_online_instance.json", False, False),
-        ]
-        for fixture, online, expected in cases:
-            fixture_path = online_dir / fixture
-            instances = load_fixture(fixture_path)
-            output = self.transformer.get_online_pending(instances, online)
-            self.assertEqual(output, expected)
 
     @patch('src.mappings.SourceAgentPersonToAgent.apply')
     @patch('src.transformer.Transformer.remove_keys_from_dict')

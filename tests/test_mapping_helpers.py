@@ -1,10 +1,10 @@
 from unittest.mock import patch
 
 from src.mappings import (convert_dates, generate_download_identifier,
-                          generate_manifest_identifier, has_online_asset,
-                          has_online_instance, identifier_from_uri,
-                          language_name, strip_tags, transform_formats,
-                          transform_group, transform_language)
+                          generate_manifest_identifier, has_online_instance,
+                          identifier_from_uri, language_name, strip_tags,
+                          transform_formats, transform_group,
+                          transform_language)
 from tests.test_helpers import RecursiveNamespace
 
 
@@ -48,41 +48,18 @@ def test_strip_tags_xml_and_regex():
     assert strip_tags("a <b>broken") == "a <b>broken"
 
 
-@patch("requests.head")
-def test_has_online_asset(mock_head):
-    mock_head.return_value = RecursiveNamespace.from_obj({"status_code": 200})
-    assert has_online_asset(
-        "abc", {"ASSET_BASEURL": "https://assets.example.org"}
-    ) is True
-    mock_head.assert_called_once_with("https://assets.example.org/pdfs/abc")
-
-    mock_head.reset_mock()
-    mock_head.return_value = RecursiveNamespace.from_obj({"status_code": 404})
-    assert has_online_asset("abc", {}) is False
-    mock_head.assert_not_called()
-
-    mock_head.reset_mock()
-    mock_head.return_value = RecursiveNamespace.from_obj({"status_code": 404})
-    assert has_online_asset("abc", {"ASSET_BASEURL": ""}) is False
-    mock_head.assert_not_called()
-
-
-@patch("src.mappings.has_online_asset")
-def test_has_online_instance(mock_online_asset):
-    mock_online_asset.return_value = True
+def test_has_online_instance():
     instances = [
-        {"instance_type": "digital_object"},
+        {"instance_type": "digital_object", "digital_object": {"publish": True}},
         {"instance_type": "text"},
     ]
-    uri = "/repositories/2/resources/123"
+    assert has_online_instance(instances) is True
 
-    assert has_online_instance(instances, uri, {}) is True
-    mock_online_asset.assert_called_once_with(identifier_from_uri(uri), {})
-
-    mock_online_asset.reset_mock()
-    mock_online_asset.return_value = False
-    assert has_online_instance(instances, uri, {}) is False
-    mock_online_asset.assert_called_once_with(identifier_from_uri(uri), {})
+    instances = [
+        {"instance_type": "digital_object", "digital_object": {"publish": False}},
+        {"instance_type": "text"},
+    ]
+    assert has_online_instance(instances) is False
 
 
 @patch("src.mappings.odin.codecs.json_codec.loads")
