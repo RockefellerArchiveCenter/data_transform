@@ -88,14 +88,6 @@ class Transformer:
         }
         return type_map[object_type]
 
-    def get_online_pending(self, instances, online):
-        published_digital_instances = [
-            v for v in instances
-            if v.get("instance_type") == "digital_object"
-            and v.get("digital_object", {}).get("_resolved", {}).get("publish")
-        ]
-        return bool(len(published_digital_instances) and not online)
-
     def get_transformed_object(self, data, from_resource, mapping):
         from_obj = json_codec.loads(json.dumps(data), resource=from_resource)
         transformed = mapping.apply(from_obj, context=self.config)
@@ -204,10 +196,6 @@ class Transformer:
             transformed = self.get_transformed_object(
                 data, from_resource, mapping)
             logging.debug(f"Object {data['uri']} transformed")
-            transformed['online_pending'] = self.get_online_pending(
-                data.get("instances", []),
-                transformed.get("online", False))
-            logging.debug(f"Online pending set for object {data['uri']}")
             self.validate_transformed(transformed, schema_name)
             logging.debug(f"Transformed object {data['uri']} validated")
             self.send_success_message(transformed, object_type)
